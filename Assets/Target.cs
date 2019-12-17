@@ -18,6 +18,6 @@ public class Target : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = Vector3.Lerp(transform.position, follow.position, 0.01f);
+        transform.position = Vector3.Lerp(transform.position, follow.position, 0.005f);
     }
 }
