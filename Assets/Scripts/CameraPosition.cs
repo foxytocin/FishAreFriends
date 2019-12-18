@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraPosition : MonoBehaviour
 {
@@ -39,7 +37,7 @@ public class CameraPosition : MonoBehaviour
 
         if (targetPosition.position != transform.position)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.15f);
+            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.2f);
         }
 
         transform.LookAt(target);
