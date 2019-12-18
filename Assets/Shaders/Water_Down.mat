@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_Water_Down
+  m_Name: Water_Down
   m_Shader: {fileID: -6465566751694194690, guid: f51dbdffa6707e442b3d8b52c465fb00,
     type: 3}
   m_ShaderKeywords: 
