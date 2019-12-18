@@ -333,6 +333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 852689590}
   - component: {fileID: 852689591}
+  - component: {fileID: 852689592}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -348,7 +349,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852689589}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.89, y: 0, z: 0}
+  m_LocalPosition: {x: 9.42, y: 1.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -366,7 +367,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e3fda6331db7714a9d997b7c0623efa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemsToPool: []
+  itemsToPool:
+  - objectToPool: {fileID: 3437761381416398532, guid: 85337087952d8204f99e3419f57fbd40,
+      type: 3}
+    amountToPool: 1000
+    identifier: Fish
+--- !u!114 &852689592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852689589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e8357a06a2ca054daf050049e8fcc80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,7 +493,7 @@ GameObject:
   - component: {fileID: 2099399213}
   - component: {fileID: 2099399212}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -550,8 +567,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2099399211}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 132.43054, y: 0.00061512, z: 192.90471}
+  m_LocalPosition: {x: 75, y: 0, z: 75}
+  m_LocalScale: {x: 150, y: 0.00061512, z: 150}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
