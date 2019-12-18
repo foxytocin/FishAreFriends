@@ -19,7 +19,7 @@ public class CameraPosition : MonoBehaviour
     void Start()
     {
         targetPosition = Side_View;
-        transform.position = targetPosition.position;
+        //transform.position = targetPosition.position;
     }
 
     // Update is called once per frame
@@ -39,7 +39,7 @@ public class CameraPosition : MonoBehaviour
 
         if (targetPosition.position != transform.position)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.1f);
+            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.15f);
         }
 
         transform.LookAt(target);
