@@ -1,7 +1,5 @@
 #### Master Angewandte Informatik
 Computer Games / Wintersemester 19/20
-
-## FISH ARE FRIENDS (sometimes food)
 ![Fish Are Friends](Doku/splash.jpg?raw=true "Splash-Screen")
 Foto-Quelle: Getty Images/Last Resort
 
