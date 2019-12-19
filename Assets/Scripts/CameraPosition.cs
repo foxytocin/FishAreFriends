@@ -21,7 +21,7 @@ public class CameraPosition : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         bool down = Input.GetKeyDown(KeyCode.Space);
         if (down & side)
