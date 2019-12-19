@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 252559901}
   - component: {fileID: 252559900}
   - component: {fileID: 252559904}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Fish
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -961,7 +961,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194230}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -1027,7 +1027,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.25932997, y: -0, z: -0, w: 0.9657888}
-  m_LocalPosition: {x: 0.02, y: 1.77, z: -2.53}
+  m_LocalPosition: {x: 0.02, y: 4.48, z: -7.21}
   m_LocalScale: {x: 1.0985, y: 1.0985001, z: 1.0985001}
   m_Children: []
   m_Father: {fileID: 252559903}
