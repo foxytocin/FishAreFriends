@@ -37,7 +37,7 @@ public class CameraPosition : MonoBehaviour
 
         if (targetPosition.position != transform.position)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.2f);
+            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.5f * Time.deltaTime * 5);
         }
 
         transform.LookAt(target);
