@@ -33,6 +33,10 @@ public class KeyController : MonoBehaviour
         {
             accelDir += 1;
         }
+        if (Input.GetKey(KeyCode.R))
+        {
+            transform.position = new Vector3(0, 0, 0);
+        }
 
         currentSpeed += acceleration * Time.deltaTime * accelDir;
         currentSpeed = Mathf.Clamp(currentSpeed, 0, maxSpeed);
