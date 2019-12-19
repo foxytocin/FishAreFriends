@@ -13,6 +13,11 @@ public class Fish : MonoBehaviour
     int _height = 3;
     int _speed = 1;
 
+
+    float lastX = 0;
+    float lastY = 0;
+    float lastZ = 0;
+
     public void Start()
     {
        worldHandler = WorldHandler.Instance;
@@ -54,48 +59,24 @@ public class Fish : MonoBehaviour
 
     private bool keepInBorders()
     {
-        // x
-        if(transform.position.x > worldHandler.worldX)
+
+        if(transform.position.x < 0 || transform.position.x > worldHandler.worldX)
         {
-            transform.position = new Vector3(0, transform.position.y, transform.position.z);
-            return true;
+            transform.forward = transform.forward * -1;
         }
 
-        if (transform.position.x < 0)
+        if (transform.position.y < 0 || transform.position.y > worldHandler.worldHeight)
         {
-            transform.position = new Vector3(worldHandler.worldX, transform.position.y, transform.position.z);
-            return true;
+            transform.forward = transform.forward * -1;
         }
 
-        // z
-        if (transform.position.z > worldHandler.worldZ)
+        if (transform.position.z < 0 || transform.position.z > worldHandler.worldZ)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-            return true;
+            transform.forward = transform.forward * -1;
         }
 
-        if (transform.position.z < 0)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, worldHandler.worldZ);
-            return true;
-        }
-
-        // z
-        if (transform.position.y > worldHandler.worldHeight)
-        {
-            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
-            return true;
-        }
-
-        if (transform.position.z < 0)
-        {
-            transform.position = new Vector3(transform.position.x, worldHandler.worldHeight, transform.position.z);
-            return true;
-        }
 
         return false;
-
-
     }
 
 

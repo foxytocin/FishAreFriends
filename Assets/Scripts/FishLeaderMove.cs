@@ -31,11 +31,6 @@ public class FishLeaderMove : MonoBehaviour
     void Update()
     {
 
-        if (keepInBorders())
-        {
-            return;
-        }
-
 
         if (Input.GetKeyDown(KeyCode.W))
         {
@@ -66,55 +61,6 @@ public class FishLeaderMove : MonoBehaviour
         transform.eulerAngles = new Vector3(_pitch, _yaw, 0.0f);
                           
     }
-
-
-    private bool keepInBorders()
-    {
-        // x
-        if (transform.position.x > worldHandler.worldX)
-        {
-            transform.position = new Vector3(0, transform.position.y, transform.position.z);
-            return true;
-        }
-
-        if (transform.position.x < 0)
-        {
-            transform.position = new Vector3(worldHandler.worldX, transform.position.y, transform.position.z);
-            return true;
-        }
-
-        // z
-        if (transform.position.z > worldHandler.worldZ)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-            return true;
-        }
-
-        if (transform.position.z < 0)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, worldHandler.worldZ);
-            return true;
-        }
-
-        // z
-        if (transform.position.y > worldHandler.worldHeight)
-        {
-            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
-            return true;
-        }
-
-        if (transform.position.z < 0)
-        {
-            transform.position = new Vector3(transform.position.x, worldHandler.worldHeight, transform.position.z);
-            return true;
-        }
-
-        return false;
-
-
-    }
-
-
 
 
 }
