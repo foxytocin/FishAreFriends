@@ -9,7 +9,7 @@ public class WorldHandler : MonoBehaviour
     public int worldZ = 150;
     public int worldHeight = 50;
 
-    List<Fish>[,] fishList;
+    List<Boid>[,] fishList;
 
 
     #region singelton
@@ -19,7 +19,7 @@ public class WorldHandler : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        fishList = new List<Fish>[worldX / 10, worldZ / 10];
+        fishList = new List<Boid>[worldX / 10, worldZ / 10];
     }
 
 
