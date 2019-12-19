@@ -18,7 +18,7 @@ public class ObjectPooler : MonoBehaviour
 
 
     public List<ObjectPoolItem> itemsToPool;
-    public Dictionary<string, Queue<GameObject>> pooledObjectsDictionary;
+    public Dictionary<string, Queue<GameObject>> pooledObjectsDictionary = new Dictionary<string, Queue<GameObject>>();
 
 
     #region singelton
@@ -34,7 +34,7 @@ public class ObjectPooler : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        pooledObjectsDictionary = new Dictionary<string, Queue<GameObject>>();
+        //pooledObjectsDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (ObjectPoolItem item in itemsToPool)
         {

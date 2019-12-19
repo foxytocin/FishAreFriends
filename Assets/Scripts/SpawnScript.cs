@@ -7,7 +7,7 @@ public class SpawnScript : MonoBehaviour
 
     private ObjectPooler _objectPooler;
 
-    private int _spawnedObjects = 999;
+    private int _spawnedObjects = 9;
 
     // Start is called before the first frame update
     void Start()

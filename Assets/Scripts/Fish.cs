@@ -2,76 +2,60 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FishLeaderMove : MonoBehaviour
+public class Fish : MonoBehaviour
 {
-
-    private bool _forwardPressed = false;
-
-    public float maximumSpeed = 0.9f;
-
-    public float speedH = 1.0f;
-    public float speedV = 1.0f;
-
-    private float _yaw = 0.0f;
-    private float _pitch = 0.0f;
-    private float _speed = 0;
-    private float _absorptionValue = 0.008f;
-
+    GameObject leader = null;
 
     WorldHandler worldHandler;
 
+    float _timeToChangeDirection = 100;
+    int _movement = 40;
+    int _height = 3;
+    int _speed = 1;
 
-    private void Start()
+    public void Start()
     {
-        worldHandler = WorldHandler.Instance;
-        Cursor.visible = false;
+       worldHandler = WorldHandler.Instance;
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
 
         if (keepInBorders())
         {
             return;
         }
+        
+        transform.Rotate(new Vector3(0, _movement, _height) * Time.deltaTime);
 
+        //Forward Movement
+        transform.Translate(new Vector3(_speed, 0, 0) * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.W))
+        _timeToChangeDirection -= Random.Range(1, 2);
+
+        if (_timeToChangeDirection < 0)
         {
-            _forwardPressed = true;
-        }
-        if (Input.GetKeyUp(KeyCode.W))
-        {
-            _forwardPressed = false;
-        }
+            _timeToChangeDirection = 100;
 
-        if (_forwardPressed)
-        {
-            if(_speed < maximumSpeed)
-                _speed += 0.01f;
-            transform.position += Camera.main.transform.forward * _speed * Time.deltaTime * 10;
-        }
-        else
-        {
-            if (_speed > 0)
-                _speed -= _absorptionValue;
-            transform.position += Camera.main.transform.forward * _speed * Time.deltaTime * 10;
-        }
+            _movement = Random.Range(-60, 60);
+
+            if (_speed > 50)
+                _speed = 3;
+            _speed = Random.Range(_speed - 3, _speed + 5);
 
 
-        _yaw += speedH * Input.GetAxis("Mouse X") * 7;
-        _pitch -= speedV * Input.GetAxis("Mouse Y") * 7;
+            _height = Random.Range(-1, 1);
 
-        transform.eulerAngles = new Vector3(_pitch, _yaw, 0.0f);
-                          
+            
+        }
+
     }
-
 
     private bool keepInBorders()
     {
         // x
-        if (transform.position.x > worldHandler.worldX)
+        if(transform.position.x > worldHandler.worldX)
         {
             transform.position = new Vector3(0, transform.position.y, transform.position.z);
             return true;
@@ -115,6 +99,11 @@ public class FishLeaderMove : MonoBehaviour
     }
 
 
+
+    void LeaderFollowing()
+    {
+
+    }
 
 
 }
