@@ -13,11 +13,6 @@ public class Fish : MonoBehaviour
     int _height = 3;
     int _speed = 1;
 
-
-    float lastX = 0;
-    float lastY = 0;
-    float lastZ = 0;
-
     public void Start()
     {
        worldHandler = WorldHandler.Instance;
@@ -79,12 +74,6 @@ public class Fish : MonoBehaviour
         return false;
     }
 
-
-
-    void LeaderFollowing()
-    {
-
-    }
 
 
 }
