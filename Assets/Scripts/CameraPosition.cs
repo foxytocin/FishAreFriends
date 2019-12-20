@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraPosition : MonoBehaviour
 {
@@ -23,7 +21,7 @@ public class CameraPosition : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         bool down = Input.GetKeyDown(KeyCode.Space);
         if (down & side)
@@ -39,7 +37,7 @@ public class CameraPosition : MonoBehaviour
 
         if (targetPosition.position != transform.position)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.15f);
+            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.5f * Time.deltaTime * 5);
         }
 
         transform.LookAt(target);
