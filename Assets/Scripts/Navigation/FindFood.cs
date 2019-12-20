@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class MoveToMouseClick : MonoBehaviour
+public class FindFood : MonoBehaviour
 {
     public Vector3 target;
 

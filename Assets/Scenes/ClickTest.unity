@@ -150,11 +150,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 195322714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d8d9a0d6139b4c39afb43f273e128e5, type: 3}
+  m_Script: {fileID: 11500000, guid: 09db4e817577443549c3ae9d66f6fbe9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0, z: 0}
-  speed: 1
+  speed: 3
 --- !u!135 &195322716
 SphereCollider:
   m_ObjectHideFlags: 0
