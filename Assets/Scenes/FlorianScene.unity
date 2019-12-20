@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 252559901}
   - component: {fileID: 252559900}
   - component: {fileID: 252559904}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Fish
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,6 +324,7 @@ MonoBehaviour:
   maximumSpeed: 3
   speedH: 2
   speedV: 2
+  leaderColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &274968062
 GameObject:
   m_ObjectHideFlags: 0
@@ -772,7 +773,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 6.33e-43, y: 2.486929, z: 6.33e-43, w: 1.707776e+19}
+  m_BoundingSphereOverride: {x: 4.32e-43, y: 0, z: 4.5905e-41, w: 1.8351e-41}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -928,8 +929,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemsToPool:
-  - objectToPool: {fileID: 3437761381416398532, guid: 85337087952d8204f99e3419f57fbd40,
-      type: 3}
+  - objectToPool: {fileID: 0}
     amountToPool: 1000
     identifier: Fish
 --- !u!114 &852689592
@@ -948,7 +948,7 @@ MonoBehaviour:
   spawnRadius: 1
   spawnCount: 999
   colour: {r: 0, g: 0, b: 0, a: 0}
-  showSpawnRegion: 0
+  showSpawnRegion: 2
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -961,7 +961,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194230}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -1318,6 +1318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: fd4bc51c395304add92e7ac263cc6d3f, type: 2}
   compute: {fileID: 7200000, guid: c51b961c8b9d746f1a2f242fa7bf1a31, type: 3}
+  distance: 1
 --- !u!4 &1236065718
 Transform:
   m_ObjectHideFlags: 0

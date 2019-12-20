@@ -20,6 +20,9 @@ public class FishLeaderMove : MonoBehaviour
 
     WorldHandler worldHandler;
 
+    private int _waitLatency = 0;
+    public Color leaderColor = Color.green;
+
 
     private void Start()
     {
@@ -30,7 +33,6 @@ public class FishLeaderMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
 
         if (Input.GetKeyDown(KeyCode.W))
         {

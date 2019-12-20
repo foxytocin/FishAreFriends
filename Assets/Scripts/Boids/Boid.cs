@@ -29,12 +29,19 @@ public class Boid : MonoBehaviour {
     Transform cachedTransform;
     Transform target;
 
+    // Swarm handling varialbes
+    int minimumReceivers = 4;
+    float waitingLatency = 0;
+    Color swarmColor;
+    List<Boid> myCrew;
+
     // Debug
     bool showDebug = false;
 
     void Awake () {
         material = transform.GetComponentInChildren<MeshRenderer> ().material;
         cachedTransform = transform;
+        myCrew = new List<Boid>();
     }
 
     public void Initialize (BoidSettings settings, Transform target) {
@@ -54,7 +61,30 @@ public class Boid : MonoBehaviour {
         }
     }
 
+  
+   private void checkLeader()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
+        if(hitColliders.Length > 0)
+        {
+            FishLeaderMove fishLeaderMove =  hitColliders[0].gameObject.GetComponent<FishLeaderMove>();
+            if (fishLeaderMove == null)
+                return;
+
+            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", fishLeaderMove.leaderColor);
+        }
+        else
+        {
+            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", Color.red);
+        }
+    }
+ 
+
+
     public void UpdateBoid () {
+
+        // check leader is in neightbourhood
+        checkLeader();
 
         Vector3 acceleration = Vector3.zero;
 
