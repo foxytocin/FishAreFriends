@@ -15,11 +15,13 @@ public class KeyController : MonoBehaviour
     float yawVelocity;
     float pitchVelocity;
     float currentSpeed;
+    private Vector3 resetPosition;
 
 
     void Start()
     {
         currentSpeed = maxSpeed;
+        resetPosition = transform.position;
     }
 
     void Update()
@@ -35,7 +37,7 @@ public class KeyController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.R))
         {
-            transform.position = new Vector3(0, 0, 0);
+            transform.position = resetPosition;
         }
 
         currentSpeed += acceleration * Time.deltaTime * accelDir;
