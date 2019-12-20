@@ -67,7 +67,7 @@ public class Boid : MonoBehaviour {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
         if(hitColliders.Length > 0)
         {
-            FishLeaderMove fishLeaderMove =  hitColliders[0].gameObject.GetComponent<FishLeaderMove>();
+            Leader fishLeaderMove =  hitColliders[0].gameObject.GetComponent<Leader>();
             if (fishLeaderMove == null)
                 return;
 

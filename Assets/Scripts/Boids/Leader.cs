@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FishLeaderMove : MonoBehaviour
+public class Leader : MonoBehaviour
 {
 
     private bool _forwardPressed = false;
@@ -17,16 +17,12 @@ public class FishLeaderMove : MonoBehaviour
     private float _speed = 0;
     private float _absorptionValue = 0.008f;
 
-
-    WorldHandler worldHandler;
-
     private int _waitLatency = 0;
     public Color leaderColor = Color.green;
 
 
     private void Start()
     {
-        worldHandler = WorldHandler.Instance;
         Cursor.visible = false;
     }
 
