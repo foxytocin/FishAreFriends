@@ -123,13 +123,37 @@ public class Boid : MonoBehaviour
         }
 
         // avoid predator
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
-        if (hitColliders.Length > 0)
+        Collider[] hitCollidersPredator = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
+        if (hitCollidersPredator.Length > 0)
         {
-            GameObject other = hitColliders[0].gameObject;
-            var positionToPredator = other.transform.position - position;
-            acceleration += positionToPredator * -1;
+            GameObject predator = hitCollidersPredator[0].gameObject;
+            var positionToPredator = predator.transform.position - position;
+            acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
         }
+
+
+        // follow leader
+        Collider[] hitCollidersLeader = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
+        if (hitCollidersPredator.Length == 0 && hitCollidersLeader.Length > 0)
+        {
+            GameObject leader = hitCollidersLeader[0].gameObject;
+            var positionToLeader = leader.transform.position - position;
+            acceleration += positionToLeader * settings.leadingForce;
+
+            Leader fishLeaderMove = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
+            if (fishLeaderMove == null)
+                return;
+
+            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", fishLeaderMove.leaderColor);
+        }
+        else
+        {
+            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", Color.red);
+        }
+
+
+
+
 
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
