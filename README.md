@@ -10,10 +10,11 @@ Foto-Quelle: Getty Images/Last Resort
 
 ---
 
-## Flocking-Simulation & Shader Graphs / Unterwasserwelt
+## 21.12.2019: Flocking-Simulation & Shader Graphs / Unterwasserwelt
+
 ![Fish Are Friends](Doku/undewater_flocking_fishes.jpg?raw=true "Underwater Scene")
 
-Flocking-Simulation
+#### Flocking-Simulation
   - Allgemeines Schwarmverhalten
   - Kollisionsvermeidung
   - Fluchtverhalten beim Anwesenheit eines Feindes
@@ -22,7 +23,7 @@ Flocking-Simulation
     - Übernahme der Farben aus dem Editor
     - Manipulation des Shader-Graphs zur Laufzeit
 
-Shader-Graphs / Optik der Unterwasserwelt
+#### Shader-Graphs / Optik der Unterwasserwelt
   - Shader-Graph
     - Fisch-"Texturierung" (Procedural)
     - Shader-basierte Schwimm-Animation
