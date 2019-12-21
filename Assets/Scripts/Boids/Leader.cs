@@ -8,12 +8,14 @@ public class Leader : MonoBehaviour
 
     public Color leaderColor1;
     public Color leaderColor2;
+    private Material material;
 
     private void Awake()
     {
         //leaderColor = Random.ColorHSV();
-        gameObject.GetComponentInChildren<MeshRenderer>().material.SetColor("_BaseColor1", leaderColor1);
-        gameObject.GetComponentInChildren<MeshRenderer>().material.SetColor("_BaseColor2", leaderColor2);
+        material = gameObject.GetComponentInChildren<MeshRenderer>().material;
+        material.SetColor("_BaseColor1", leaderColor1);
+        material.SetColor("_BaseColor2", leaderColor2);
         swarmList = new List<Boid>();
     }
 
