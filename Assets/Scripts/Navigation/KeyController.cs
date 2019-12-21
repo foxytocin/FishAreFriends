@@ -20,7 +20,7 @@ public class KeyController : MonoBehaviour
 
     void Start()
     {
-        currentSpeed = maxSpeed;
+        currentSpeed = maxSpeed / 2;
         resetPosition = transform.position;
     }
 

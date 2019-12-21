@@ -10639,9 +10639,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cdf66dd5e6e042b9aa215bb3525182c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 3
-  maxPitchSpeed: 30
-  maxTurnSpeed: 70
+  maxSpeed: 5
+  maxPitchSpeed: 60
+  maxTurnSpeed: 80
   acceleration: 2
   smoothSpeed: 3
   smoothTurnSpeed: 3
@@ -11980,7 +11980,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579326309}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -3}
+  m_LocalPosition: {x: 0, y: 2, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 953782350}
