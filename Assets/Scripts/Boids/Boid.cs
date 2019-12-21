@@ -31,10 +31,7 @@ public class Boid : MonoBehaviour
     Transform target;
 
     // Swarm handling varialbes
-    int minimumReceivers = 4;
-    float waitingLatency = 0;
-    Color swarmColor;
-    List<Boid> myCrew;
+    Leader myLeader = null;
 
     // Debug
     bool showDebug = false;
@@ -43,7 +40,6 @@ public class Boid : MonoBehaviour
     {
         material = transform.GetComponentInChildren<MeshRenderer>().material;
         cachedTransform = transform;
-        myCrew = new List<Boid>();
     }
 
     public void Initialize(BoidSettings settings, Transform target)
@@ -114,19 +110,34 @@ public class Boid : MonoBehaviour
         Collider[] hitCollidersLeader = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
         if (hitCollidersPredator.Length == 0 && hitCollidersLeader.Length > 0)
         {
-            GameObject leader = hitCollidersLeader[0].gameObject;
-            var positionToLeader = leader.transform.position - position;
+            GameObject leaderGameObject = hitCollidersLeader[0].gameObject;
+            var positionToLeader = leaderGameObject.transform.position - position;
             acceleration += positionToLeader * settings.leadingForce;
 
-            Leader fishLeaderMove = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
-            if (fishLeaderMove == null)
+
+            Leader leaderScript = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
+            if (leaderScript == null)
                 return;
 
-            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", fishLeaderMove.leaderColor);
+           gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", leaderScript.leaderColor);
+
+            if (myLeader == null)
+            {
+                myLeader = leaderScript;
+                leaderScript.AddBoidToSwarm(this);               
+            }
+                
         }
         else
         {
             gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", Color.red);
+
+            if(myLeader != null)
+            {
+                myLeader.RemoveBoidFromSwarm(this);
+                myLeader = null;
+            }
+
         }
 
 
