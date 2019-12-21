@@ -6,13 +6,22 @@ Foto-Quelle: Getty Images/Last Resort
 
 ## 18.12.2019: Erster Mood-Test
 [![Fish Are Friends](https://img.youtube.com/vi/WbI-Z4hy8Qo/0.jpg)](https://www.youtube.com/watch?v=WbI-Z4hy8Qo)
-
+  - Mood-Test
+    - Erster Test für den Unterwasserlook
+    - Schwebepartikel um Wasser und Raum anzudeuten
+    - GodRays um Wasseroberfläche / Lichtbrechung zu imitieren
+    - Shader-Graph Caustics am Meeresgrund um Lichtbrechung zu imitieren
+    
 ---
 
 ## 19.12.2019: Flocking-Tests / Futtersuche-Tests
 ![Fish Are Friends](Doku/test_flocking_2.jpg?raw=true "Splash-Screen")
-<img src="Doku/test_flocking_1.jpg?raw=true" width="425"/> <img src="Doku/test_food_0.jpg?raw=true" width="425"/>
-
+<img src="Doku/test_flocking_1.jpg?raw=true" width="433"/> <img src="Doku/test_food_0.jpg?raw=true" width="433"/>
+  - Flocking-Tests
+    - Allgemeines Schwarmverhalten mit Kollisionsvermeidung
+  
+  - Futtersuche-Tests
+    - KI findet automatisch das nahe gelegenste Futter
 
 ---
 
