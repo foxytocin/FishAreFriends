@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
@@ -10,7 +8,8 @@ public class Spawner : MonoBehaviour
     public Boid prefab;
     public float spawnRadius = 10;
     public int spawnCount = 10;
-    public Color colour;
+    public Color color1;
+    public Color color2;
     public GizmoType showSpawnRegion;
 
     void Awake()
@@ -25,7 +24,7 @@ public class Spawner : MonoBehaviour
             boid.transform.parent = fishHolder;
             boid.transform.forward = Random.insideUnitSphere;
 
-            boid.SetColour(colour);
+            boid.SetColour(color1, color2);
         }
     }
 
@@ -48,7 +47,7 @@ public class Spawner : MonoBehaviour
     void DrawGizmos()
     {
 
-        Gizmos.color = new Color(colour.r, colour.g, colour.b, 0.3f);
+        Gizmos.color = new Color(color1.r, color1.g, color1.b, 0.3f);
         Gizmos.DrawSphere(transform.position, spawnRadius);
     }
 

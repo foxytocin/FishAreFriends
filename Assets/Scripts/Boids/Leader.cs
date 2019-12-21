@@ -3,13 +3,17 @@ using UnityEngine;
 
 public class Leader : MonoBehaviour
 {
-    
+
     private List<Boid> swarmList;
-    public Color leaderColor;
+
+    public Color leaderColor1;
+    public Color leaderColor2;
 
     private void Awake()
     {
-        leaderColor = Random.ColorHSV();
+        //leaderColor = Random.ColorHSV();
+        gameObject.GetComponentInChildren<MeshRenderer>().material.SetColor("_BaseColor1", leaderColor1);
+        gameObject.GetComponentInChildren<MeshRenderer>().material.SetColor("_BaseColor2", leaderColor2);
         swarmList = new List<Boid>();
     }
 
@@ -18,7 +22,7 @@ public class Leader : MonoBehaviour
         swarmList.Add(boid);
     }
 
-    
+
     public void RemoveBoidFromSwarm(Boid boid)
     {
         swarmList.Remove(boid);

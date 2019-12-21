@@ -64,7 +64,7 @@ Material:
     - _AlphaClip: 0
     - _AmplitudeX: 0
     - _AmplitudeY: 0.2
-    - _AmplitudeZ: 1
+    - _AmplitudeZ: 1.4
     - _Blend: 0
     - _BumpScale: 1
     - _Cull: 2
@@ -72,7 +72,7 @@ Material:
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _FrequencyX: 0
-    - _FrequencyY: 1
+    - _FrequencyY: 2
     - _FrequencyZ: 1.4
     - _GlossMapScale: 0
     - _Glossiness: 0
@@ -87,7 +87,7 @@ Material:
     - _SpecularHighlights: 1
     - _SpeedX: 0
     - _SpeedY: 1
-    - _SpeedZ: 4
+    - _SpeedZ: 5
     - _SrcBlend: 1
     - _Surface: 0
     - _WorkflowMode: 1
