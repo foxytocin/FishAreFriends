@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boid : MonoBehaviour {
+public class Boid : MonoBehaviour
+{
 
     BoidSettings settings;
 
@@ -38,13 +39,15 @@ public class Boid : MonoBehaviour {
     // Debug
     bool showDebug = false;
 
-    void Awake () {
-        material = transform.GetComponentInChildren<MeshRenderer> ().material;
+    void Awake()
+    {
+        material = transform.GetComponentInChildren<MeshRenderer>().material;
         cachedTransform = transform;
         myCrew = new List<Boid>();
     }
 
-    public void Initialize (BoidSettings settings, Transform target) {
+    public void Initialize(BoidSettings settings, Transform target)
+    {
         this.target = target;
         this.settings = settings;
 
@@ -55,19 +58,21 @@ public class Boid : MonoBehaviour {
         velocity = transform.forward * startSpeed;
     }
 
-    public void SetColour (Color col) {
-        if (material != null) {
+    public void SetColour(Color col)
+    {
+        if (material != null)
+        {
             material.color = col;
         }
     }
 
-  
-   private void checkLeader()
+
+    private void checkLeader()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
-        if(hitColliders.Length > 0)
+        if (hitColliders.Length > 0)
         {
-            Leader fishLeaderMove =  hitColliders[0].gameObject.GetComponent<Leader>();
+            Leader fishLeaderMove = hitColliders[0].gameObject.GetComponent<Leader>();
             if (fishLeaderMove == null)
                 return;
 
@@ -78,45 +83,49 @@ public class Boid : MonoBehaviour {
             gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", Color.red);
         }
     }
- 
 
 
-    public void UpdateBoid () {
+
+    public void UpdateBoid()
+    {
 
         // check leader is in neightbourhood
         checkLeader();
 
         Vector3 acceleration = Vector3.zero;
 
-        if (target != null) {
+        if (target != null)
+        {
             Vector3 offsetToTarget = (target.position - position);
-            acceleration = SteerTowards (offsetToTarget) * settings.targetWeight;
+            acceleration = SteerTowards(offsetToTarget) * settings.targetWeight;
         }
 
-        if (numPerceivedFlockmates != 0) {
+        if (numPerceivedFlockmates != 0)
+        {
             centreOfFlockmates /= numPerceivedFlockmates;
 
             Vector3 offsetToFlockmatesCentre = (centreOfFlockmates - position);
 
-            var alignmentForce = SteerTowards (avgFlockHeading) * settings.alignWeight;
-            var cohesionForce = SteerTowards (offsetToFlockmatesCentre) * settings.cohesionWeight;
-            var seperationForce = SteerTowards (avgAvoidanceHeading) * settings.seperateWeight;
+            var alignmentForce = SteerTowards(avgFlockHeading) * settings.alignWeight;
+            var cohesionForce = SteerTowards(offsetToFlockmatesCentre) * settings.cohesionWeight;
+            var seperationForce = SteerTowards(avgAvoidanceHeading) * settings.seperateWeight;
 
             acceleration += alignmentForce;
             acceleration += cohesionForce;
             acceleration += seperationForce;
         }
 
-        if (IsHeadingForCollision ()) {
-            Vector3 collisionAvoidDir = ObstacleRays ();
-            Vector3 collisionAvoidForce = SteerTowards (collisionAvoidDir) * settings.avoidCollisionWeight;
+        if (IsHeadingForCollision())
+        {
+            Vector3 collisionAvoidDir = ObstacleRays();
+            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
             acceleration += collisionAvoidForce;
         }
 
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
         Vector3 dir = velocity / speed;
-        speed = Mathf.Clamp (speed, settings.minSpeed, settings.maxSpeed);
+        speed = Mathf.Clamp(speed, settings.minSpeed, settings.maxSpeed);
         velocity = dir * speed;
 
         cachedTransform.position += velocity * Time.deltaTime;
@@ -125,7 +134,8 @@ public class Boid : MonoBehaviour {
         forward = dir;
     }
 
-    bool IsHeadingForCollision () {
+    bool IsHeadingForCollision()
+    {
         if (showDebug)
         {
             Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
@@ -134,20 +144,24 @@ public class Boid : MonoBehaviour {
 
 
         RaycastHit hit;
-        if (Physics.SphereCast (position, settings.boundsRadius, forward, out hit, settings.collisionAvoidDst, settings.obstacleMask)) {
+        if (Physics.SphereCast(position, settings.boundsRadius, forward, out hit, settings.collisionAvoidDst, settings.obstacleMask))
+        {
             return true;
-        } else { }
+        }
+        else { }
         return false;
     }
 
-    Vector3 ObstacleRays () {
+    Vector3 ObstacleRays()
+    {
         Vector3[] rayDirections = BoidHelper.directions;
 
 
-        for (int i = 0; i < rayDirections.Length; i++) {
+        for (int i = 0; i < rayDirections.Length; i++)
+        {
 
-            Vector3 dir = cachedTransform.TransformDirection (rayDirections[i]);
-            Ray ray = new Ray (position, dir);
+            Vector3 dir = cachedTransform.TransformDirection(rayDirections[i]);
+            Ray ray = new Ray(position, dir);
 
             if (showDebug)
             {
@@ -155,7 +169,8 @@ public class Boid : MonoBehaviour {
                 Debug.DrawRay(position, forward, Color.green);
             }
 
-            if (!Physics.SphereCast (ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask)) {
+            if (!Physics.SphereCast(ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask))
+            {
                 return dir;
             }
         }
@@ -163,9 +178,10 @@ public class Boid : MonoBehaviour {
         return forward;
     }
 
-    Vector3 SteerTowards (Vector3 vector) {
+    Vector3 SteerTowards(Vector3 vector)
+    {
         Vector3 v = vector.normalized * settings.maxSpeed - velocity;
-        return Vector3.ClampMagnitude (v, settings.maxSteerForce);
+        return Vector3.ClampMagnitude(v, settings.maxSteerForce);
     }
 
 }

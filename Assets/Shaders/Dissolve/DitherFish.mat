@@ -25,7 +25,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_3545F7F1: 3
+    - Vector1_3545F7F1: 4
     - Vector1_9F87FDA0: 1
     m_Colors:
     - Color_67DC14BD: {r: 0.7264151, g: 0, b: 0, a: 0}
+    - _BaseColor: {r: 0.002149545, g: 0, b: 0.11320745, a: 0}
