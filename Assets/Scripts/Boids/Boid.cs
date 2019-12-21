@@ -113,6 +113,15 @@ public class Boid : MonoBehaviour {
             acceleration += collisionAvoidForce;
         }
 
+        // avoid predator
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
+        if (hitColliders.Length > 0)
+        {
+            GameObject other = hitColliders[0].gameObject;
+            var positionToPredator = other.transform.position - position;
+            acceleration += positionToPredator * -1;
+        }
+
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
         Vector3 dir = velocity / speed;
