@@ -7,6 +7,9 @@ public class Boid : MonoBehaviour
 
     BoidSettings settings;
 
+    private Color originalColor1;
+    private Color originalColor2;
+
     // State
     [HideInInspector]
     public Vector3 position;
@@ -38,7 +41,7 @@ public class Boid : MonoBehaviour
 
     void Awake()
     {
-        material = transform.GetComponentInChildren<MeshRenderer>().material;
+        material = gameObject.GetComponent<MeshRenderer>().material;
         cachedTransform = transform;
     }
 
@@ -54,11 +57,14 @@ public class Boid : MonoBehaviour
         velocity = transform.forward * startSpeed;
     }
 
-    public void SetColour(Color col)
+    public void SetColour(Color col1, Color col2)
     {
         if (material != null)
         {
-            material.color = col;
+            originalColor1 = col1;
+            originalColor2 = col2;
+            material.SetColor("_BaseColor1", originalColor1);
+            material.SetColor("_BaseColor2", originalColor2);
         }
     }
 
@@ -119,20 +125,22 @@ public class Boid : MonoBehaviour
             if (leaderScript == null)
                 return;
 
-           gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", leaderScript.leaderColor);
+            material.SetColor("_BaseColor1", leaderScript.leaderColor1);
+            material.SetColor("_BaseColor2", leaderScript.leaderColor2);
 
             if (myLeader == null)
             {
                 myLeader = leaderScript;
-                leaderScript.AddBoidToSwarm(this);               
+                leaderScript.AddBoidToSwarm(this);
             }
-                
+
         }
         else
         {
-            gameObject.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", Color.red);
+            material.SetColor("_BaseColor1", originalColor1);
+            material.SetColor("_BaseColor2", originalColor2);
 
-            if(myLeader != null)
+            if (myLeader != null)
             {
                 myLeader.RemoveBoidFromSwarm(this);
                 myLeader = null;

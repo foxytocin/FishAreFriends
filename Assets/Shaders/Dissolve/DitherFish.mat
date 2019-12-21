@@ -20,13 +20,34 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 9a2412be282194aaeb994b3257674937, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_3170D4B5_Texture_1:
+        m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_5CFD3A42_Texture_1:
         m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_3545F7F1: 4
     - Vector1_9F87FDA0: 1
+    - _AmplitudeX: 0
+    - _AmplitudeY: 0.2
+    - _AmplitudeZ: 1.4
+    - _FrequencyX: 0
+    - _FrequencyY: 3
+    - _FrequencyZ: 1.4
+    - _HeadLimit: 0.05
+    - _Metallic: 0.7
+    - _Smoothness: 0.5
+    - _SpeedX: 0
+    - _SpeedY: 0
+    - _SpeedZ: 5
     m_Colors:
     - Color_67DC14BD: {r: 0.7264151, g: 0, b: 0, a: 0}
-    - _BaseColor: {r: 0.002149545, g: 0, b: 0.11320745, a: 0}
+    - _BaseColor: {r: 0.7830189, g: 0.26078585, b: 0, a: 0}
+    - _Emission: {r: 0, g: 0, b: 0, a: 0}
