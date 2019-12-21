@@ -12,6 +12,8 @@ public class LandscapeGenerator : MonoBehaviour
 
     void Awake()
     {
+        var enviromentHolder = new GameObject("Enviroment").transform;
+
         for (int i = 0; i < amountSzeneElements; i++)
         {
             GameObject instName = (Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
@@ -20,8 +22,9 @@ public class LandscapeGenerator : MonoBehaviour
 
             Vector2 pos = new Vector2(Random.Range(-26, 26), Random.Range(-26, 26));
 
-            GameObject newObject = Instantiate(instName, new Vector3(pos[0], elementHeight / 2f, pos[1]), Quaternion.identity) as GameObject;
-            newObject.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
+            GameObject go = Instantiate(instName, new Vector3(pos[0], elementHeight / 2f, pos[1]), Quaternion.identity) as GameObject;
+            go.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
+            go.transform.parent = enviromentHolder;
         }
     }
 
