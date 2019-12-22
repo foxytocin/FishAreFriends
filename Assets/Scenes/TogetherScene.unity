@@ -11712,7 +11712,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   size: 100
   resolution: 50
-  prefab: {fileID: 4842996941866608388, guid: 8582443ae21a84ae39020d1b46ebdc76, type: 3}
   noiseScale: 8
   prefabGrass: {fileID: 553016060044824774, guid: f38e9d59b919a4fd09f9139cf3a5fe66,
     type: 3}
