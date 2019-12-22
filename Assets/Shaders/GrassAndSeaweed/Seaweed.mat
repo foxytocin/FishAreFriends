@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DitherObstacles
-  m_Shader: {fileID: -6465566751694194690, guid: 31eff4c79d79148c28b6d50b247b6318,
+  m_Name: Seaweed
+  m_Shader: {fileID: -6465566751694194690, guid: 3e3a20b9b3d4c4ffc836e9d40869e00f,
     type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -20,20 +20,17 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _SampleTexture2D_3170D4B5_Texture_1:
-        m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_5CFD3A42_Texture_1:
         m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_3545F7F1: 9
-    - Vector1_9F87FDA0: 1
-    - _Metallic: 0
-    - _Smoothness: 0.5
+    - Vector1_A9076528: 1
+    - Vector1_B655D323: 0.6
+    - Vector1_C37359FA: 15
+    - Vector1_F831175F: 2
+    - _DitherScale: 1
     m_Colors:
-    - Color_67DC14BD: {r: 0.002149545, g: 0, b: 0.11320745, a: 0}
-    - _BaseColor: {r: 0.0058555957, g: 0, b: 0.16981131, a: 0}
-    - _Emission: {r: 0, g: 0, b: 0, a: 0}
+    - Color_4FBC447: {r: 0.7529412, g: 0.18885721, b: 0.101960756, a: 0}
+    - Color_C2373DE7: {r: 0.8679245, g: 0.81571347, b: 0, a: 0}
+    - Vector2_EB9EF6FE: {r: -0.2, g: -0.1, b: 0, a: 0}

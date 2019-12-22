@@ -11659,6 +11659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1417254605}
   - component: {fileID: 1417254606}
+  - component: {fileID: 1417254607}
   m_Layer: 0
   m_Name: LandscapeGenerator
   m_TagString: Untagged
@@ -11674,7 +11675,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1417254604}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -50, y: 1, z: -50}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1167177243}
@@ -11697,6 +11698,30 @@ MonoBehaviour:
   prefabCylinder: {fileID: 4913785265978284541, guid: 1f56ab501b651491588ce6fedf774537,
     type: 3}
   amountSzeneElements: 10
+--- !u!114 &1417254607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417254604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a00bbd32d1342f086cb4c95eeef778, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 100
+  resolution: 50
+  prefab: {fileID: 4842996941866608388, guid: 8582443ae21a84ae39020d1b46ebdc76, type: 3}
+  noiseScale: 8
+  prefabGrass: {fileID: 553016060044824774, guid: f38e9d59b919a4fd09f9139cf3a5fe66,
+    type: 3}
+  prefabSeaweed: {fileID: 4434772494120550095, guid: 02814de0ed7684604b31ba6213f9e2f3,
+    type: 3}
+  thresholdGrass: 0.7
+  grassScale: 8
+  thresholdSeaweed: 0.1
+  seaweedScale: 40
 --- !u!1 &1484693251
 GameObject:
   m_ObjectHideFlags: 0
