@@ -36,6 +36,9 @@ public class Boid : MonoBehaviour
     // Swarm handling varialbes
     Leader myLeader = null;
 
+    // Food
+    private float food = 100;
+
     // Debug
     bool showDebug = false;
 
@@ -145,6 +148,17 @@ public class Boid : MonoBehaviour
                 myLeader.RemoveBoidFromSwarm(this);
                 myLeader = null;
             }
+
+        }
+
+        // check food, if leader exists
+        if(myLeader != null)
+        {
+            food -= 0.2f;
+
+
+
+
 
         }
 
