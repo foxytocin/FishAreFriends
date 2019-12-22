@@ -11714,9 +11714,14 @@ MonoBehaviour:
   resolution: 50
   prefab: {fileID: 4842996941866608388, guid: 8582443ae21a84ae39020d1b46ebdc76, type: 3}
   noiseScale: 8
-  grassScale: 8
-  grassPrefab: {fileID: 100000, guid: cdbbe2a319c5934488c7972af0a53c68, type: 3}
+  prefabGrass: {fileID: 553016060044824774, guid: f38e9d59b919a4fd09f9139cf3a5fe66,
+    type: 3}
+  prefabSeaweed: {fileID: 4434772494120550095, guid: 02814de0ed7684604b31ba6213f9e2f3,
+    type: 3}
   thresholdGrass: 0.7
+  grassScale: 8
+  thresholdSeaweed: 0.1
+  seaweedScale: 40
 --- !u!1 &1484693251
 GameObject:
   m_ObjectHideFlags: 0
