@@ -51,7 +51,7 @@ public class BoidManager : MonoBehaviour
 
             boidBuffer.GetData(boidData);
 
-            float foodNeedsSum = 0f;
+            int foodNeedsSum = 0;
             for (int i = 0; i < numBoids; i++)
             {
                 if (boids[i].alife)

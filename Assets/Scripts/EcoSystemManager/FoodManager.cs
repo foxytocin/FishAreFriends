@@ -5,11 +5,11 @@ public class FoodManager : MonoBehaviour
     private Vector3 target;
     public GameObject Food;
 
-    Transform grassHolder;
+    Transform foodHolder;
 
     void Awake()
     {
-        grassHolder = new GameObject("GrassAndSeaweed").transform;
+        foodHolder = new GameObject("Food").transform;
     }
 
     void Update()
@@ -24,6 +24,6 @@ public class FoodManager : MonoBehaviour
     {
         target = new Vector3(Random.Range(-20, 20), Random.Range(3, 15), Random.Range(-20, 20));
         GameObject go = Instantiate(Food, target, Quaternion.identity);
-        go.transform.parent = grassHolder;
+        go.transform.parent = foodHolder;
     }
 }
