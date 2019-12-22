@@ -8,11 +8,11 @@ public class DropFood : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("space"))
+        if (Input.GetKeyDown(KeyCode.N))
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 3; i++)
             {
-                target = new Vector3(Random.Range(-20, 20), 5, Random.Range(-20, 20));
+                target = new Vector3(Random.Range(-20, 20), Random.Range(3, 15), Random.Range(-20, 20));
                 Instantiate(Food, target, Quaternion.identity);
             }
         }

@@ -6,6 +6,7 @@ public class Boid : MonoBehaviour
 {
 
     BoidSettings settings;
+    EcoSystemManager ecoSystemManager;
 
     private Color originalColor1;
     private Color originalColor2;
@@ -37,15 +38,24 @@ public class Boid : MonoBehaviour
     Leader myLeader = null;
 
     // Food
-    private float food = 100;
+    public float basicFoodNeed = 100f;
+    public float foodNeeds;
+    public float foodLeft;
+    private float hungerRate;
+    public bool alife;
 
     // Debug
     bool showDebug = false;
 
     void Awake()
     {
+        alife = true;
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        foodNeeds = 0f;
+        foodLeft = basicFoodNeed;
         material = gameObject.GetComponent<MeshRenderer>().material;
         cachedTransform = transform;
+        hungerRate = Random.Range(0.1f, 0.3f);
     }
 
     public void Initialize(BoidSettings settings, Transform target)
@@ -73,8 +83,6 @@ public class Boid : MonoBehaviour
 
     public void UpdateBoid()
     {
-
-
         Vector3 acceleration = Vector3.zero;
 
         if (target != null)
@@ -152,18 +160,56 @@ public class Boid : MonoBehaviour
         }
 
         // check food, if leader exists
-        if(myLeader != null)
+        // if (myLeader != null)
+        // {
+        //     food -= 0.2f;
+        // }
+
+
+        // chaising for food
+        setFoodNeeds();
+        if (foodLeft < 30)
         {
-            food -= 0.2f;
+            material.SetColor("_BaseColor1", Color.red);
+            material.SetColor("_BaseColor2", Color.red);
 
+            Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
+            if (hitCollidersFood.Length > 0)
+            {
+                // find nearest food
+                float nearestFood = float.PositiveInfinity;
+                int nearestFoodIndex = 0;
+                for (int i = 0; i < hitCollidersFood.Length; i++)
+                {
+                    float dist = Vector3.Distance(transform.position, hitCollidersFood[i].gameObject.transform.position);
+                    if (dist < nearestFood)
+                    {
+                        nearestFood = dist;
+                        nearestFoodIndex = i;
+                    }
+                }
 
+                // get nearest food gameobject
+                GameObject fo = hitCollidersFood[nearestFoodIndex].gameObject;
 
+                if (fo)
+                {
+                    // swim towards food
+                    var positionToFood = fo.transform.position - position;
+                    acceleration += positionToFood * settings.chaisingForFoodForce;
 
+                    // eat when nearby
+                    if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
+                    {
+                        material.SetColor("_BaseColor1", Color.green);
+                        material.SetColor("_BaseColor2", Color.green);
 
+                        foodNeeds -= fo.GetComponent<FoodBehavior>().getFood(foodNeeds);
+                        setFoodNeeds();
+                    }
+                }
+            }
         }
-
-
-
 
 
         velocity += acceleration * Time.deltaTime;
@@ -176,6 +222,21 @@ public class Boid : MonoBehaviour
         cachedTransform.forward = dir;
         position = cachedTransform.position;
         forward = dir;
+    }
+
+    void setFoodNeeds()
+    {
+        foodNeeds += hungerRate;
+        if (foodNeeds > basicFoodNeed)
+        {
+            alife = false;
+            ecoSystemManager.addDiedFish();
+        }
+        else
+        {
+            foodNeeds = Mathf.Clamp(foodNeeds, 0f, basicFoodNeed);
+            foodLeft = basicFoodNeed - foodNeeds;
+        }
     }
 
     bool IsHeadingForCollision()
