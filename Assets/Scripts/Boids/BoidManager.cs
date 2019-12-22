@@ -65,6 +65,12 @@ public class BoidManager : MonoBehaviour
 
                     boids[i].UpdateBoid();
                 }
+                else
+                {
+                    // Hier wird aktuell nur das Mesh des Fishes
+                    GameObject tb = boids[i].gameObject;
+                    tb.SetActive(false);
+                }
             }
             ecoSystemManager.setFoodDemand(foodNeedsSum);
 
