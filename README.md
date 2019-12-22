@@ -75,7 +75,7 @@ Foto-Quelle: Getty Images/Last Resort
     - noch vorhandene Nahrung
   - dient dem Balancing der Überlebenschancen
   - kann automatisch Futter generieren wenn das Gleichgewicht gefährdet ist
-  - beim der Entwicklung dieser Erweiterung, sind 3.453.871 Alpha-Tester gestorben
+  - bei der Entwicklung dieser Erweiterung, sind 3.453.871 Alpha-Tester gestorben
     - sie mögen in Frieden ruhen - blubb, blubb
 
 
