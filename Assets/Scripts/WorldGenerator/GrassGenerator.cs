@@ -5,33 +5,30 @@ public class GrassGenerator : MonoBehaviour
 
     public float size;
     public float resolution;
-    public GameObject prefab;
-
     private float stepSize;
     public float noiseScale;
-
-    public float grassScale;
-
-    public GameObject grassPrefab;
+    public GameObject prefabGrass;
+    public GameObject prefabSeaweed;
     public float thresholdGrass;
-
+    public float grassScale;
+    public float thresholdSeaweed;
+    public float seaweedScale;
     private Vector2 offset;
+    private float seed;
 
-    Renderer m_Renderer;
+    void Awake()
+    {
+        seed = Random.Range(0, 100000);
+        stepSize = size / resolution;
+        offset = new Vector2(transform.position.x, transform.position.z);
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        stepSize = size / resolution;
-        offset = new Vector2(transform.position.x, transform.position.z);
         generateGround();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     void generateGround()
     {
@@ -47,16 +44,24 @@ public class GrassGenerator : MonoBehaviour
 
                 if (sample > thresholdGrass)
                 {
-                    GameObject grass = Instantiate(grassPrefab, new Vector3(i + offset[0], 1, j + offset[1]), Quaternion.identity);
+                    GameObject grass = Instantiate(prefabGrass, new Vector3(i + offset[0], 1, j + offset[1]), Quaternion.identity);
                     float gs = sample * grassScale;
                     grass.transform.localScale = new Vector3(gs, gs, gs);
+                    grass.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
+                }
+
+                if (sample < thresholdSeaweed)
+                {
+                    GameObject grass = Instantiate(prefabSeaweed, new Vector3(i + offset[0], 1, j + offset[1]), Quaternion.identity);
+                    float gs = sample * seaweedScale;
+                    grass.transform.localScale = new Vector3(gs, gs * 10, gs);
                     grass.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                 }
             }
         }
     }
 
-    int seed = Random.Range(0, 100000);
+
     private float groundType(float i, float j)
     {
         float xCoord = seed + i / size * noiseScale;
