@@ -17,7 +17,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &4072494296809950113
 Transform:
@@ -49,7 +49,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5454107561852931696}
   m_Enabled: 1
-  m_CastShadows: 0
+  m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -92,8 +92,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3caeddb08852c9e40952912927dfa857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boidColor1: {r: 0.14816025, g: 0.509434, b: 0.08410466, a: 0}
-  boidColor2: {r: 0.31366438, g: 0.745283, b: 0.13007298, a: 0}
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
   avgFlockHeading: {x: 0, y: 0, z: 0}
