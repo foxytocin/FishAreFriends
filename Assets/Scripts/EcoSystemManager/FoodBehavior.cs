@@ -4,14 +4,14 @@ public class FoodBehavior : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
-    private float availableFood;
+    private int availableFood;
     private BoxCollider b_collider;
 
 
     void Awake()
     {
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        availableFood = Random.Range(500, 5000);
+        availableFood = Random.Range(5000, 40000);
         ecoSystemManager.setAvailableFood(availableFood);
         b_collider = GetComponent<BoxCollider>();
         scaleFood();
@@ -20,12 +20,12 @@ public class FoodBehavior : MonoBehaviour
 
     private void scaleFood()
     {
-        float size = availableFood / 1000f;
+        float size = (float)availableFood / 10000f;
         transform.localScale = new Vector3(size, size, size);
         b_collider.size = new Vector3(size, size, size);
     }
 
-    public float getFood(float amount)
+    public int getFood(int amount)
     {
         if (availableFood >= amount)
         {
@@ -38,8 +38,8 @@ public class FoodBehavior : MonoBehaviour
 
         if (amount > availableFood)
         {
-            float tmp = availableFood;
-            availableFood = 0f;
+            int tmp = availableFood;
+            availableFood = 0;
             ecoSystemManager.setAvailableFood(-tmp);
             scaleFood();
             //Debug.Log("FOOD: Ordert: " + amount + " / Received: " + tmp);
@@ -50,7 +50,7 @@ public class FoodBehavior : MonoBehaviour
 
         gameObject.layer = 2;
         gameObject.SetActive(false);
-        return 0f;
+        return 0;
     }
 
     public float checkAmount()

@@ -38,10 +38,10 @@ public class Boid : MonoBehaviour
     Leader myLeader = null;
 
     // Food
-    public float basicFoodNeed = 100f;
-    public float foodNeeds;
-    public float foodLeft;
-    private float hungerRate;
+    public int basicFoodNeed = 1000;
+    public int foodNeeds;
+    public int foodLeft;
+    private int hungerRate;
     public bool alife;
 
     // Debug
@@ -51,11 +51,11 @@ public class Boid : MonoBehaviour
     {
         alife = true;
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        foodNeeds = 0f;
+        foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = gameObject.GetComponent<MeshRenderer>().material;
         cachedTransform = transform;
-        hungerRate = Random.Range(0.1f, 0.3f);
+        hungerRate = Random.Range(1, 3);
     }
 
     public void Initialize(BoidSettings settings, Transform target)
@@ -168,7 +168,7 @@ public class Boid : MonoBehaviour
 
         // chaising for food
         setFoodNeeds();
-        if (foodLeft < 30)
+        if (foodLeft < 400)
         {
             material.SetColor("_BaseColor1", Color.red);
             material.SetColor("_BaseColor2", Color.red);
@@ -198,11 +198,16 @@ public class Boid : MonoBehaviour
                     var positionToFood = fo.transform.position - position;
                     acceleration += positionToFood * settings.chaisingForFoodForce;
 
+                    if (true)
+                    {
+                        Debug.DrawRay(position, positionToFood, Color.red);
+                    }
+
                     // eat when nearby
                     if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
                     {
-                        material.SetColor("_BaseColor1", Color.green);
-                        material.SetColor("_BaseColor2", Color.green);
+                        material.SetColor("_BaseColor1", originalColor1);
+                        material.SetColor("_BaseColor2", originalColor2);
 
                         foodNeeds -= fo.GetComponent<FoodBehavior>().getFood(foodNeeds);
                         setFoodNeeds();
@@ -234,7 +239,7 @@ public class Boid : MonoBehaviour
         }
         else
         {
-            foodNeeds = Mathf.Clamp(foodNeeds, 0f, basicFoodNeed);
+            foodNeeds = Mathf.Clamp(foodNeeds, 0, basicFoodNeed);
             foodLeft = basicFoodNeed - foodNeeds;
         }
     }

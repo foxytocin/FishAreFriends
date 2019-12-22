@@ -9,14 +9,14 @@ public class EcoSystemManager : MonoBehaviour
 
     [Header("Statistics")]
     public int fishCount;
-    public float foodDemand;
-    public float availableFood;
+    public int foodDemand;
+    public int availableFood;
     public int diedFishes;
 
     [Header("Food Management")]
     public bool feedAutomatically;
-    public int feedIfHungerAbove = 50;
-    public int feedIfLeftFoodBelow = 1000;
+    public int ifHungerAbove = 300;
+    public int andAvailableFoodBelow = 40000;
 
     // Start is called before the first frame update
     void Awake()
@@ -30,17 +30,17 @@ public class EcoSystemManager : MonoBehaviour
     }
 
 
-    public void setFoodDemand(float amount)
+    public void setFoodDemand(int amount)
     {
         foodDemand = amount / fishCount;
 
-        if (feedAutomatically && foodDemand > feedIfHungerAbove && availableFood < feedIfLeftFoodBelow)
+        if (feedAutomatically && foodDemand > ifHungerAbove && availableFood < andAvailableFoodBelow)
         {
             foodManager.dropFood();
         }
     }
 
-    public void setAvailableFood(float amount)
+    public void setAvailableFood(int amount)
     {
         availableFood += amount;
     }
