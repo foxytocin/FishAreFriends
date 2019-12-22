@@ -173,7 +173,7 @@ public class Boid : MonoBehaviour
             material.SetColor("_BaseColor1", Color.red);
             material.SetColor("_BaseColor2", Color.red);
 
-            Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
+            Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Food"));
             if (hitCollidersFood.Length > 0)
             {
                 // find nearest food
@@ -197,6 +197,11 @@ public class Boid : MonoBehaviour
                     // swim towards food
                     var positionToFood = fo.transform.position - position;
                     acceleration += positionToFood * settings.chaisingForFoodForce;
+
+                    if (true)
+                    {
+                        Debug.DrawRay(position, positionToFood, Color.red);
+                    }
 
                     // eat when nearby
                     if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)

@@ -15,8 +15,8 @@ public class EcoSystemManager : MonoBehaviour
 
     [Header("Food Management")]
     public bool feedAutomatically;
-    public int feedIfHungerAbove = 50;
-    public int feedIfLeftFoodBelow = 1000;
+    public int ifHungerAbove = 50;
+    public int andAvailableFoodBelow = 1000;
 
     // Start is called before the first frame update
     void Awake()
@@ -34,7 +34,7 @@ public class EcoSystemManager : MonoBehaviour
     {
         foodDemand = amount / fishCount;
 
-        if (feedAutomatically && foodDemand > feedIfHungerAbove && availableFood < feedIfLeftFoodBelow)
+        if (feedAutomatically && foodDemand > ifHungerAbove && availableFood < andAvailableFoodBelow)
         {
             foodManager.dropFood();
         }

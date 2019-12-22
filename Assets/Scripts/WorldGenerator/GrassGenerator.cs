@@ -32,6 +32,7 @@ public class GrassGenerator : MonoBehaviour
 
     void generateGround()
     {
+        var grassHolder = new GameObject("GrassAndSeaweed").transform;
         for (float i = 0; i < size; i += stepSize)
         {
             for (float j = 0; j < size; j += stepSize)
@@ -48,6 +49,7 @@ public class GrassGenerator : MonoBehaviour
                     float gs = sample * grassScale;
                     grass.transform.localScale = new Vector3(gs, gs, gs);
                     grass.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
+                    grass.transform.parent = grassHolder;
                 }
 
                 if (sample < thresholdSeaweed)
@@ -56,6 +58,7 @@ public class GrassGenerator : MonoBehaviour
                     float gs = sample * seaweedScale;
                     grass.transform.localScale = new Vector3(gs, gs * 10, gs);
                     grass.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
+                    grass.transform.parent = grassHolder;
                 }
             }
         }
