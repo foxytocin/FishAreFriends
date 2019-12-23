@@ -198,10 +198,7 @@ public class Boid : MonoBehaviour
                     var positionToFood = fo.transform.position - position;
                     acceleration += positionToFood * settings.chaisingForFoodForce;
 
-                    if (true)
-                    {
-                        Debug.DrawRay(position, positionToFood, Color.red);
-                    }
+                    //Debug.DrawRay(position, positionToFood, Color.red);
 
                     // eat when nearby
                     if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
