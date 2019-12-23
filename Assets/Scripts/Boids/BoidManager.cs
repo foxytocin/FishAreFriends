@@ -68,6 +68,7 @@ public class BoidManager : MonoBehaviour
                 else
                 {
                     boids[i].LetMeDie();
+                    boids[i].RespawnBoid();
                 }
             }
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);

@@ -15,9 +15,11 @@ public class GrassGenerator : MonoBehaviour
     public float seaweedScale;
     private Vector2 offset;
     private float seed;
+    private EcoSystemManager ecoSystemManager;
 
     void Awake()
     {
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         seed = Random.Range(0, 100000);
         stepSize = size / resolution;
         offset = new Vector2(transform.position.x, transform.position.z);
@@ -54,11 +56,16 @@ public class GrassGenerator : MonoBehaviour
 
                 if (sample < thresholdSeaweed)
                 {
-                    GameObject grass = Instantiate(prefabSeaweed, new Vector3(i + offset[0], 1, j + offset[1]), Quaternion.identity);
+                    Vector3 grasPosition = new Vector3(i + offset[0], 1, j + offset[1]);
+                    GameObject grass = Instantiate(prefabSeaweed, grasPosition, Quaternion.identity);
                     float gs = sample * seaweedScale;
                     grass.transform.localScale = new Vector3(gs, gs * 10, gs);
                     grass.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                     grass.transform.parent = grassHolder;
+
+                    // add gras as spawnpoint
+                    ecoSystemManager.AddSpawnPoint(grasPosition);
+
                 }
             }
         }
