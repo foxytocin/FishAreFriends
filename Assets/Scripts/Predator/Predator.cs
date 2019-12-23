@@ -14,16 +14,21 @@ public class Predator : MonoBehaviour
 
     Transform cachedTransform;
 
-    float minSpeed = 2;
-    float maxSpeed = 4;
-    float maxSteerForce = 2;
-    float avoidCollisionWeight = 5;
-    float boundsRadius = 0.27f;
-    float collisionAvoidDst = 5;
-    LayerMask obstacleMask;
+    public float minSpeed = 2;
+    public float maxSpeed = 4.5f;
+    public float maxSteerForce = 2;
+    public float avoidCollisionWeight = 5;
+    public float boundsRadius = 0.27f;
+    public float collisionAvoidDst = 5;
+    public LayerMask obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
 
     // hunting
     GameObject boidToHunt = null;
+    public int fishNutritionalValue = 700;
+
+    // food
+    public int basicFoodNeed = 1000;
+    public int foodNeeds;
 
     // Debug
     bool showDebug = true;
@@ -32,15 +37,15 @@ public class Predator : MonoBehaviour
     void Awake()
     {
         cachedTransform = transform;   
-        obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
     }
 
     public void Start()
     {
+        foodNeeds = basicFoodNeed;
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
-        float startSpeed = (minSpeed + maxSpeed) / 2;
+        float startSpeed = minSpeed;
         velocity = transform.forward * startSpeed;
     }
 
@@ -50,17 +55,33 @@ public class Predator : MonoBehaviour
             boidToHunt = boid;
     }
 
-    public void BoidDied()
+    public bool BoidDied(Boid boid)
     {
+
+        if (!boidToHunt.Equals(boid.gameObject))
+            return false;
+
         boidToHunt = null;
+
+        if (foodNeeds >= basicFoodNeed)
+            return false;
+
+        foodNeeds += fishNutritionalValue;
+        return true;
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 acceleration = Vector3.zero;
 
+        // foodNeeds
+        foodNeeds -= 1;
+
+
+
+
+        Vector3 acceleration = Vector3.zero;
         if (IsHeadingForCollision())
         {
             Vector3 collisionAvoidDir = ObstacleRays();
@@ -68,7 +89,7 @@ public class Predator : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
-        if (boidToHunt != null)
+        if (boidToHunt != null && foodNeeds < 500)
         {
             var positionToBoid = boidToHunt.transform.position - position;
             acceleration += positionToBoid * 5;
