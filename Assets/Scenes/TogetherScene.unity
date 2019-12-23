@@ -10480,7 +10480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e49c8bde9c136834e82e875e3aa06d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 7687712262706944671, guid: 5f747eeaba6f04d67a8ed83baeea508e, type: 3}
+  prefab: {fileID: 6029163333581138845, guid: a577ae74c54f44f4b9a3eb452533fd88, type: 3}
   spawnRadius: 2
   spawnCount: 999
   color1: {r: 0, g: 0.6509434, b: 0.015509457, a: 0}
