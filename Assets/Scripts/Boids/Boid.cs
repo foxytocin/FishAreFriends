@@ -128,15 +128,16 @@ public class Boid : MonoBehaviour
             predatorScript.IAmYourBoid(gameObject);
 
             float distanceToPredator = Vector3.Distance(position, predator.transform.position);
-            if(distanceToPredator <= 1.5)
+            if (distanceToPredator <= 1.5f)
             {
                 if (predatorScript.BoidDied(this))
                 {
+                    ecoSystemManager.addKilledFish();
                     LetMeDie();
                 }
-                
+
             }
-             
+
 
         }
 
@@ -174,12 +175,6 @@ public class Boid : MonoBehaviour
             }
 
         }
-
-        // check food, if leader exists
-        // if (myLeader != null)
-        // {
-        //     food -= 0.2f;
-        // }
 
 
         // chaising for food
@@ -254,8 +249,7 @@ public class Boid : MonoBehaviour
         foodNeeds += hungerRate;
         if (foodNeeds > basicFoodNeed)
         {
-            alife = false;
-            ecoSystemManager.addDiedFish();
+            LetMeDie();
         }
         else
         {
@@ -266,8 +260,13 @@ public class Boid : MonoBehaviour
 
     public void LetMeDie()
     {
-        gameObject.layer = 2;
-        gameObject.SetActive(false);
+        if (alife)
+        {
+            alife = false;
+            gameObject.layer = 2;
+            gameObject.SetActive(false);
+            ecoSystemManager.addDiedFish();
+        }
     }
 
     bool IsHeadingForCollision()
