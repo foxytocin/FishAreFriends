@@ -9877,8 +9877,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
-  minSpeed: 2
-  maxSpeed: 4.5
+  minSpeed: 1
+  normalMaxSpeed: 3
+  huntingMaxSpeed: 4.5
   maxSteerForce: 2
   avoidCollisionWeight: 5
   boundsRadius: 0.27
@@ -11724,7 +11725,8 @@ MonoBehaviour:
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
   minSpeed: 2
-  maxSpeed: 4.5
+  normalMaxSpeed: 3
+  huntingMaxSpeed: 4.5
   maxSteerForce: 2
   avoidCollisionWeight: 5
   boundsRadius: 0.27
