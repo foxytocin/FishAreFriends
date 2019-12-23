@@ -40,6 +40,9 @@ public class EcoSystemManager : MonoBehaviour
 
     public void setfoodDemandFishes(int amount)
     {
+        if (fishCount == 0)
+            return;
+
         foodDemandFishes = amount / fishCount;
 
         if (feedAutomatically && foodDemandFishes > ifHungerAbove && availableFood < andAvailableFoodBelow)
