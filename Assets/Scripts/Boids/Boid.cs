@@ -169,7 +169,7 @@ public class Boid : MonoBehaviour
 
         // chaising for food
         setFoodNeeds();
-        if (foodLeft < 400)
+        if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
         {
             setColor(Color.red, Color.red);
 
