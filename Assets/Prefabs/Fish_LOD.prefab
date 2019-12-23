@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3caeddb08852c9e40952912927dfa857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabBlood: {fileID: 8512845443297896005, guid: a9e041582adfc45509cecb189b47f330,
+    type: 3}
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
   avgFlockHeading: {x: 0, y: 0, z: 0}
