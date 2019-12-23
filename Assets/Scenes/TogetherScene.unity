@@ -11406,9 +11406,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishCount: 0
-  foodDemand: 0
+  foodDemandFishes: 0
   availableFood: 0
   diedFishes: 0
+  killedFishes: 0
+  foodLeft: 0
   feedAutomatically: 1
   ifHungerAbove: 300
   andAvailableFoodBelow: 40000
@@ -11519,6 +11521,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
+  minSpeed: 2
+  maxSpeed: 4.5
+  maxSteerForce: 2
+  avoidCollisionWeight: 5
+  boundsRadius: 0.27
+  collisionAvoidDst: 5
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  fishNutritionalValue: 700
+  basicFoodNeed: 1000
+  foodNeeds: 0
 --- !u!23 &1239412644
 MeshRenderer:
   m_ObjectHideFlags: 0
