@@ -123,6 +123,18 @@ public class Boid : MonoBehaviour
             GameObject predator = hitCollidersPredator[0].gameObject;
             var positionToPredator = predator.transform.position - position;
             acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
+
+            Predator predatorScript = predator.GetComponent<Predator>();
+            predatorScript.IAmYourBoid(gameObject);
+
+            float distanceToPredator = Vector3.Distance(position, predator.transform.position);
+            if(distanceToPredator <= 1)
+            {
+                LetMeDie();
+                predatorScript.BoidDied();
+            }
+             
+
         }
 
 
@@ -247,6 +259,12 @@ public class Boid : MonoBehaviour
             foodNeeds = Mathf.Clamp(foodNeeds, 0, basicFoodNeed);
             foodLeft = basicFoodNeed - foodNeeds;
         }
+    }
+
+    public void LetMeDie()
+    {
+        gameObject.layer = 2;
+        gameObject.SetActive(false);
     }
 
     bool IsHeadingForCollision()

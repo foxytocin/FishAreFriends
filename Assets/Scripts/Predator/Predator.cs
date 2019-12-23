@@ -5,7 +5,6 @@ using UnityEngine;
 public class Predator : MonoBehaviour
 {
 
-
     // State
     [HideInInspector]
     public Vector3 position;
@@ -22,6 +21,9 @@ public class Predator : MonoBehaviour
     float boundsRadius = 0.27f;
     float collisionAvoidDst = 5;
     LayerMask obstacleMask;
+
+    // hunting
+    GameObject boidToHunt = null;
 
     // Debug
     bool showDebug = true;
@@ -42,6 +44,18 @@ public class Predator : MonoBehaviour
         velocity = transform.forward * startSpeed;
     }
 
+    public void IAmYourBoid(GameObject boid)
+    {
+        if (boidToHunt == null)
+            boidToHunt = boid;
+    }
+
+    public void BoidDied()
+    {
+        boidToHunt = null;
+    }
+
+
     // Update is called once per frame
     void Update()
     {
@@ -52,6 +66,21 @@ public class Predator : MonoBehaviour
             Vector3 collisionAvoidDir = ObstacleRays();
             Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
             acceleration += collisionAvoidForce;
+        }
+
+        if (boidToHunt != null)
+        {
+            var positionToBoid = boidToHunt.transform.position - position;
+            acceleration += positionToBoid * 5;
+
+            float distance = Vector3.Distance(position, boidToHunt.transform.position);
+
+            if (!boidToHunt.activeSelf)
+                boidToHunt = null;
+
+            if (distance > 10)
+                boidToHunt = null;
+
         }
 
         velocity += acceleration * Time.deltaTime;
@@ -67,7 +96,6 @@ public class Predator : MonoBehaviour
 
     }
 
-
     bool IsHeadingForCollision()
     {
         if (showDebug)
@@ -75,8 +103,7 @@ public class Predator : MonoBehaviour
             Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
             Debug.DrawRay(position, forward, Color.green);
         }
-
-
+        
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
         {
