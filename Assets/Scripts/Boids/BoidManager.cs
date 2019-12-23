@@ -67,11 +67,10 @@ public class BoidManager : MonoBehaviour
                 }
                 else
                 {
-                    // Hier wird aktuell nur das Mesh des Fishes
                     boids[i].LetMeDie();
                 }
             }
-            ecoSystemManager.setFoodDemand(foodNeedsSum);
+            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
 
             boidBuffer.Release();
         }
