@@ -5,6 +5,8 @@ using UnityEngine;
 public class Predator : MonoBehaviour
 {
 
+    EcoSystemManager ecoSystemManager;
+
     // State
     [HideInInspector]
     public Vector3 position;
@@ -20,7 +22,7 @@ public class Predator : MonoBehaviour
     public float avoidCollisionWeight = 5;
     public float boundsRadius = 0.27f;
     public float collisionAvoidDst = 5;
-    public LayerMask obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
+    public LayerMask obstacleMask;
 
     // hunting
     GameObject boidToHunt = null;
@@ -36,7 +38,9 @@ public class Predator : MonoBehaviour
 
     void Awake()
     {
-        cachedTransform = transform;   
+        obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        cachedTransform = transform;
     }
 
     public void Start()
@@ -72,14 +76,13 @@ public class Predator : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
 
         // foodNeeds
         foodNeeds -= 1;
 
-
-
+        ecoSystemManager.setFoodDemandPredator(foodNeeds);
 
         Vector3 acceleration = Vector3.zero;
         if (IsHeadingForCollision())
@@ -114,7 +117,6 @@ public class Predator : MonoBehaviour
         cachedTransform.forward = dir;
         position = cachedTransform.position;
         forward = dir;
-
     }
 
     bool IsHeadingForCollision()
@@ -124,7 +126,7 @@ public class Predator : MonoBehaviour
             Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
             Debug.DrawRay(position, forward, Color.green);
         }
-        
+
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
         {

@@ -9,9 +9,15 @@ public class EcoSystemManager : MonoBehaviour
 
     [Header("Statistics")]
     public int fishCount;
-    public int foodDemand;
+    public int foodDemandFishes;
     public int availableFood;
     public int diedFishes;
+
+
+    [Header("Predator")]
+    public int killedFishes;
+    public int foodLeft;
+
 
     [Header("Food Management")]
     public bool feedAutomatically;
@@ -23,18 +29,20 @@ public class EcoSystemManager : MonoBehaviour
     {
         foodManager = FindObjectOfType<FoodManager>();
         availableFood = 0;
-        foodDemand = 0;
+        foodDemandFishes = 0;
         fishCount = 0;
         diedFishes = 0;
+        killedFishes = 0;
+        foodLeft = 0;
         feedAutomatically = true;
     }
 
 
-    public void setFoodDemand(int amount)
+    public void setfoodDemandFishes(int amount)
     {
-        foodDemand = amount / fishCount;
+        foodDemandFishes = amount / fishCount;
 
-        if (feedAutomatically && foodDemand > ifHungerAbove && availableFood < andAvailableFoodBelow)
+        if (feedAutomatically && foodDemandFishes > ifHungerAbove && availableFood < andAvailableFoodBelow)
         {
             foodManager.dropFood();
         }
@@ -54,5 +62,15 @@ public class EcoSystemManager : MonoBehaviour
     {
         diedFishes++;
         fishCount--;
+    }
+
+    public void addKilledFish()
+    {
+        killedFishes++;
+    }
+
+    public void setFoodDemandPredator(int amount)
+    {
+        foodLeft = amount;
     }
 }
