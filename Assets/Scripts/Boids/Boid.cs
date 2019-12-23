@@ -6,6 +6,7 @@ public class Boid : MonoBehaviour
 {
 
     BoidSettings settings;
+    public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
 
     private Color originalColor1;
@@ -132,6 +133,7 @@ public class Boid : MonoBehaviour
             {
                 if (predatorScript.BoidDied(this))
                 {
+                    Instantiate(prefabBlood, position, Quaternion.identity);
                     ecoSystemManager.addKilledFish();
                     LetMeDie();
                 }
