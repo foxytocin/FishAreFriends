@@ -15,10 +15,10 @@ public class Predator : MonoBehaviour
 
     Transform cachedTransform;
 
-    float minSpeed = 1;
-    float maxSpeed = 3;
+    float minSpeed = 2;
+    float maxSpeed = 4;
     float maxSteerForce = 2;
-    float avoidCollisionWeight = 2;
+    float avoidCollisionWeight = 5;
     float boundsRadius = 0.27f;
     float collisionAvoidDst = 5;
     LayerMask obstacleMask;
@@ -29,8 +29,7 @@ public class Predator : MonoBehaviour
 
     void Awake()
     {
-        cachedTransform = transform;
-        
+        cachedTransform = transform;   
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
     }
 
