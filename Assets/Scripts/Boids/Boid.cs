@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Boid : MonoBehaviour
 {
@@ -131,7 +129,7 @@ public class Boid : MonoBehaviour
             float distanceToPredator = Vector3.Distance(position, predator.transform.position);
             if (distanceToPredator <= 1.5f)
             {
-                if (predatorScript.BoidDied(this))
+                if (predatorScript.BoidDied(this, foodLeft))
                 {
                     Instantiate(prefabBlood, position, Quaternion.identity);
                     ecoSystemManager.addKilledFish();

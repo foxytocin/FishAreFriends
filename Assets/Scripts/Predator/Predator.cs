@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Predator : MonoBehaviour
 {
@@ -16,12 +14,14 @@ public class Predator : MonoBehaviour
 
     Transform cachedTransform;
 
-    public float minSpeed = 2;
-    public float maxSpeed = 4.5f;
-    public float maxSteerForce = 2;
-    public float avoidCollisionWeight = 5;
+    public float minSpeed = 2f;
+    public float normalMaxSpeed = 3f;
+    public float huntingMaxSpeed = 4.5f;
+    private float maxSpeed;
+    public float maxSteerForce = 2f;
+    public float avoidCollisionWeight = 5f;
     public float boundsRadius = 0.27f;
-    public float collisionAvoidDst = 5;
+    public float collisionAvoidDst = 5f;
     public LayerMask obstacleMask;
 
     // hunting
@@ -30,14 +30,17 @@ public class Predator : MonoBehaviour
 
     // food
     public int basicFoodNeed = 1000;
+
     public int foodNeeds;
+    private bool isHunting = false;
 
     // Debug
-    bool showDebug = true;
+    bool showDebug = false;
 
 
     void Awake()
     {
+        maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         cachedTransform = transform;
@@ -59,18 +62,20 @@ public class Predator : MonoBehaviour
             boidToHunt = boid;
     }
 
-    public bool BoidDied(Boid boid)
+    public bool BoidDied(Boid boid, int vitality)
     {
-
         if (!boidToHunt.Equals(boid.gameObject))
             return false;
 
         boidToHunt = null;
 
-        if (foodNeeds >= basicFoodNeed)
+        if (foodNeeds >= basicFoodNeed * 2)
+        {
+            huntingModus(false);
             return false;
+        }
 
-        foodNeeds += fishNutritionalValue;
+        foodNeeds += vitality;
         return true;
     }
 
@@ -92,8 +97,11 @@ public class Predator : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
-        if (boidToHunt != null && foodNeeds < 500)
+        if (boidToHunt != null && (foodNeeds < 200 || isHunting))
         {
+            if (!isHunting)
+                huntingModus(true);
+
             var positionToBoid = boidToHunt.transform.position - position;
             acceleration += positionToBoid * 5;
 
@@ -166,5 +174,11 @@ public class Predator : MonoBehaviour
     {
         Vector3 v = vector.normalized * maxSpeed - velocity;
         return Vector3.ClampMagnitude(v, maxSteerForce);
+    }
+
+    private void huntingModus(bool value)
+    {
+        isHunting = value;
+        maxSpeed = (isHunting) ? huntingMaxSpeed : normalMaxSpeed;
     }
 }
