@@ -51,12 +51,15 @@ public class Predator : MonoBehaviour
 
     public void IAmYourBoid(GameObject boid)
     {
-        if (boidToHunt == null && foodNeeds < 500)
+        if (boidToHunt == null)
             boidToHunt = boid;
     }
 
-    public bool BoidDied()
+    public bool BoidDied(Boid boid)
     {
+
+        if (!boidToHunt.Equals(boid.gameObject))
+            return false;
 
         boidToHunt = null;
 

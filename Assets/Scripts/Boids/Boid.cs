@@ -130,7 +130,7 @@ public class Boid : MonoBehaviour
             float distanceToPredator = Vector3.Distance(position, predator.transform.position);
             if(distanceToPredator <= 1.5)
             {
-                if (predatorScript.BoidDied())
+                if (predatorScript.BoidDied(this))
                 {
                     LetMeDie();
                 }
