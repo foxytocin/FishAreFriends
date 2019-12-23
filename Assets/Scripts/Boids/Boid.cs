@@ -30,7 +30,7 @@ public class Boid : MonoBehaviour
     public int numPerceivedFlockmates;
 
     // Cached
-    Material material;
+    Material[] material;
     Transform cachedTransform;
     Transform target;
 
@@ -53,7 +53,11 @@ public class Boid : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
-        material = gameObject.GetComponent<MeshRenderer>().material;
+        material = new Material[3];
+        material[0] = gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material;
+        material[1] = gameObject.transform.GetChild(1).GetComponent<MeshRenderer>().material;
+        material[2] = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
+
         cachedTransform = transform;
         hungerRate = Random.Range(1, 3);
     }
@@ -76,8 +80,7 @@ public class Boid : MonoBehaviour
         {
             originalColor1 = col1;
             originalColor2 = col2;
-            material.SetColor("_BaseColor1", originalColor1);
-            material.SetColor("_BaseColor2", originalColor2);
+            setColor(originalColor1, originalColor2);
         }
     }
 
@@ -136,8 +139,7 @@ public class Boid : MonoBehaviour
             if (leaderScript == null)
                 return;
 
-            material.SetColor("_BaseColor1", leaderScript.leaderColor1);
-            material.SetColor("_BaseColor2", leaderScript.leaderColor2);
+            setColor(leaderScript.leaderColor1, leaderScript.leaderColor2);
 
             if (myLeader == null)
             {
@@ -148,8 +150,7 @@ public class Boid : MonoBehaviour
         }
         else
         {
-            material.SetColor("_BaseColor1", originalColor1);
-            material.SetColor("_BaseColor2", originalColor2);
+            setColor(originalColor1, originalColor2);
 
             if (myLeader != null)
             {
@@ -170,8 +171,7 @@ public class Boid : MonoBehaviour
         setFoodNeeds();
         if (foodLeft < 400)
         {
-            material.SetColor("_BaseColor1", Color.red);
-            material.SetColor("_BaseColor2", Color.red);
+            setColor(Color.red, Color.red);
 
             Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
             if (hitCollidersFood.Length > 0)
@@ -198,16 +198,12 @@ public class Boid : MonoBehaviour
                     var positionToFood = fo.transform.position - position;
                     acceleration += positionToFood * settings.chaisingForFoodForce;
 
-                    if (true)
-                    {
-                        Debug.DrawRay(position, positionToFood, Color.red);
-                    }
+                    //Debug.DrawRay(position, positionToFood, Color.red);
 
                     // eat when nearby
                     if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
                     {
-                        material.SetColor("_BaseColor1", originalColor1);
-                        material.SetColor("_BaseColor2", originalColor2);
+                        setColor(originalColor1, originalColor2);
 
                         foodNeeds -= fo.GetComponent<FoodBehavior>().getFood(foodNeeds);
                         setFoodNeeds();
@@ -227,6 +223,15 @@ public class Boid : MonoBehaviour
         cachedTransform.forward = dir;
         position = cachedTransform.position;
         forward = dir;
+    }
+
+    void setColor(Color col1, Color col2)
+    {
+        foreach (Material mat in material)
+        {
+            mat.SetColor("_BaseColor1", col1);
+            mat.SetColor("_BaseColor2", col2);
+        }
     }
 
     void setFoodNeeds()
