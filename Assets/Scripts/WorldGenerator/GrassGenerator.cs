@@ -64,7 +64,7 @@ public class GrassGenerator : MonoBehaviour
                     grass.transform.parent = grassHolder;
 
                     // add gras as spawnpoint
-                    ecoSystemManager.AddSpawnPoint(grasPosition);
+                    ecoSystemManager.AddSpawnPoint(grasPosition + new Vector3(0, 3, 0));
 
                 }
             }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.28121173, g: 0.3666275, b: 0.49903026, a: 1}
+  m_IndirectSpecularColor: {r: 0.28121132, g: 0.36662698, b: 0.4990273, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -99,7 +99,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: 0997250387ba6480cb803962511a66cd,
     type: 2}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -11616,7 +11616,7 @@ MonoBehaviour:
   foodLeft: 0
   feedAutomatically: 1
   ifHungerAbove: 300
-  andAvailableFoodBelow: 40000
+  andAvailableFoodBelow: 100000
 --- !u!4 &1215664452
 Transform:
   m_ObjectHideFlags: 0

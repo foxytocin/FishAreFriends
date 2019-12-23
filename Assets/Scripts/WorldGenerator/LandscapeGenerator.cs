@@ -2,17 +2,9 @@
 
 public class LandscapeGenerator : MonoBehaviour
 {
-
-
     public GameObject prefabCube;
     public GameObject prefabCylinder;
     public int amountSzeneElements;
-    private EcoSystemManager ecoSystemManager;
-
-    void Awake()
-    {
-        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-    }
 
     private void Start()
     {
@@ -27,10 +19,9 @@ public class LandscapeGenerator : MonoBehaviour
             Vector2 pos = new Vector2(Random.Range(-26, 26), Random.Range(-26, 26));
 
             Vector3 position = new Vector3(pos[0], elementHeight / 2f, pos[1]);
-            GameObject go = Instantiate(instName, position, Quaternion.identity) as GameObject;
+            GameObject go = Instantiate(instName, position, Quaternion.identity);
             go.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
             go.transform.parent = enviromentHolder;
-            ecoSystemManager.AddSpawnPoint(position);
         }
     }
 

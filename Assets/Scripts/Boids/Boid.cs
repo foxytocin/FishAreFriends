@@ -132,7 +132,7 @@ public class Boid : MonoBehaviour
                 if (predatorScript.BoidDied(this, foodLeft))
                 {
                     Instantiate(prefabBlood, position, Quaternion.identity);
-                    //ecoSystemManager.addKilledFish();
+                    ecoSystemManager.addKilledFish();
                     LetMeDie();
                 }
 
@@ -264,6 +264,7 @@ public class Boid : MonoBehaviour
         {
             alife = false;
             gameObject.SetActive(false);
+            ecoSystemManager.addDiedFish();
         }
     }
 
@@ -272,7 +273,7 @@ public class Boid : MonoBehaviour
         // reset foold
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
-         
+
         // reset position
         gameObject.transform.position = ecoSystemManager.GetNextSpawnPoint();
         gameObject.transform.forward = Random.insideUnitSphere;

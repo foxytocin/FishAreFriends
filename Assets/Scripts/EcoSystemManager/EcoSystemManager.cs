@@ -11,11 +11,11 @@ public class EcoSystemManager : MonoBehaviour
     public int fishCount;
     public int foodDemandFishes;
     public int availableFood;
-    // public int diedFishes;
+    public int diedFishes;
 
 
     [Header("Predator")]
-    // public int killedFishes;
+    public int killedFishes;
     public int foodLeft;
 
 
@@ -34,9 +34,9 @@ public class EcoSystemManager : MonoBehaviour
         foodManager = FindObjectOfType<FoodManager>();
         availableFood = 0;
         foodDemandFishes = 0;
-        // fishCount = 0;
-        // diedFishes = 0;
-        // killedFishes = 0;
+        fishCount = 0;
+        diedFishes = 0;
+        killedFishes = 0;
         foodLeft = 0;
         feedAutomatically = true;
     }
@@ -60,27 +60,27 @@ public class EcoSystemManager : MonoBehaviour
         availableFood += amount;
     }
 
-    
+
     public void setFishCount(int amount)
     {
         fishCount = amount;
     }
-    
 
-    /*
+    public void addFishToFishCount()
+    {
+        fishCount++;
+    }
+
     public void addDiedFish()
     {
         diedFishes++;
         fishCount--;
     }
-    */
 
-    /*
     public void addKilledFish()
     {
         killedFishes++;
     }
-    */
 
     public void setFoodDemandPredator(int amount)
     {
