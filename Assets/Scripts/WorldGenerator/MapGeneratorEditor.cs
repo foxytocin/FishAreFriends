@@ -22,5 +22,10 @@ public class MapGeneratorEditor : Editor
         {
             mapGen.GenerateMap();
         }
+
+        if (GUILayout.Button("Destroy All"))
+        {
+            mapGen.Cleanup();
+        }
     }
 }
