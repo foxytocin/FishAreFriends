@@ -75,9 +75,9 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int y = 0; y < height; y++)
+        for (int y = 5; y < height - 5; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 5; x < width - 5; x++)
             {
                 float sample = noiseMap[x, y];
                 if (sample < thresholdGrass)
