@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -53,11 +51,18 @@ public class MapGenerator : MonoBehaviour
     public Material groundMaterial;
 
 
+    [Header("Water Setting")]
+
+    public Material waterMaterial;
 
 
 
-    private Mesh mesh;
+
+
+    private Mesh meshGround;
     private Vector3[] verticesGround;
+    private Mesh meshWater;
+    private Vector3[] verticesWater;
 
 
 
@@ -83,14 +88,15 @@ public class MapGenerator : MonoBehaviour
 
         float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
-        //MapDisplay display = FindObjectOfType<MapDisplay>();
-        //display.DrawNoiseMap(noiseMap, mapResolution);
+        if (!debug)
+        {
+            PlantPlants(noiseMap);
+            GenerateWalls();
+            placeStones(noiseMap);
+            GenerateGround(noiseMap);
+        }
 
-        PlantPlants(noiseMap);
-        GenerateWalls();
-        placeStones(noiseMap);
-
-        GenerateGround(noiseMap);
+        GenerateWater();
     }
 
     float map(float s, float a1, float a2, float b1, float b2)
@@ -223,8 +229,9 @@ public class MapGenerator : MonoBehaviour
         proceduralGround.AddComponent<MeshRenderer>();
         proceduralGround.GetComponent<Renderer>().material = groundMaterial;
         proceduralGround.AddComponent<MeshFilter>();
-        proceduralGround.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        mesh.name = "ProceduralGround";
+        proceduralGround.GetComponent<MeshFilter>().mesh = meshGround = new Mesh();
+        proceduralGround.layer = 11;
+        meshGround.name = "ProceduralGround";
 
         verticesGround = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         Vector2[] uv = new Vector2[verticesGround.Length];
@@ -243,8 +250,8 @@ public class MapGenerator : MonoBehaviour
                 uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
             }
         }
-        mesh.vertices = verticesGround;
-        mesh.uv = uv;
+        meshGround.vertices = verticesGround;
+        meshGround.uv = uv;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
         for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
@@ -257,9 +264,54 @@ public class MapGenerator : MonoBehaviour
                 triangles[ti + 5] = vi + (int)mapSize.x + 2;
             }
         }
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        meshGround.triangles = triangles;
+        meshGround.RecalculateNormals();
     }
+
+    private void GenerateWater()
+    {
+        GameObject proceduralWater = new GameObject("ProceduralWater");
+        proceduralWater.tag = "Enviroment";
+        proceduralWater.AddComponent<MeshRenderer>();
+        proceduralWater.GetComponent<Renderer>().material = waterMaterial;
+        proceduralWater.AddComponent<MeshFilter>();
+        proceduralWater.GetComponent<MeshFilter>().mesh = meshWater = new Mesh();
+        proceduralWater.layer = 4;
+
+        meshWater.name = "ProceduralWater";
+
+        verticesWater = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
+        Vector2[] uv = new Vector2[verticesWater.Length];
+
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        {
+            for (int x = 0; x <= mapSize.x; x++, i++)
+            {
+                verticesWater[i] = new Vector3(x, 0, y);
+                uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
+            }
+        }
+        meshWater.vertices = verticesWater;
+        meshWater.uv = uv;
+
+        int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        {
+            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            {
+                triangles[ti] = vi;
+                triangles[ti + 3] = triangles[ti + 2] = vi + 1;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+            }
+        }
+        meshWater.triangles = triangles;
+        meshWater.RecalculateNormals();
+
+        proceduralWater.transform.Rotate(180, 0, 0, Space.Self);
+        proceduralWater.transform.position = new Vector3(0, mapSize.y, mapSize.z);
+    }
+
 
     private void OnDrawGizmos()
     {
