@@ -24,9 +24,13 @@ public class EcoSystemManager : MonoBehaviour
     public int ifHungerAbove = 300;
     public int andAvailableFoodBelow = 40000;
 
+
+    public Queue<Vector3> spawnPoints;
+
     // Start is called before the first frame update
     void Awake()
     {
+        spawnPoints = new Queue<Vector3>();
         foodManager = FindObjectOfType<FoodManager>();
         availableFood = 0;
         foodDemandFishes = 0;
@@ -56,9 +60,15 @@ public class EcoSystemManager : MonoBehaviour
         availableFood += amount;
     }
 
+
     public void setFishCount(int amount)
     {
         fishCount = amount;
+    }
+
+    public void addFishToFishCount()
+    {
+        fishCount++;
     }
 
     public void addDiedFish()
@@ -75,5 +85,21 @@ public class EcoSystemManager : MonoBehaviour
     public void setFoodDemandPredator(int amount)
     {
         foodLeft = amount;
+    }
+
+    public void AddSpawnPoint(Vector3 point)
+    {
+        spawnPoints.Enqueue(point);
+        Debug.Log(spawnPoints.Count);
+    }
+
+    public Vector3 GetNextSpawnPoint()
+    {
+        if (spawnPoints.Count == 0)
+            spawnPoints.Enqueue(new Vector3(0, 0, 2));
+
+        Vector3 point = spawnPoints.Dequeue();
+        spawnPoints.Enqueue(point);
+        return point;
     }
 }

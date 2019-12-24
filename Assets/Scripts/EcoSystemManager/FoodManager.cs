@@ -4,6 +4,7 @@ public class FoodManager : MonoBehaviour
 {
     private Vector3 target;
     public GameObject Food;
+    public int saveArea;
 
     Transform foodHolder;
 
@@ -22,7 +23,7 @@ public class FoodManager : MonoBehaviour
 
     public void dropFood()
     {
-        target = new Vector3(Random.Range(-20, 20), Random.Range(3, 15), Random.Range(-20, 20));
+        target = new Vector3(Random.Range(0 + saveArea, 100 - saveArea), Random.Range(0 + saveArea, 30 - saveArea), Random.Range(0 + saveArea, 100 - saveArea));
         GameObject go = Instantiate(Food, target, Quaternion.identity);
         go.transform.parent = foodHolder;
     }

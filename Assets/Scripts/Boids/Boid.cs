@@ -263,10 +263,24 @@ public class Boid : MonoBehaviour
         if (alife)
         {
             alife = false;
-            gameObject.layer = 2;
             gameObject.SetActive(false);
             ecoSystemManager.addDiedFish();
         }
+    }
+
+    public void RespawnBoid()
+    {
+        // reset foold
+        foodNeeds = 0;
+        foodLeft = basicFoodNeed;
+
+        // reset position
+        gameObject.transform.position = ecoSystemManager.GetNextSpawnPoint();
+        gameObject.transform.forward = Random.insideUnitSphere;
+
+        // reset state
+        gameObject.SetActive(true);
+        alife = true;
     }
 
     bool IsHeadingForCollision()
