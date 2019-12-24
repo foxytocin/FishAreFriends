@@ -6,6 +6,7 @@ public class BoidManager : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
+    Spawner spawner;
     const int threadGroupSize = 1024;
 
     public BoidSettings settings;
@@ -13,15 +14,25 @@ public class BoidManager : MonoBehaviour
     public float distance = 1;
     Boid[] boids;
 
+    void Awake()
+    {
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        spawner = FindObjectOfType<Spawner>();
+    }
+
     void Start()
     {
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        boids = FindObjectsOfType<Boid>();
-        foreach (Boid b in boids)
+
+        if (spawner.spawnBoids)
         {
-            b.Initialize(settings, null);
+            boids = FindObjectsOfType<Boid>();
+            foreach (Boid b in boids)
+            {
+                b.Initialize(settings, null);
+            }
+            ecoSystemManager.setFishCount(boids.Length);
         }
-        ecoSystemManager.setFishCount(boids.Length);
     }
 
     void Update()

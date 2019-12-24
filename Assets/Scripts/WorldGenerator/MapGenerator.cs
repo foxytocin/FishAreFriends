@@ -7,6 +7,11 @@ public class MapGenerator : MonoBehaviour
 
     EcoSystemManager ecoSystemManager;
     public GameObject underwaterDust;
+    public bool generateGras = true;
+    public bool generateStones = true;
+    public bool generateWater = true;
+    public bool generateGround = true;
+    public bool generateWalls = true;
 
     [Header("Stones")]
     public GameObject prefabCube;
@@ -49,6 +54,7 @@ public class MapGenerator : MonoBehaviour
     public bool debug = false;
     [Range(0, 20f)]
     public float heightScale;
+    public int groundResolution = 1;
     public Material groundMaterial;
 
 
@@ -89,16 +95,22 @@ public class MapGenerator : MonoBehaviour
 
         float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
-        if (!debug)
-        {
-            ScaleUnderwaterDust();
-            PlantPlants(noiseMap);
-            GenerateWalls();
-            PlaceStones(noiseMap);
-            GenerateGround(noiseMap);
-        }
+        ScaleUnderwaterDust();
 
-        GenerateWater();
+        if (generateGras)
+            PlantPlants(noiseMap);
+
+        if (generateWalls)
+            GenerateWalls();
+
+        if (generateStones)
+            PlaceStones(noiseMap);
+
+        if (generateGround)
+            GenerateGround(noiseMap);
+
+        if (generateWater)
+            GenerateWater();
     }
 
     float map(float s, float a1, float a2, float b1, float b2)
@@ -249,7 +261,7 @@ public class MapGenerator : MonoBehaviour
 
         for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
         {
-            for (int x = 0; x <= mapSize.x; x++, i++)
+            for (int x = 0; x <= (int)mapSize.x; x++, i++)
             {
                 int xMax = Mathf.Clamp(x, 0, width - 1);
                 int yMax = Mathf.Clamp(y, 0, height - 1);
