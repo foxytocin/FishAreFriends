@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+
+
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapGenerator : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
+    public GameObject underwaterDust;
 
     [Header("Stones")]
     public GameObject prefabCube;
@@ -29,6 +31,7 @@ public class MapGenerator : MonoBehaviour
 
     [Header("General World Settings")]
     public GameObject prefabWall;
+    public int paddingToMapBorder;
     public bool autoUpdate;
     Transform enviromentHolder;
     public int mapResolution;
@@ -42,8 +45,32 @@ public class MapGenerator : MonoBehaviour
     public bool randomSeed;
     public Vector2 offset;
 
+    [Header("Ground Setting")]
+    public bool debug = false;
+    [Range(0, 20f)]
+    public float heightScale;
+    public Material groundMaterial;
+
+
+    [Header("Water Setting")]
+
+    public Material waterMaterial;
+
+
+
+
+
+    private Mesh meshGround;
+    private Vector3[] verticesGround;
+    private Mesh meshWater;
+    private Vector3[] verticesWater;
+
+
+
+
     void Awake()
     {
+        verticesGround = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
     }
 
@@ -62,12 +89,21 @@ public class MapGenerator : MonoBehaviour
 
         float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
-        //MapDisplay display = FindObjectOfType<MapDisplay>();
-        //display.DrawNoiseMap(noiseMap, mapResolution);
+        if (!debug)
+        {
+            ScaleUnderwaterDust();
+            PlantPlants(noiseMap);
+            GenerateWalls();
+            PlaceStones(noiseMap);
+            GenerateGround(noiseMap);
+        }
 
-        PlantPlants(noiseMap);
-        GenerateWalls();
-        placeStones();
+        GenerateWater();
+    }
+
+    float map(float s, float a1, float a2, float b1, float b2)
+    {
+        return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
     }
 
     public void PlantPlants(float[,] noiseMap)
@@ -75,16 +111,22 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int y = 5; y < height - 5; y++)
+        for (int y = paddingToMapBorder; y < height - paddingToMapBorder; y++)
         {
-            for (int x = 5; x < width - 5; x++)
+            for (int x = paddingToMapBorder; x < width - paddingToMapBorder; x++)
             {
                 float sample = noiseMap[x, y];
+                float heightOffset = sample * heightScale;
+
                 if (sample < thresholdGrass)
                 {
-                    GameObject go1 = Instantiate(prefabGrass, new Vector3((x / (float)mapResolution), 0, (y / (float)mapResolution)), Quaternion.identity);
-                    float gs1 = sample * grassScale;
+                    GameObject go1 = Instantiate(prefabGrass, new Vector3(0, 0, 0), Quaternion.identity);
+                    //float gs1 = sample * grassScale;
+
+                    float gs1 = map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
+
                     go1.transform.localScale = new Vector3(gs1, gs1, gs1);
+                    go1.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
                     go1.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                     go1.transform.parent = enviromentHolder;
                     go1.tag = "Enviroment";
@@ -92,7 +134,7 @@ public class MapGenerator : MonoBehaviour
 
                 if (sample > thresholdSeaweed)
                 {
-                    GameObject go2 = Instantiate(prefabSeaweed, new Vector3((x / (float)mapResolution), 0, (y / (float)mapResolution)), Quaternion.identity);
+                    GameObject go2 = Instantiate(prefabSeaweed, new Vector3((x / (float)mapResolution), heightOffset / 2f, (y / (float)mapResolution)), Quaternion.identity);
                     float gs2 = sample * seaweedScale;
                     go2.transform.localScale = new Vector3(gs2, gs2 * 10, gs2);
                     go2.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
@@ -158,46 +200,20 @@ public class MapGenerator : MonoBehaviour
     }
 
 
-    private void placeStones()
+    private void PlaceStones(float[,] noiseMap)
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
             float elementHeight = Random.Range(4f, 20f);
             float elementWidth = Random.Range(3f, 8f);
 
-            Vector2 pos = new Vector2(Random.Range(10, 90), Random.Range(10, 90));
-            Vector3 position = new Vector3(pos[0], elementHeight / 2f, pos[1]);
+            int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
+            int y = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
 
+            float sample = noiseMap[x, y];
+            float heightOffset = sample * heightScale;
 
-            List<Vector3> hitPoints;
-
-            RaycastHit hit;
-            if (Physics.Raycast(new Vector3(pos[0], 10, pos[1]), Vector3.down, out hit, 100))
-            {
-                Debug.Log(hit.transform.position);
-                Debug.Log(hit.point);
-                hitPoints = new List<Vector3>();
-                hitPoints.Add(transform.position);
-                //FireRay(transform.position, transform.forward);
-                Gizmos.color = Color.blue;
-
-                for (int j = 1; j < hitPoints.Count; j++)
-                {
-                    Gizmos.DrawLine(hitPoints[i - 1], hitPoints[i]);
-                }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
+            Vector3 position = new Vector3(x, elementHeight / 2f, y);
             GameObject instName = prefabCube; //(Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
 
             GameObject go = Instantiate(instName, position, Quaternion.identity);
@@ -208,20 +224,133 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void Cleanup()
+    private void ScaleUnderwaterDust()
     {
+        underwaterDust.transform.localScale = new Vector3(mapSize.x, mapSize.z, mapSize.y);
+        underwaterDust.transform.position = new Vector3(mapSize.x / 2, mapSize.y / 2, mapSize.z / 2);
+    }
 
-        if (!enviromentHolder)
+    private void GenerateGround(float[,] noiseMap)
+    {
+        GameObject proceduralGround = new GameObject("ProceduralGround");
+        proceduralGround.tag = "Enviroment";
+        proceduralGround.AddComponent<MeshRenderer>();
+        proceduralGround.GetComponent<Renderer>().material = groundMaterial;
+        proceduralGround.AddComponent<MeshFilter>();
+        proceduralGround.GetComponent<MeshFilter>().mesh = meshGround = new Mesh();
+        proceduralGround.layer = 11;
+        meshGround.name = "ProceduralGround";
+
+        verticesGround = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
+        Vector2[] uv = new Vector2[verticesGround.Length];
+
+        int width = noiseMap.GetLength(0);
+        int height = noiseMap.GetLength(1);
+
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
         {
-            enviromentHolder = new GameObject("Enviroment").transform;
+            for (int x = 0; x <= mapSize.x; x++, i++)
+            {
+                int xMax = Mathf.Clamp(x, 0, width - 1);
+                int yMax = Mathf.Clamp(y, 0, height - 1);
+                float heightOffset = noiseMap[xMax, yMax] * heightScale;
+                verticesGround[i] = new Vector3(x, heightOffset, y);
+                uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
+            }
         }
-        else
+        meshGround.vertices = verticesGround;
+        meshGround.uv = uv;
+
+        int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        {
+            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            {
+                triangles[ti] = vi;
+                triangles[ti + 3] = triangles[ti + 2] = vi + 1;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+            }
+        }
+        meshGround.triangles = triangles;
+        meshGround.RecalculateNormals();
+    }
+
+    private void GenerateWater()
+    {
+        GameObject proceduralWater = new GameObject("ProceduralWater");
+        proceduralWater.tag = "Enviroment";
+        proceduralWater.AddComponent<MeshRenderer>();
+        proceduralWater.GetComponent<Renderer>().material = waterMaterial;
+        proceduralWater.AddComponent<MeshFilter>();
+        proceduralWater.GetComponent<MeshFilter>().mesh = meshWater = new Mesh();
+        proceduralWater.layer = 4;
+
+        meshWater.name = "ProceduralWater";
+
+        verticesWater = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
+        Vector2[] uv = new Vector2[verticesWater.Length];
+
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        {
+            for (int x = 0; x <= mapSize.x; x++, i++)
+            {
+                verticesWater[i] = new Vector3(x, 0, y);
+                uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
+            }
+        }
+        meshWater.vertices = verticesWater;
+        meshWater.uv = uv;
+
+        int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        {
+            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            {
+                triangles[ti] = vi;
+                triangles[ti + 3] = triangles[ti + 2] = vi + 1;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+            }
+        }
+        meshWater.triangles = triangles;
+        meshWater.RecalculateNormals();
+
+        proceduralWater.transform.Rotate(180, 0, 0, Space.Self);
+        proceduralWater.transform.position = new Vector3(0, mapSize.y, mapSize.z);
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        if (debug)
+        {
+            if (verticesGround == null)
+            {
+                return;
+            }
+
+            Gizmos.color = Color.black;
+            for (int i = 0; i < verticesGround.Length; i++)
+            {
+                Gizmos.DrawSphere(verticesGround[i], 0.1f);
+            }
+        }
+    }
+
+    public void Cleanup()
+    {
         {
             GameObject[] go = GameObject.FindGameObjectsWithTag("Enviroment");
-
             foreach (GameObject tgo in go)
             {
                 DestroyImmediate(tgo);
+            }
+
+            if (!enviromentHolder)
+            {
+                enviromentHolder = new GameObject("Enviroment").transform;
+                enviromentHolder.tag = "Enviroment";
             }
         }
     }
@@ -252,6 +381,14 @@ public class MapGenerator : MonoBehaviour
         if (mapResolution < 1)
         {
             mapResolution = 1;
+        }
+        if (paddingToMapBorder < 0)
+        {
+            paddingToMapBorder = 0;
+        }
+        if (heightScale < 0)
+        {
+            heightScale = 0;
         }
     }
 
