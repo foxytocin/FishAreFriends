@@ -29,6 +29,7 @@ public class MapGenerator : MonoBehaviour
 
     [Header("General World Settings")]
     public GameObject prefabWall;
+    public int paddingToMapBorder;
     public bool autoUpdate;
     Transform enviromentHolder;
     public int mapResolution;
@@ -75,9 +76,9 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int y = 5; y < height - 5; y++)
+        for (int y = paddingToMapBorder; y < height - paddingToMapBorder; y++)
         {
-            for (int x = 5; x < width - 5; x++)
+            for (int x = paddingToMapBorder; x < width - paddingToMapBorder; x++)
             {
                 float sample = noiseMap[x, y];
                 if (sample < thresholdGrass)
@@ -165,7 +166,7 @@ public class MapGenerator : MonoBehaviour
             float elementHeight = Random.Range(4f, 20f);
             float elementWidth = Random.Range(3f, 8f);
 
-            Vector2 pos = new Vector2(Random.Range(10, 90), Random.Range(10, 90));
+            Vector2 pos = new Vector2(Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder), Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder));
             Vector3 position = new Vector3(pos[0], elementHeight / 2f, pos[1]);
 
 
@@ -252,6 +253,10 @@ public class MapGenerator : MonoBehaviour
         if (mapResolution < 1)
         {
             mapResolution = 1;
+        }
+        if (paddingToMapBorder < 0)
+        {
+            paddingToMapBorder = 0;
         }
     }
 
