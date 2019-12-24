@@ -54,23 +54,24 @@ public class MapGenerator : MonoBehaviour
     public bool debug = false;
     [Range(0, 20f)]
     public float heightScale;
-    public int groundResolution = 1;
+    public float groundResolution = 0.25f;
     public Material groundMaterial;
+    private int stepXGround;
+    private int stepYGround;
 
 
     [Header("Water Setting")]
 
     public Material waterMaterial;
-
-
-
+    public float waterResolution = 0.1f;
+    private int stepXWater;
+    private int stepYWater;
 
 
     private Mesh meshGround;
     private Vector3[] verticesGround;
     private Mesh meshWater;
     private Vector3[] verticesWater;
-
 
 
 
@@ -89,6 +90,11 @@ public class MapGenerator : MonoBehaviour
     public void GenerateMap()
     {
         Cleanup();
+
+        stepXGround = Mathf.FloorToInt(mapSize.x / (mapSize.x * groundResolution));
+        stepYGround = Mathf.FloorToInt(mapSize.z / (mapSize.z * groundResolution));
+        stepXWater = Mathf.FloorToInt(mapSize.x / (mapSize.x * waterResolution));
+        stepYWater = Mathf.FloorToInt(mapSize.z / (mapSize.z * waterResolution));
 
         if (randomSeed)
             seed = Random.Range(0, 100000);
@@ -259,9 +265,9 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y += stepYGround)
         {
-            for (int x = 0; x <= (int)mapSize.x; x++, i++)
+            for (int x = 0; x <= (int)mapSize.x; x += stepXGround, i++)
             {
                 int xMax = Mathf.Clamp(x, 0, width - 1);
                 int yMax = Mathf.Clamp(y, 0, height - 1);
@@ -274,14 +280,14 @@ public class MapGenerator : MonoBehaviour
         meshGround.uv = uv;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
-        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y += stepYGround, vi++)
         {
-            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            for (int x = 0; x < (int)mapSize.x; x += stepXGround, ti += 6, vi++)
             {
                 triangles[ti] = vi;
                 triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
-                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x / stepXGround + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x / stepXGround + 2;
             }
         }
         meshGround.triangles = triangles;
@@ -303,9 +309,9 @@ public class MapGenerator : MonoBehaviour
         verticesWater = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         Vector2[] uv = new Vector2[verticesWater.Length];
 
-        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y += stepYWater)
         {
-            for (int x = 0; x <= mapSize.x; x++, i++)
+            for (int x = 0; x <= (int)mapSize.x; x += stepXWater, i++)
             {
                 verticesWater[i] = new Vector3(x, 0, y);
                 uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
@@ -315,14 +321,14 @@ public class MapGenerator : MonoBehaviour
         meshWater.uv = uv;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
-        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y += stepYWater, vi++)
         {
-            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            for (int x = 0; x < (int)mapSize.x; x += stepXWater, ti += 6, vi++)
             {
                 triangles[ti] = vi;
                 triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
-                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x / stepXWater + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x / stepXWater + 2;
             }
         }
         meshWater.triangles = triangles;
@@ -370,17 +376,17 @@ public class MapGenerator : MonoBehaviour
 
     void OnValidate()
     {
-        if (mapSize.x < 10)
+        if (mapSize.x < 3)
         {
-            mapSize.x = 10;
+            mapSize.x = 3;
         }
-        if (mapSize.y < 10)
+        if (mapSize.y < 3)
         {
-            mapSize.y = 10;
+            mapSize.y = 3;
         }
-        if (mapSize.z < 10)
+        if (mapSize.z < 3)
         {
-            mapSize.z = 10;
+            mapSize.z = 3;
         }
         if (lacunarity < 1)
         {
