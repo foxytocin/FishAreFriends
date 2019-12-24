@@ -6,6 +6,7 @@ public class MapGenerator : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
+    public GameObject underwaterDust;
 
     [Header("Stones")]
     public GameObject prefabCube;
@@ -90,9 +91,10 @@ public class MapGenerator : MonoBehaviour
 
         if (!debug)
         {
+            ScaleUnderwaterDust();
             PlantPlants(noiseMap);
             GenerateWalls();
-            placeStones(noiseMap);
+            PlaceStones(noiseMap);
             GenerateGround(noiseMap);
         }
 
@@ -198,7 +200,7 @@ public class MapGenerator : MonoBehaviour
     }
 
 
-    private void placeStones(float[,] noiseMap)
+    private void PlaceStones(float[,] noiseMap)
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
@@ -220,6 +222,12 @@ public class MapGenerator : MonoBehaviour
             go.transform.parent = enviromentHolder;
             go.tag = "Enviroment";
         }
+    }
+
+    private void ScaleUnderwaterDust()
+    {
+        underwaterDust.transform.localScale = new Vector3(mapSize.x, mapSize.z, mapSize.y);
+        underwaterDust.transform.position = new Vector3(mapSize.x / 2, mapSize.y / 2, mapSize.z / 2);
     }
 
     private void GenerateGround(float[,] noiseMap)
