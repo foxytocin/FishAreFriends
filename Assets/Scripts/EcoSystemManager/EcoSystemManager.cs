@@ -96,7 +96,7 @@ public class EcoSystemManager : MonoBehaviour
     public Vector3 GetNextSpawnPoint()
     {
         if (spawnPoints.Count == 0)
-            spawnPoints.Enqueue(new Vector3(0, 0, 2));
+            spawnPoints.Enqueue(new Vector3(10, 10, 2));
 
         Vector3 point = spawnPoints.Dequeue();
         spawnPoints.Enqueue(point);

@@ -5,24 +5,32 @@ public class MapGenerator : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
+
+    [Header("Stones")]
     public GameObject prefabCube;
     public GameObject prefabCylinder;
-    public GameObject prefabGrass;
-    public GameObject prefabSeaweed;
-    public GameObject prefabWall;
     public int amountSzeneElements;
+
+
+    [Header("Grass")]
+    public GameObject prefabGrass;
 
     [Range(0, 0.5f)]
     public float thresholdGrass;
     public float grassScale;
 
+
+    [Header("Seaweed")]
+    public GameObject prefabSeaweed;
     [Range(0.5f, 1)]
     public float thresholdSeaweed;
     public float seaweedScale;
 
+
+    [Header("General World Settings")]
+    public GameObject prefabWall;
     public bool autoUpdate;
     Transform enviromentHolder;
-
     public int mapResolution;
     public Vector3 mapSize;
     public float noiseScale;
@@ -31,6 +39,7 @@ public class MapGenerator : MonoBehaviour
     public float persistence;
     public float lacunarity;
     public int seed;
+    public bool randomSeed;
     public Vector2 offset;
 
     void Awake()
@@ -48,6 +57,9 @@ public class MapGenerator : MonoBehaviour
     {
         Cleanup();
 
+        if (randomSeed)
+            seed = Random.Range(0, 100000);
+
         float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
         //MapDisplay display = FindObjectOfType<MapDisplay>();
@@ -63,9 +75,9 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int y = 0; y < height; y++)
+        for (int y = 5; y < height - 5; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 5; x < width - 5; x++)
             {
                 float sample = noiseMap[x, y];
                 if (sample < thresholdGrass)
