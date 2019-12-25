@@ -2,57 +2,123 @@
 
 public class KeyController : MonoBehaviour
 {
-    public float maxSpeed = 3;
-    public float maxPitchSpeed = 30;
-    public float maxTurnSpeed = 70;
-    public float acceleration = 2;
 
-    public float smoothSpeed = 3;
-    public float smoothTurnSpeed = 3;
-
-
+    // State
+    [HideInInspector]
+    public Vector3 position;
+    [HideInInspector]
+    public Vector3 forward;
     Vector3 velocity;
-    float yawVelocity;
-    float pitchVelocity;
-    float currentSpeed;
-    private Vector3 resetPosition;
+
+    Transform cachedTransform;
+
+    public float minSpeed = 0f;
+    private float maxSpeed = 3f;
+    private float speed;
+    public float maxSteerForce = 2f;
+    public float avoidCollisionWeight = 5f;
+    public float boundsRadius = 0.27f;
+    public float collisionAvoidDst = 5f;
+    public LayerMask obstacleMask;
+
+    // Debug
+    bool showDebug = true;
 
 
-    void Start()
+    void Awake()
     {
-        currentSpeed = maxSpeed / 2;
-        resetPosition = transform.position;
+        speed = maxSpeed/2;
+        obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
+        cachedTransform = transform;
+    }
+
+    public void Start()
+    {
+  
+        position = cachedTransform.position;
+        forward = cachedTransform.forward;
+
+        float startSpeed = minSpeed;
+        velocity = transform.forward * startSpeed;
     }
 
     void Update()
     {
-        float accelDir = 0;
-        if (Input.GetKey(KeyCode.Q))
+
+
+        Vector3 acceleration = Vector3.zero;
+
+        if (IsHeadingForCollision())
         {
-            accelDir -= 1;
-        }
-        if (Input.GetKey(KeyCode.E))
-        {
-            accelDir += 1;
-        }
-        if (Input.GetKey(KeyCode.R))
-        {
-            transform.position = resetPosition;
+            Vector3 collisionAvoidDir = ObstacleRays();
+            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
+            acceleration += collisionAvoidForce;
         }
 
-        currentSpeed += acceleration * Time.deltaTime * accelDir;
-        currentSpeed = Mathf.Clamp(currentSpeed, 0, maxSpeed);
-        float speedPercent = currentSpeed / maxSpeed;
+        velocity += acceleration * Time.deltaTime;
 
-        Vector3 targetVelocity = transform.forward * currentSpeed;
-        velocity = Vector3.Lerp(velocity, targetVelocity, Time.deltaTime * smoothSpeed);
+        Vector3 dir;
+        if (speed != 0)
+            dir = velocity / speed;
+        else
+            dir = velocity;
+        speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+        velocity = dir * speed;
 
-        float targetPitchVelocity = Input.GetAxisRaw("Vertical") * maxPitchSpeed;
-        pitchVelocity = Mathf.Lerp(pitchVelocity, targetPitchVelocity, Time.deltaTime * smoothTurnSpeed);
+        cachedTransform.position += velocity * Time.deltaTime;
+        cachedTransform.forward = dir;
+        position = cachedTransform.position;
+        forward = dir;
 
-        float targetYawVelocity = Input.GetAxisRaw("Horizontal") * maxTurnSpeed;
-        yawVelocity = Mathf.Lerp(yawVelocity, targetYawVelocity, Time.deltaTime * smoothTurnSpeed);
-        transform.localEulerAngles += (Vector3.up * yawVelocity + Vector3.left * pitchVelocity) * Time.deltaTime * speedPercent;
-        transform.Translate(transform.forward * currentSpeed * Time.deltaTime, Space.World);
+    }
+
+
+    bool IsHeadingForCollision()
+    {
+        if (showDebug)
+        {
+            Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+            Debug.DrawRay(position, forward, Color.green);
+        }
+
+        RaycastHit hit;
+        if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
+        {
+            return true;
+        }
+        else { }
+        return false;
+    }
+
+    Vector3 ObstacleRays()
+    {
+        Vector3[] rayDirections = BoidHelper.directions;
+
+
+        for (int i = 0; i < rayDirections.Length; i++)
+        {
+
+            Vector3 dir = cachedTransform.TransformDirection(rayDirections[i]);
+            Ray ray = new Ray(position, dir);
+
+            if (showDebug)
+            {
+                Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+                Debug.DrawRay(position, forward, Color.green);
+            }
+
+            if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
+            {
+                return dir;
+            }
+        }
+
+        return forward;
+    }
+
+    Vector3 SteerTowards(Vector3 vector)
+    {
+        Vector3 v = vector.normalized * maxSpeed - velocity;
+        return Vector3.ClampMagnitude(v, maxSteerForce);
     }
 }
