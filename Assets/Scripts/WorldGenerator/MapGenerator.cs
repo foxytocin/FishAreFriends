@@ -54,8 +54,8 @@ public class MapGenerator : MonoBehaviour
     public bool debug = false;
     [Range(0, 20f)]
     public float heightScale;
-    public float groundResolution = 0.25f;
     public Material groundMaterial;
+    public float groundResolution = 0.25f;
     private int stepXGround;
     private int stepYGround;
 
@@ -83,7 +83,6 @@ public class MapGenerator : MonoBehaviour
 
     private void Start()
     {
-        Cleanup();
         GenerateMap();
     }
 
@@ -139,10 +138,7 @@ public class MapGenerator : MonoBehaviour
                 if (sample < thresholdGrass)
                 {
                     GameObject go1 = Instantiate(prefabGrass, new Vector3(0, 0, 0), Quaternion.identity);
-                    //float gs1 = sample * grassScale;
-
                     float gs1 = map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
-
                     go1.transform.localScale = new Vector3(gs1, gs1, gs1);
                     go1.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
                     go1.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
@@ -161,8 +157,11 @@ public class MapGenerator : MonoBehaviour
                     go2.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    if (!Application.isEditor)
+                    if (UnityEditor.EditorApplication.isPlaying)
+                    {
                         ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, 3, 0));
+                    }
+
                 }
             }
         }
@@ -407,6 +406,22 @@ public class MapGenerator : MonoBehaviour
         if (heightScale < 0)
         {
             heightScale = 0;
+        }
+        if (waterResolution > 1)
+        {
+            waterResolution = 1;
+        }
+        if (waterResolution < 0.1f)
+        {
+            waterResolution = 0.1f;
+        }
+        if (groundResolution > 1)
+        {
+            groundResolution = 1;
+        }
+        if (groundResolution < 0.1f)
+        {
+            groundResolution = 0.1f;
         }
     }
 

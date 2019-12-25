@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class EcoSystemManager : MonoBehaviour
 {
 
+    MapGenerator mapGenerator;
     FoodManager foodManager;
 
     [Header("Statistics")]
@@ -26,12 +26,21 @@ public class EcoSystemManager : MonoBehaviour
 
 
     public Queue<Vector3> spawnPoints;
+    private Vector3 mapSize;
+    private Vector3 spawnOffset;
 
     // Start is called before the first frame update
     void Awake()
     {
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        mapSize = mapGenerator.mapSize;
+        spawnOffset = mapSize * 0.2f;
         spawnPoints = new Queue<Vector3>();
         foodManager = FindObjectOfType<FoodManager>();
+    }
+
+    void Start()
+    {
         availableFood = 0;
         foodDemandFishes = 0;
         fishCount = 0;
@@ -96,7 +105,13 @@ public class EcoSystemManager : MonoBehaviour
     public Vector3 GetNextSpawnPoint()
     {
         if (spawnPoints.Count == 0)
-            spawnPoints.Enqueue(new Vector3(10, 10, 2));
+        {
+            Debug.Log(spawnOffset);
+            spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, spawnOffset.z));
+            spawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
+            spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
+            spawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, spawnOffset.z));
+        }
 
         Vector3 point = spawnPoints.Dequeue();
         spawnPoints.Enqueue(point);

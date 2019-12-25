@@ -10,9 +10,10 @@ public class Spawner : MonoBehaviour
     public int spawnCount = 10;
     public Color color1;
     public Color color2;
+    public bool debug = false;
     public GizmoType showSpawnRegion;
 
-    void Awake()
+    void Start()
     {
         var fishHolder = new GameObject("Fishes").transform;
 
@@ -22,11 +23,12 @@ public class Spawner : MonoBehaviour
             {
                 Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
                 Boid boid = Instantiate(prefab);
-                boid.transform.position = pos;
+                //boid.transform.position = pos;
                 boid.transform.parent = fishHolder;
-                boid.transform.forward = Random.insideUnitSphere;
-
+                //boid.transform.forward = Random.insideUnitSphere;
                 boid.SetColour(color1, color2);
+
+                boid.RespawnBoid();
             }
         }
     }
@@ -34,7 +36,7 @@ public class Spawner : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (showSpawnRegion == GizmoType.Always)
+        if (debug && showSpawnRegion == GizmoType.Always)
         {
             DrawGizmos();
         }
@@ -42,7 +44,7 @@ public class Spawner : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        if (showSpawnRegion == GizmoType.SelectedOnly)
+        if (debug && showSpawnRegion == GizmoType.SelectedOnly)
         {
             DrawGizmos();
         }
@@ -50,9 +52,11 @@ public class Spawner : MonoBehaviour
 
     void DrawGizmos()
     {
-
-        Gizmos.color = new Color(color1.r, color1.g, color1.b, 0.3f);
-        Gizmos.DrawSphere(transform.position, spawnRadius);
+        if (debug)
+        {
+            Gizmos.color = new Color(color1.r, color1.g, color1.b, 0.3f);
+            Gizmos.DrawSphere(transform.position, spawnRadius);
+        }
     }
 
 }
