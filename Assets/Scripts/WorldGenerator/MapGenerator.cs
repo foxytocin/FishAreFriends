@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using Unity.Collections;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapGenerator : MonoBehaviour
@@ -7,11 +7,27 @@ public class MapGenerator : MonoBehaviour
 
     EcoSystemManager ecoSystemManager;
     public GameObject underwaterDust;
+    public bool generateGras = true;
+    public bool generateStones = true;
+    public bool generateBricks = true;
+    public bool generateWater = true;
+    public bool generateGround = true;
+    public bool generateWalls = true;
 
-    [Header("Stones")]
+
+    [Header("Bricks")]
     public GameObject prefabCube;
     public GameObject prefabCylinder;
     public int amountSzeneElements;
+
+
+    [Header("Stones")]
+    public GameObject[] stones = new GameObject[5];
+    public int stonesAmount;
+    public int sizeVariation = 10;
+    [Range(0, 0.5f)]
+    public float groupingStones;
+
 
 
     [Header("Grass")]
@@ -50,21 +66,23 @@ public class MapGenerator : MonoBehaviour
     [Range(0, 20f)]
     public float heightScale;
     public Material groundMaterial;
+    public float groundResolution = 0.25f;
+    private int stepXGround;
+    private int stepYGround;
 
 
     [Header("Water Setting")]
 
     public Material waterMaterial;
-
-
-
+    public float waterResolution = 0.1f;
+    private int stepXWater;
+    private int stepYWater;
 
 
     private Mesh meshGround;
     private Vector3[] verticesGround;
     private Mesh meshWater;
     private Vector3[] verticesWater;
-
 
 
 
@@ -76,7 +94,6 @@ public class MapGenerator : MonoBehaviour
 
     private void Start()
     {
-        Cleanup();
         GenerateMap();
     }
 
@@ -84,21 +101,35 @@ public class MapGenerator : MonoBehaviour
     {
         Cleanup();
 
+        stepXGround = Mathf.FloorToInt(mapSize.x / (mapSize.x * groundResolution));
+        stepYGround = Mathf.FloorToInt(mapSize.z / (mapSize.z * groundResolution));
+        stepXWater = Mathf.FloorToInt(mapSize.x / (mapSize.x * waterResolution));
+        stepYWater = Mathf.FloorToInt(mapSize.z / (mapSize.z * waterResolution));
+
         if (randomSeed)
             seed = Random.Range(0, 100000);
 
         float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
-        if (!debug)
-        {
-            ScaleUnderwaterDust();
-            PlantPlants(noiseMap);
-            GenerateWalls();
-            PlaceStones(noiseMap);
-            GenerateGround(noiseMap);
-        }
+        ScaleUnderwaterDust();
 
-        GenerateWater();
+        if (generateGras)
+            PlantPlants(noiseMap);
+
+        if (generateWalls)
+            GenerateWalls();
+
+        if (generateStones)
+            PlaceStones(noiseMap);
+
+        if (generateGround)
+            GenerateGround(noiseMap);
+
+        if (generateWater)
+            GenerateWater();
+
+        if (generateBricks)
+            PlaceBricks(noiseMap);
     }
 
     float map(float s, float a1, float a2, float b1, float b2)
@@ -121,10 +152,7 @@ public class MapGenerator : MonoBehaviour
                 if (sample < thresholdGrass)
                 {
                     GameObject go1 = Instantiate(prefabGrass, new Vector3(0, 0, 0), Quaternion.identity);
-                    //float gs1 = sample * grassScale;
-
                     float gs1 = map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
-
                     go1.transform.localScale = new Vector3(gs1, gs1, gs1);
                     go1.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
                     go1.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
@@ -143,8 +171,11 @@ public class MapGenerator : MonoBehaviour
                     go2.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    if (!Application.isEditor)
+                    if (UnityEditor.EditorApplication.isPlaying)
+                    {
                         ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, 3, 0));
+                    }
+
                 }
             }
         }
@@ -200,7 +231,7 @@ public class MapGenerator : MonoBehaviour
     }
 
 
-    private void PlaceStones(float[,] noiseMap)
+    private void PlaceBricks(float[,] noiseMap)
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
@@ -221,6 +252,34 @@ public class MapGenerator : MonoBehaviour
             go.transform.localEulerAngles = new Vector3(0, Random.Range(0, 90), 0);
             go.transform.parent = enviromentHolder;
             go.tag = "Enviroment";
+        }
+    }
+
+    private void PlaceStones(float[,] noiseMap)
+    {
+
+        for (int s = 0; s < stonesAmount; s++)
+        {
+            int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
+            int z = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
+
+            float sample = noiseMap[x, z];
+            float heightOffset = sample * heightScale;
+
+            if (sample > thresholdGrass + groupingStones && sample < thresholdSeaweed + groupingStones)
+            {
+                Vector3 position = new Vector3(x, heightOffset, z);
+                GameObject goTmp = stones[(int)Random.Range(0, stones.Length)];
+                GameObject rgo = Instantiate(goTmp, position, Quaternion.identity);
+                rgo.transform.localScale = new Vector3(1, 1, 1) * Random.Range(1, sizeVariation);
+                rgo.transform.eulerAngles = new Vector3(Random.Range(0, 180), Random.Range(0, 180), Random.Range(0, 180));
+                // Material material = rgo.GetComponent<MeshRenderer>().material;
+                // Color color = new Color();
+                Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
+                rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+                rgo.transform.parent = enviromentHolder;
+                rgo.tag = "Enviroment";
+            }
         }
     }
 
@@ -247,9 +306,9 @@ public class MapGenerator : MonoBehaviour
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
-        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y += stepYGround)
         {
-            for (int x = 0; x <= mapSize.x; x++, i++)
+            for (int x = 0; x <= (int)mapSize.x; x += stepXGround, i++)
             {
                 int xMax = Mathf.Clamp(x, 0, width - 1);
                 int yMax = Mathf.Clamp(y, 0, height - 1);
@@ -262,14 +321,14 @@ public class MapGenerator : MonoBehaviour
         meshGround.uv = uv;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
-        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y += stepYGround, vi++)
         {
-            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            for (int x = 0; x < (int)mapSize.x; x += stepXGround, ti += 6, vi++)
             {
                 triangles[ti] = vi;
                 triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
-                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x / stepXGround + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x / stepXGround + 2;
             }
         }
         meshGround.triangles = triangles;
@@ -291,9 +350,9 @@ public class MapGenerator : MonoBehaviour
         verticesWater = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         Vector2[] uv = new Vector2[verticesWater.Length];
 
-        for (int i = 0, y = 0; y <= (int)mapSize.z; y++)
+        for (int i = 0, y = 0; y <= (int)mapSize.z; y += stepYWater)
         {
-            for (int x = 0; x <= mapSize.x; x++, i++)
+            for (int x = 0; x <= (int)mapSize.x; x += stepXWater, i++)
             {
                 verticesWater[i] = new Vector3(x, 0, y);
                 uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
@@ -303,14 +362,14 @@ public class MapGenerator : MonoBehaviour
         meshWater.uv = uv;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
-        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y++, vi++)
+        for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y += stepYWater, vi++)
         {
-            for (int x = 0; x < mapSize.x; x++, ti += 6, vi++)
+            for (int x = 0; x < (int)mapSize.x; x += stepXWater, ti += 6, vi++)
             {
                 triangles[ti] = vi;
                 triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x + 1;
-                triangles[ti + 5] = vi + (int)mapSize.x + 2;
+                triangles[ti + 4] = triangles[ti + 1] = vi + (int)mapSize.x / stepXWater + 1;
+                triangles[ti + 5] = vi + (int)mapSize.x / stepXWater + 2;
             }
         }
         meshWater.triangles = triangles;
@@ -358,17 +417,17 @@ public class MapGenerator : MonoBehaviour
 
     void OnValidate()
     {
-        if (mapSize.x < 10)
+        if (mapSize.x < 3)
         {
-            mapSize.x = 10;
+            mapSize.x = 3;
         }
-        if (mapSize.y < 10)
+        if (mapSize.y < 3)
         {
-            mapSize.y = 10;
+            mapSize.y = 3;
         }
-        if (mapSize.z < 10)
+        if (mapSize.z < 3)
         {
-            mapSize.z = 10;
+            mapSize.z = 3;
         }
         if (lacunarity < 1)
         {
@@ -390,6 +449,21 @@ public class MapGenerator : MonoBehaviour
         {
             heightScale = 0;
         }
+        if (waterResolution > 1)
+        {
+            waterResolution = 1;
+        }
+        if (waterResolution < 0.1f)
+        {
+            waterResolution = 0.1f;
+        }
+        if (groundResolution > 1)
+        {
+            groundResolution = 1;
+        }
+        if (groundResolution < 0.1f)
+        {
+            groundResolution = 0.1f;
+        }
     }
-
 }

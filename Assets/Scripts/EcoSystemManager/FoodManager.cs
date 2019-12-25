@@ -2,29 +2,29 @@
 
 public class FoodManager : MonoBehaviour
 {
-    private Vector3 target;
+    MapGenerator mapGenerator;
+    private Vector3 spawnPoint;
     public GameObject Food;
-    public int saveArea;
-
+    private Vector3 spawnOffset;
+    private Vector3 mapSize;
     Transform foodHolder;
 
     void Awake()
     {
         foodHolder = new GameObject("Food").transform;
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            dropFood();
-        }
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        mapSize = mapGenerator.mapSize;
+        spawnOffset = mapSize * 0.2f;
     }
 
     public void dropFood()
     {
-        target = new Vector3(Random.Range(0 + saveArea, 100 - saveArea), Random.Range(0 + saveArea, 30 - saveArea), Random.Range(0 + saveArea, 100 - saveArea));
-        GameObject go = Instantiate(Food, target, Quaternion.identity);
+        float x = Random.Range(spawnOffset.x, mapSize.x - spawnOffset.x);
+        float y = Random.Range(spawnOffset.y, mapSize.y - spawnOffset.y);
+        float z = Random.Range(spawnOffset.z, mapSize.z - spawnOffset.z);
+        spawnPoint = new Vector3(x, y, z);
+
+        GameObject go = Instantiate(Food, spawnPoint, Quaternion.identity);
         go.transform.parent = foodHolder;
     }
 }

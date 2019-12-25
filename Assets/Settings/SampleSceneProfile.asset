@@ -18,16 +18,16 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 2
   gaussianStart:
-    m_OverrideState: 1
-    m_Value: 44.7
+    m_OverrideState: 0
+    m_Value: 42.24
     min: 0
   gaussianEnd:
     m_OverrideState: 0
-    m_Value: 30
+    m_Value: 55.3
     min: 0
   gaussianMaxRadius:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 0.5
     min: 0.5
     max: 1.5
   highQualitySampling:
@@ -39,12 +39,12 @@ MonoBehaviour:
     min: 0.1
   aperture:
     m_OverrideState: 1
-    m_Value: 16
+    m_Value: 14
     min: 1
     max: 32
   focalLength:
     m_OverrideState: 1
-    m_Value: 190
+    m_Value: 180
     min: 1
     max: 300
   bladeCount:
@@ -78,11 +78,11 @@ MonoBehaviour:
   m_AdvancedMode: 0
   threshold:
     m_OverrideState: 1
-    m_Value: 1.5
+    m_Value: 1
     min: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 1.2
     min: 0
   scatter:
     m_OverrideState: 0
@@ -103,11 +103,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   dirtTexture:
-    m_OverrideState: 0
-    m_Value: {fileID: 0}
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: fcde346f04d764a27811216757a65fe4, type: 3}
   dirtIntensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 5
     min: 0
 --- !u!114 &-7011558710299706105
 MonoBehaviour:

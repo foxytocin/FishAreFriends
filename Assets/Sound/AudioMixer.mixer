@@ -53,6 +53,7 @@ AudioMixerController:
   - guids:
     - a51b4d6916b8f42d6b9ba2ca8fc1374d
     - 4151502880cc34a47ad9570abafa4766
+    - f7727e9ac88a74caa84a6a7b2f5d22d1
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -67,6 +68,7 @@ AudioMixerGroupController:
   m_GroupID: a51b4d6916b8f42d6b9ba2ca8fc1374d
   m_Children:
   - {fileID: -6864396873777633597}
+  - {fileID: 4905191543772244310}
   m_Volume: 07af995dd3f7649bd898038fffe969f7
   m_Pitch: e0a6f5fb3ac5e4e81bae920e61989bcb
   m_Send: 00000000000000000000000000000000
@@ -100,5 +102,39 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: dda0fbd469e4c40b4a1cf13df9174ecb
   m_FloatValues:
+    c75fad52e2adb4d7096ecfeb6cad9dcc: -15.421318
     d415769240e5f4d2f976ba605b7d5edc: -10.345207
   m_TransitionOverrides: {}
+--- !u!243 &4905191543772244310
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: f7727e9ac88a74caa84a6a7b2f5d22d1
+  m_Children: []
+  m_Volume: c75fad52e2adb4d7096ecfeb6cad9dcc
+  m_Pitch: a3ae4b24deb1a441fa3eb6ef9807e089
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 7456261805981034259}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &7456261805981034259
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 0046f8a6fcde142bc893936e584d3823
+  m_EffectName: Attenuation
+  m_MixLevel: be1e4730236964defb41c4673da3ceeb
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0

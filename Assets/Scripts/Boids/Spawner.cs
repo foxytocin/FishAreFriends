@@ -4,34 +4,39 @@ public class Spawner : MonoBehaviour
 {
 
     public enum GizmoType { Never, SelectedOnly, Always }
-
+    public bool spawnBoids = true;
     public Boid prefab;
     public float spawnRadius = 10;
     public int spawnCount = 10;
     public Color color1;
     public Color color2;
+    public bool debug = false;
     public GizmoType showSpawnRegion;
 
-    void Awake()
+    void Start()
     {
         var fishHolder = new GameObject("Fishes").transform;
 
-        for (int i = 0; i < spawnCount; i++)
+        if (spawnBoids)
         {
-            Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
-            Boid boid = Instantiate(prefab);
-            boid.transform.position = pos;
-            boid.transform.parent = fishHolder;
-            boid.transform.forward = Random.insideUnitSphere;
+            for (int i = 0; i < spawnCount; i++)
+            {
+                Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
+                Boid boid = Instantiate(prefab);
+                //boid.transform.position = pos;
+                boid.transform.parent = fishHolder;
+                //boid.transform.forward = Random.insideUnitSphere;
+                boid.SetColour(color1, color2);
 
-            boid.SetColour(color1, color2);
+                boid.RespawnBoid();
+            }
         }
     }
 
 
     private void OnDrawGizmos()
     {
-        if (showSpawnRegion == GizmoType.Always)
+        if (debug && showSpawnRegion == GizmoType.Always)
         {
             DrawGizmos();
         }
@@ -39,7 +44,7 @@ public class Spawner : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        if (showSpawnRegion == GizmoType.SelectedOnly)
+        if (debug && showSpawnRegion == GizmoType.SelectedOnly)
         {
             DrawGizmos();
         }
@@ -47,9 +52,11 @@ public class Spawner : MonoBehaviour
 
     void DrawGizmos()
     {
-
-        Gizmos.color = new Color(color1.r, color1.g, color1.b, 0.3f);
-        Gizmos.DrawSphere(transform.position, spawnRadius);
+        if (debug)
+        {
+            Gizmos.color = new Color(color1.r, color1.g, color1.b, 0.3f);
+            Gizmos.DrawSphere(transform.position, spawnRadius);
+        }
     }
 
 }
