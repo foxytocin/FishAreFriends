@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class EcoSystemManager : MonoBehaviour
 {
-
     MapGenerator mapGenerator;
     FoodManager foodManager;
 
