@@ -424,5 +424,4 @@ public class MapGenerator : MonoBehaviour
             groundResolution = 0.1f;
         }
     }
-
 }
