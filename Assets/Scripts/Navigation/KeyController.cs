@@ -45,9 +45,7 @@ public class KeyController : MonoBehaviour
     void Update()
     {
 
-
         Vector3 acceleration = Vector3.zero;
-
         if (IsHeadingForCollision())
         {
             Vector3 collisionAvoidDir = ObstacleRays();
@@ -55,13 +53,10 @@ public class KeyController : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
+      
         velocity += acceleration * Time.deltaTime;
-
-        Vector3 dir;
-        if (speed != 0)
-            dir = velocity / speed;
-        else
-            dir = velocity;
+        float speed = velocity.magnitude;
+        Vector3 dir = velocity / speed;
         speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
         velocity = dir * speed;
 
