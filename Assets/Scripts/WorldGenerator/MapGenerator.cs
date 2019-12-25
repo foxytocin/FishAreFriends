@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using Unity.Collections;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapGenerator : MonoBehaviour
@@ -9,14 +9,25 @@ public class MapGenerator : MonoBehaviour
     public GameObject underwaterDust;
     public bool generateGras = true;
     public bool generateStones = true;
+    public bool generateBricks = true;
     public bool generateWater = true;
     public bool generateGround = true;
     public bool generateWalls = true;
 
-    [Header("Stones")]
+
+    [Header("Bricks")]
     public GameObject prefabCube;
     public GameObject prefabCylinder;
     public int amountSzeneElements;
+
+
+    [Header("Stones")]
+    public GameObject[] stones = new GameObject[5];
+    public int stonesAmount;
+    public int sizeVariation = 10;
+    [Range(0, 0.5f)]
+    public float groupingStones;
+
 
 
     [Header("Grass")]
@@ -116,6 +127,9 @@ public class MapGenerator : MonoBehaviour
 
         if (generateWater)
             GenerateWater();
+
+        if (generateBricks)
+            PlaceBricks(noiseMap);
     }
 
     float map(float s, float a1, float a2, float b1, float b2)
@@ -217,7 +231,7 @@ public class MapGenerator : MonoBehaviour
     }
 
 
-    private void PlaceStones(float[,] noiseMap)
+    private void PlaceBricks(float[,] noiseMap)
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
@@ -238,6 +252,34 @@ public class MapGenerator : MonoBehaviour
             go.transform.localEulerAngles = new Vector3(0, Random.Range(0, 90), 0);
             go.transform.parent = enviromentHolder;
             go.tag = "Enviroment";
+        }
+    }
+
+    private void PlaceStones(float[,] noiseMap)
+    {
+
+        for (int s = 0; s < stonesAmount; s++)
+        {
+            int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
+            int z = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
+
+            float sample = noiseMap[x, z];
+            float heightOffset = sample * heightScale;
+
+            if (sample > thresholdGrass + groupingStones && sample < thresholdSeaweed + groupingStones)
+            {
+                Vector3 position = new Vector3(x, heightOffset, z);
+                GameObject goTmp = stones[(int)Random.Range(0, stones.Length)];
+                GameObject rgo = Instantiate(goTmp, position, Quaternion.identity);
+                rgo.transform.localScale = new Vector3(1, 1, 1) * Random.Range(1, sizeVariation);
+                rgo.transform.eulerAngles = new Vector3(Random.Range(0, 180), Random.Range(0, 180), Random.Range(0, 180));
+                // Material material = rgo.GetComponent<MeshRenderer>().material;
+                // Color color = new Color();
+                Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
+                rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+                rgo.transform.parent = enviromentHolder;
+                rgo.tag = "Enviroment";
+            }
         }
     }
 
