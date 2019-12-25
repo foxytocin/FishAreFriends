@@ -98,14 +98,12 @@ public class EcoSystemManager : MonoBehaviour
     public void AddSpawnPoint(Vector3 point)
     {
         spawnPoints.Enqueue(point);
-        Debug.Log(spawnPoints.Count);
     }
 
     public Vector3 GetNextSpawnPoint()
     {
         if (spawnPoints.Count == 0)
         {
-            Debug.Log(spawnOffset);
             spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, spawnOffset.z));
             spawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
             spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
