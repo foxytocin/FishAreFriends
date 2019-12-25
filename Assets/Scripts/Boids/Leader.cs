@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Leader : MonoBehaviour
 {
-
+    MapGenerator mapGenerator;
     private List<Boid> swarmList;
 
     public Color leaderColor1;
@@ -13,6 +13,8 @@ public class Leader : MonoBehaviour
     private void Awake()
     {
         //leaderColor = Random.ColorHSV();
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        transform.position = mapGenerator.mapSize / 2;
         material = gameObject.GetComponentInChildren<MeshRenderer>().material;
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
