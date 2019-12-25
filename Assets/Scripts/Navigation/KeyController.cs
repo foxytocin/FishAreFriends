@@ -37,7 +37,7 @@ public class KeyController : MonoBehaviour
 
     public void Start()
     {
-  
+
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
@@ -49,7 +49,7 @@ public class KeyController : MonoBehaviour
     {
 
         Vector3 acceleration = Vector3.zero;
-        bool isHeadingForCollision =  IsHeadingForCollision();
+        bool isHeadingForCollision = IsHeadingForCollision();
 
         // avoid collisiton
         if (isHeadingForCollision)
@@ -70,16 +70,16 @@ public class KeyController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 speed -= 0.5f;
-                Debug.Log("KeyDown Q: " + speed);
+                //Debug.Log("KeyDown Q: " + speed);
             }
             if (Input.GetKeyDown(KeyCode.E))
             {
                 speed += 0.5f;
-                Debug.Log("KeyDown E: " + speed);
+                //Debug.Log("KeyDown E: " + speed);
             }
         }
 
-        speed = Mathf.Clamp(speed, 0, maxSpeed);
+        speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
         velocity = dir * speed;
 
         // handle key events
@@ -107,15 +107,16 @@ public class KeyController : MonoBehaviour
             downKeyPressed = false;
 
 
-        if (!isHeadingForCollision) { 
+        if (!isHeadingForCollision)
+        {
 
-            if(leftKeyPressed)
+            if (leftKeyPressed)
                 velocity -= transform.right * Time.deltaTime * speed;
-            if(rightKeyPressed)
+            if (rightKeyPressed)
                 velocity += transform.right * Time.deltaTime * speed;
-            if(upKeyPressed)
+            if (upKeyPressed)
                 velocity += transform.up * Time.deltaTime * speed;
-            if(downKeyPressed)
+            if (downKeyPressed)
                 velocity -= transform.up * Time.deltaTime * speed;
 
         }
