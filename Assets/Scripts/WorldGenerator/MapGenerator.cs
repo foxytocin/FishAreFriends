@@ -158,6 +158,14 @@ public class MapGenerator : MonoBehaviour
                     go1.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                     go1.transform.parent = enviromentHolder;
                     go1.tag = "Enviroment";
+
+                    // add gras as spawnpoint
+                    if (UnityEditor.EditorApplication.isPlaying)
+                    {
+                        if(sample < 0.3f)
+                            ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
+                    }
+
                 }
 
                 if (sample > thresholdSeaweed)
@@ -173,7 +181,7 @@ public class MapGenerator : MonoBehaviour
                     // add gras as spawnpoint
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
-                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, 3, 0));
+                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2*8), 0));
                     }
 
                 }

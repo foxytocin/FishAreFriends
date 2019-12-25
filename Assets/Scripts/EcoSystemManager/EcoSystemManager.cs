@@ -25,6 +25,7 @@ public class EcoSystemManager : MonoBehaviour
 
 
     public Queue<Vector3> spawnPoints;
+    public Queue<Vector3> initialSpawnPoints;
     private Vector3 mapSize;
     private Vector3 spawnOffset;
 
@@ -35,6 +36,7 @@ public class EcoSystemManager : MonoBehaviour
         mapSize = mapGenerator.mapSize;
         spawnOffset = mapSize * 0.2f;
         spawnPoints = new Queue<Vector3>();
+        initialSpawnPoints = new Queue<Vector3>();
         foodManager = FindObjectOfType<FoodManager>();
     }
 
@@ -100,18 +102,29 @@ public class EcoSystemManager : MonoBehaviour
         spawnPoints.Enqueue(point);
     }
 
+    
     public Vector3 GetNextSpawnPoint()
     {
-        if (spawnPoints.Count == 0)
+        Vector3 point;
+        if (spawnPoints.Count != 0)
         {
-            spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, spawnOffset.z));
-            spawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
-            spawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
-            spawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, spawnOffset.z));
+            point = spawnPoints.Dequeue();
+            spawnPoints.Enqueue(point);
+            return point;
         }
 
-        Vector3 point = spawnPoints.Dequeue();
-        spawnPoints.Enqueue(point);
+        if (initialSpawnPoints.Count == 0)
+        {
+            initialSpawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, spawnOffset.z));
+            initialSpawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
+            initialSpawnPoints.Enqueue(new Vector3(spawnOffset.x, mapSize.y / 2, mapSize.z - spawnOffset.z));
+            initialSpawnPoints.Enqueue(new Vector3(mapSize.x - spawnOffset.x, mapSize.y / 2, spawnOffset.z));
+        }
+
+        point = initialSpawnPoints.Dequeue();
+        initialSpawnPoints.Enqueue(point);
         return point;
+
+
     }
 }
