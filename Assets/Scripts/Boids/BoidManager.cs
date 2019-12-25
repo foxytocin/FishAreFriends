@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BoidManager : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
-    const int threadGroupSize = 1024;
+    const int threadGroupSize = 512;
 
     public BoidSettings settings;
     public ComputeShader compute;
+    private ComputeBuffer boidBuffer;
     public float distance = 1;
     Boid[] boids;
+    private int numBoids;
 
     void Awake()
     {
@@ -27,11 +27,12 @@ public class BoidManager : MonoBehaviour
         if (spawner.spawnBoids)
         {
             boids = FindObjectsOfType<Boid>();
+            numBoids = boids.Length;
             foreach (Boid b in boids)
             {
                 b.Initialize(settings, null);
             }
-            ecoSystemManager.setFishCount(boids.Length);
+            ecoSystemManager.setFishCount(numBoids);
         }
     }
 
@@ -39,8 +40,6 @@ public class BoidManager : MonoBehaviour
     {
         if (boids != null)
         {
-
-            int numBoids = boids.Length;
             var boidData = new BoidData[numBoids];
 
             for (int i = 0; i < boids.Length; i++)
@@ -49,7 +48,7 @@ public class BoidManager : MonoBehaviour
                 boidData[i].direction = boids[i].forward;
             }
 
-            var boidBuffer = new ComputeBuffer(numBoids, BoidData.Size);
+            boidBuffer = new ComputeBuffer(numBoids, BoidData.Size);
             boidBuffer.SetData(boidData);
 
             compute.SetBuffer(0, "boids", boidBuffer);
