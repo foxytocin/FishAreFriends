@@ -12,14 +12,18 @@ public class KeyController : MonoBehaviour
 
     Transform cachedTransform;
 
-    public float minSpeed = 0f;
     private float maxSpeed = 3f;
-    private float speed;
     public float maxSteerForce = 2f;
-    public float avoidCollisionWeight = 5f;
+    public float avoidCollisionWeight = 10f;
     public float boundsRadius = 0.27f;
     public float collisionAvoidDst = 5f;
     public LayerMask obstacleMask;
+
+    // Key events
+    bool upKeyPressed = false;
+    bool downKeyPressed = false;
+    bool leftKeyPressed = false;
+    bool rightKeyPressed = false;
 
     // Debug
     bool showDebug = true;
@@ -27,7 +31,6 @@ public class KeyController : MonoBehaviour
 
     void Awake()
     {
-        speed = maxSpeed/2;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cachedTransform = transform;
     }
@@ -38,7 +41,7 @@ public class KeyController : MonoBehaviour
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
-        float startSpeed = minSpeed;
+        float startSpeed = maxSpeed / 2;
         velocity = transform.forward * startSpeed;
     }
 
@@ -46,22 +49,81 @@ public class KeyController : MonoBehaviour
     {
 
         Vector3 acceleration = Vector3.zero;
-        if (IsHeadingForCollision())
+        bool isHeadingForCollision =  IsHeadingForCollision();
+
+        // avoid collisiton
+        if (isHeadingForCollision)
         {
             Vector3 collisionAvoidDir = ObstacleRays();
             Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
             acceleration += collisionAvoidForce;
         }
 
-      
+        // speed handling
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
         Vector3 dir = velocity / speed;
-        speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+
+
+        if (!isHeadingForCollision)
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                speed -= 0.5f;
+                Debug.Log("KeyDown Q: " + speed);
+            }
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                speed += 0.5f;
+                Debug.Log("KeyDown E: " + speed);
+            }
+        }
+
+        speed = Mathf.Clamp(speed, 0, maxSpeed);
         velocity = dir * speed;
+
+        // handle key events
+        if (!isHeadingForCollision)
+        {
+            // key ups
+            if (Input.GetKeyDown(KeyCode.A))
+                leftKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.D))
+                rightKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.W))
+                upKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.S))
+                downKeyPressed = true;
+        }
+
+        // key downs
+        if (Input.GetKeyUp(KeyCode.A))
+            leftKeyPressed = false;
+        if (Input.GetKeyUp(KeyCode.D))
+            rightKeyPressed = false;
+        if (Input.GetKeyUp(KeyCode.W))
+            upKeyPressed = false;
+        if (Input.GetKeyUp(KeyCode.S))
+            downKeyPressed = false;
+
+
+        if (!isHeadingForCollision) { 
+
+            if(leftKeyPressed)
+                velocity -= transform.right * Time.deltaTime * speed;
+            if(rightKeyPressed)
+                velocity += transform.right * Time.deltaTime * speed;
+            if(upKeyPressed)
+                velocity += transform.up * Time.deltaTime * speed;
+            if(downKeyPressed)
+                velocity -= transform.up * Time.deltaTime * speed;
+
+        }
+
 
         cachedTransform.position += velocity * Time.deltaTime;
         cachedTransform.forward = dir;
+
         position = cachedTransform.position;
         forward = dir;
 
