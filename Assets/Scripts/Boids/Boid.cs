@@ -30,6 +30,7 @@ public class Boid : MonoBehaviour
 
     // Cached
     Material[] material;
+
     Transform cachedTransform;
     Transform target;
 
@@ -52,11 +53,11 @@ public class Boid : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
-        material = new Material[3];
+        material = new Material[4];
         material[0] = gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material;
         material[1] = gameObject.transform.GetChild(1).GetComponent<MeshRenderer>().material;
         material[2] = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
-
+        material[3] = gameObject.transform.GetChild(3).GetComponent<MeshRenderer>().material;
         cachedTransform = transform;
         hungerRate = Random.Range(1, 3);
     }
@@ -237,11 +238,14 @@ public class Boid : MonoBehaviour
 
     void setColor(Color col1, Color col2)
     {
-        foreach (Material mat in material)
+
+        for (int i = 0; i < material.Length - 1; i++)
         {
-            mat.SetColor("_BaseColor1", col1);
-            mat.SetColor("_BaseColor2", col2);
+            material[i].SetColor("_BaseColor1", col1);
+            material[i].SetColor("_BaseColor2", col2);
         }
+
+        material[3].SetColor("_BaseColor", col1);
     }
 
     void setFoodNeeds()
