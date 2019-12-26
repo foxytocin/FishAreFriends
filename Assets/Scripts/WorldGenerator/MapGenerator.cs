@@ -162,7 +162,7 @@ public class MapGenerator : MonoBehaviour
                     // add gras as spawnpoint
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
-                        if(sample < 0.3f)
+                        if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
                     }
 
@@ -181,7 +181,7 @@ public class MapGenerator : MonoBehaviour
                     // add gras as spawnpoint
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
-                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2*8), 0));
+                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 8), 0));
                     }
 
                 }
@@ -194,21 +194,21 @@ public class MapGenerator : MonoBehaviour
         // Wall
         Vector3 position1 = new Vector3(mapSize.x / 2, mapSize.y / 2, 0);
         GameObject wall1 = Instantiate(prefabWall, position1, Quaternion.identity);
-        wall1.transform.localScale = new Vector3(mapSize.x, mapSize.y, 1);
+        wall1.transform.localScale = new Vector3(mapSize.x + 1, mapSize.y, 1);
         wall1.transform.parent = enviromentHolder;
         wall1.tag = "Enviroment";
 
         // Wall
         Vector3 position2 = new Vector3(mapSize.x / 2, mapSize.y / 2, mapSize.z);
         GameObject wall2 = Instantiate(prefabWall, position2, Quaternion.identity);
-        wall2.transform.localScale = new Vector3(mapSize.x, mapSize.y, 1);
+        wall2.transform.localScale = new Vector3(mapSize.x + 1, mapSize.y, 1);
         wall2.transform.parent = enviromentHolder;
         wall2.tag = "Enviroment";
 
         // Wall
         Vector3 position3 = new Vector3(0, mapSize.y / 2, mapSize.z / 2);
         GameObject wall3 = Instantiate(prefabWall, position3, Quaternion.identity);
-        wall3.transform.localScale = new Vector3(mapSize.z, mapSize.y, 1);
+        wall3.transform.localScale = new Vector3(mapSize.z + 1, mapSize.y, 1);
         wall3.transform.localEulerAngles = new Vector3(0, 90, 0);
         wall3.transform.parent = enviromentHolder;
         wall3.tag = "Enviroment";
@@ -216,23 +216,23 @@ public class MapGenerator : MonoBehaviour
         // Wall
         Vector3 position4 = new Vector3(mapSize.x, mapSize.y / 2, mapSize.z / 2);
         GameObject wall4 = Instantiate(prefabWall, position4, Quaternion.identity);
-        wall4.transform.localScale = new Vector3(mapSize.z, mapSize.y, 1);
+        wall4.transform.localScale = new Vector3(mapSize.z + 1, mapSize.y, 1);
         wall4.transform.localEulerAngles = new Vector3(0, 90, 0);
         wall4.transform.parent = enviromentHolder;
         wall4.tag = "Enviroment";
 
         // Bottom
-        Vector3 position5 = new Vector3(mapSize.x / 2, 1, mapSize.z / 2);
+        Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
         GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
-        wall5.transform.localScale = new Vector3(mapSize.x, 1, mapSize.z);
+        wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
         wall5.GetComponent<MeshRenderer>().enabled = false;
         wall5.transform.parent = enviromentHolder;
         wall5.tag = "Enviroment";
 
         // Top
-        Vector3 position6 = new Vector3(mapSize.x / 2, mapSize.y - 1, mapSize.z / 2);
+        Vector3 position6 = new Vector3(mapSize.x / 2, mapSize.y - 0.5f, mapSize.z / 2);
         GameObject wall6 = Instantiate(prefabWall, position6, Quaternion.identity);
-        wall6.transform.localScale = new Vector3(mapSize.x, 1, mapSize.z);
+        wall6.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
         wall6.GetComponent<MeshRenderer>().enabled = false;
         wall6.transform.parent = enviromentHolder;
         wall6.tag = "Enviroment";
@@ -384,7 +384,7 @@ public class MapGenerator : MonoBehaviour
         meshWater.RecalculateNormals();
 
         proceduralWater.transform.Rotate(180, 0, 0, Space.Self);
-        proceduralWater.transform.position = new Vector3(0, mapSize.y, mapSize.z);
+        proceduralWater.transform.position = new Vector3(0, mapSize.y + 3, mapSize.z);
     }
 
 
