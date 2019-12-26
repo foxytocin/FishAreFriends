@@ -18,15 +18,15 @@ public class MapGenerator : MonoBehaviour
     [Header("Bricks")]
     public GameObject prefabCube;
     public GameObject prefabCylinder;
-    public int amountSzeneElements;
+    public int amountSzeneElements = 40;
 
 
     [Header("Stones")]
     public GameObject[] stones = new GameObject[5];
-    public int stonesAmount;
-    public int sizeVariation = 10;
+    public int stonesAmount = 3000;
+    public int sizeVariation = 8;
     [Range(0, 0.5f)]
-    public float groupingStones;
+    public float groupingStones = 0.254f;
 
 
 
@@ -34,36 +34,38 @@ public class MapGenerator : MonoBehaviour
     public GameObject prefabGrass;
 
     [Range(0, 0.5f)]
-    public float thresholdGrass;
-    public float grassScale;
+    public float thresholdGrass = 0.364f;
+    public float grassScale = 13;
 
 
     [Header("Seaweed")]
     public GameObject prefabSeaweed;
     [Range(0.5f, 1)]
-    public float thresholdSeaweed;
-    public float seaweedScale;
+    public float thresholdSeaweed = 0.835f;
+    public float seaweedScale = 3;
 
 
     [Header("General World Settings")]
     public GameObject prefabWall;
     public int paddingToMapBorder;
-    public bool autoUpdate;
+    public bool autoUpdate = true;
     Transform enviromentHolder;
-    public int mapResolution;
-    public Vector3 mapSize;
-    public float noiseScale;
-    public int octaves;
+    public int mapResolution = 1;
+    public Vector3 mapSize = new Vector3(100, 50, 100);
+    public float noiseScale = 50;
+    public int octaves = 8;
+
     [Range(0, 1)]
-    public float persistence;
-    public float lacunarity;
+    public float persistence = 0.49f;
+    public float lacunarity = 2;
     public int seed;
-    public bool randomSeed;
+    public bool randomSeed = true;
     public Vector2 offset;
 
     [Header("Ground Setting")]
     public bool debug = false;
-    [Range(0, 20f)]
+
+    [Range(0, 100f)]
     public float heightScale;
     public Material groundMaterial;
     public float groundResolution = 0.25f;
@@ -170,8 +172,9 @@ public class MapGenerator : MonoBehaviour
 
                 if (sample > thresholdSeaweed)
                 {
-                    GameObject go2 = Instantiate(prefabSeaweed, new Vector3((x / (float)mapResolution), heightOffset / 2f, (y / (float)mapResolution)), Quaternion.identity);
+                    GameObject go2 = Instantiate(prefabSeaweed, new Vector3(0, 0, 0), Quaternion.identity);
                     float gs2 = sample * seaweedScale;
+                    go2.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
                     go2.transform.localScale = new Vector3(gs2, gs2 * 10, gs2);
                     go2.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                     go2.transform.position += new Vector3(0, gs2, 0);
@@ -181,7 +184,7 @@ public class MapGenerator : MonoBehaviour
                     // add gras as spawnpoint
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
-                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 8), 0));
+                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
                     }
 
                 }
@@ -221,13 +224,13 @@ public class MapGenerator : MonoBehaviour
         wall4.transform.parent = enviromentHolder;
         wall4.tag = "Enviroment";
 
-        // Bottom
-        Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
-        GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
-        wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
-        wall5.GetComponent<MeshRenderer>().enabled = false;
-        wall5.transform.parent = enviromentHolder;
-        wall5.tag = "Enviroment";
+        // Bottom - Ground is the Wall
+        // Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
+        // GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
+        // wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
+        // wall5.GetComponent<MeshRenderer>().enabled = false;
+        // wall5.transform.parent = enviromentHolder;
+        // wall5.tag = "Enviroment";
 
         // Top
         Vector3 position6 = new Vector3(mapSize.x / 2, mapSize.y - 0.5f, mapSize.z / 2);
@@ -305,6 +308,8 @@ public class MapGenerator : MonoBehaviour
         proceduralGround.GetComponent<Renderer>().material = groundMaterial;
         proceduralGround.AddComponent<MeshFilter>();
         proceduralGround.GetComponent<MeshFilter>().mesh = meshGround = new Mesh();
+        proceduralGround.AddComponent<MeshCollider>();
+        proceduralGround.GetComponent<MeshCollider>().enabled = false;
         proceduralGround.layer = 11;
         meshGround.name = "ProceduralGround";
 
@@ -341,6 +346,7 @@ public class MapGenerator : MonoBehaviour
         }
         meshGround.triangles = triangles;
         meshGround.RecalculateNormals();
+        proceduralGround.GetComponent<MeshCollider>().enabled = true;
     }
 
     private void GenerateWater()
@@ -472,6 +478,14 @@ public class MapGenerator : MonoBehaviour
         if (groundResolution < 0.1f)
         {
             groundResolution = 0.1f;
+        }
+        if (mapResolution > 10)
+        {
+            mapResolution = 10;
+        }
+        if (mapResolution < 0)
+        {
+            mapResolution = 0;
         }
     }
 }
