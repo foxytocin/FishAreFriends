@@ -6,6 +6,7 @@ public class Boid : MonoBehaviour
     BoidSettings settings;
     public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
+    MapGenerator mapGenerator;
 
     private Color originalColor1;
     private Color originalColor2;
@@ -51,6 +52,7 @@ public class Boid : MonoBehaviour
     {
         alife = true;
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = new Material[4];
@@ -86,6 +88,18 @@ public class Boid : MonoBehaviour
 
     public void UpdateBoid()
     {
+        if (
+            position.x < -1 || position.x > mapGenerator.mapSize.x + 1 ||
+            position.y < -1 || position.y > mapGenerator.mapSize.y + 1 ||
+            position.z < -1 || position.z > mapGenerator.mapSize.z + 1
+        )
+        {
+            Debug.Log("EIN FISCH IST AUSGEBROCHEN " + position);
+        }
+
+
+
+
         Vector3 acceleration = Vector3.zero;
 
         if (target != null)
