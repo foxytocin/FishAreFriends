@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class FoodBehavior : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class FoodBehavior : MonoBehaviour
     EcoSystemManager ecoSystemManager;
     private int availableFood;
     private BoxCollider b_collider;
+    private float size;
 
 
     void Awake()
@@ -13,10 +15,24 @@ public class FoodBehavior : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         availableFood = Random.Range(5000, 40000);
         ecoSystemManager.setAvailableFood(availableFood);
+        size = (float)availableFood / 10000f;
         b_collider = GetComponent<BoxCollider>();
-        scaleFood();
+        b_collider.enabled = false;
+        b_collider.size = new Vector3(size, size, size);
+        StartCoroutine(Animate());
     }
 
+    private IEnumerator Animate()
+    {
+        float tmp = 0;
+        while (tmp < size)
+        {
+            transform.localScale = new Vector3(tmp, tmp, tmp);
+            tmp += 0.05f;
+            yield return new WaitForEndOfFrame();
+        }
+        b_collider.enabled = true;
+    }
 
     private void scaleFood()
     {
@@ -32,7 +48,6 @@ public class FoodBehavior : MonoBehaviour
             availableFood -= amount;
             ecoSystemManager.setAvailableFood(-amount);
             scaleFood();
-            //Debug.Log("FOOD: Ordert: " + amount + " / Received: " + amount);
             return amount;
         }
 
@@ -42,22 +57,24 @@ public class FoodBehavior : MonoBehaviour
             availableFood = 0;
             ecoSystemManager.setAvailableFood(-tmp);
             scaleFood();
-            //Debug.Log("FOOD: Ordert: " + amount + " / Received: " + tmp);
-            gameObject.layer = 2;
-            gameObject.SetActive(false);
+            StartCoroutine(Destroy());
             return tmp;
         }
 
-        gameObject.layer = 2;
-        gameObject.SetActive(false);
+        StartCoroutine(Destroy());
         return 0;
+    }
+
+    private IEnumerator Destroy()
+    {
+        gameObject.layer = 2;
+        b_collider.enabled = false;
+        yield return new WaitForSeconds(5);
+        Destroy(gameObject);
     }
 
     public float checkAmount()
     {
         return availableFood;
     }
-
-
-
 }
