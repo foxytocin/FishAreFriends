@@ -18,15 +18,17 @@ public class MapGenerator : MonoBehaviour
     [Header("Bricks")]
     public GameObject prefabCube;
     public GameObject prefabCylinder;
-    public int amountSzeneElements = 40;
-
+    public int amountSzeneElements = 30;
+    public int sizeVariationBrick = 3;
 
     [Header("Stones")]
     public GameObject[] stones = new GameObject[5];
-    public int stonesAmount = 3000;
+
+    [Range(0, 1f)]
+    public float placingDensityStones = 0.4f;
     public int sizeVariation = 8;
     [Range(0, 0.5f)]
-    public float groupingStones = 0.254f;
+    public float groupingStones = 0.3f;
 
 
 
@@ -250,8 +252,8 @@ public class MapGenerator : MonoBehaviour
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
-            float elementHeight = Random.Range(4f, 20f);
-            float elementWidth = Random.Range(3f, 8f);
+            float elementHeight = Random.Range(3f * sizeVariationBrick, 9f * sizeVariationBrick);
+            float elementWidth = Random.Range(1f * sizeVariationBrick, 3f * sizeVariationBrick);
 
             int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
             int y = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
@@ -272,28 +274,30 @@ public class MapGenerator : MonoBehaviour
 
     private void PlaceStones(float[,] noiseMap)
     {
+        int width = noiseMap.GetLength(0);
+        int height = noiseMap.GetLength(1);
 
-        for (int s = 0; s < stonesAmount; s++)
+        for (int y = paddingToMapBorder; y < height - paddingToMapBorder; y++)
         {
-            int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
-            int z = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
-
-            float sample = noiseMap[x, z];
-            float heightOffset = sample * heightScale;
-
-            if (sample > thresholdGrass + groupingStones && sample < thresholdSeaweed + groupingStones)
+            for (int x = paddingToMapBorder; x < width - paddingToMapBorder; x++)
             {
-                Vector3 position = new Vector3(x, heightOffset, z);
-                GameObject goTmp = stones[(int)Random.Range(0, stones.Length)];
-                GameObject rgo = Instantiate(goTmp, position, Quaternion.identity);
-                rgo.transform.localScale = new Vector3(1, 1, 1) * Random.Range(1, sizeVariation);
-                rgo.transform.eulerAngles = new Vector3(Random.Range(0, 180), Random.Range(0, 180), Random.Range(0, 180));
-                // Material material = rgo.GetComponent<MeshRenderer>().material;
-                // Color color = new Color();
-                Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
-                rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
-                rgo.transform.parent = enviromentHolder;
-                rgo.tag = "Enviroment";
+                float sample = noiseMap[x, y];
+                float heightOffset = sample * heightScale;
+
+                if (sample > thresholdGrass + groupingStones && sample < thresholdSeaweed + groupingStones && Random.value < placingDensityStones)
+                {
+                    Vector3 position = new Vector3(x, heightOffset, y);
+                    GameObject goTmp = stones[(int)Random.Range(0, stones.Length)];
+                    GameObject rgo = Instantiate(goTmp, position, Quaternion.identity);
+                    rgo.transform.localScale = new Vector3(1, 1, 1) * Random.Range(1, sizeVariation);
+                    rgo.transform.eulerAngles = new Vector3(Random.Range(0, 180), Random.Range(0, 180), Random.Range(0, 180));
+                    // Material material = rgo.GetComponent<MeshRenderer>().material;
+                    // Color color = new Color();
+                    Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
+                    rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+                    rgo.transform.parent = enviromentHolder;
+                    rgo.tag = "Enviroment";
+                }
             }
         }
     }
