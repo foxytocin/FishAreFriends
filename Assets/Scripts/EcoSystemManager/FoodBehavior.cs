@@ -38,7 +38,9 @@ public class FoodBehavior : MonoBehaviour
     {
         float size = (float)availableFood / 10000f;
         transform.localScale = new Vector3(size, size, size);
-        b_collider.size = new Vector3(size, size, size);
+
+        float tmp = (size < 0.2f) ? 0.2f : size;
+        b_collider.size = new Vector3(tmp, tmp, tmp);
     }
 
     public int getFood(int amount)
