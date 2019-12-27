@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Boid : MonoBehaviour
 {
@@ -42,8 +43,10 @@ public class Boid : MonoBehaviour
     public int basicFoodNeed = 1000;
     public int foodNeeds;
     public int foodLeft;
-    private int hungerRate;
+    public int hungerRate = 1;
     public bool alife;
+    private int delay;
+    private bool firstTime = true;
 
     // Debug
     bool showDebug = false;
@@ -61,7 +64,7 @@ public class Boid : MonoBehaviour
         material[2] = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         material[3] = gameObject.transform.GetChild(3).GetComponent<MeshRenderer>().material;
         cachedTransform = transform;
-        hungerRate = Random.Range(1, 3);
+        delay = Random.Range(5, 31);
     }
 
     public void Initialize(BoidSettings settings, Transform target)
@@ -74,6 +77,8 @@ public class Boid : MonoBehaviour
 
         float startSpeed = (settings.minSpeed + settings.maxSpeed) / 2;
         velocity = transform.forward * startSpeed;
+
+        StartCoroutine(IncreaseFood());
     }
 
     public void SetColour(Color col1, Color col2)
@@ -86,6 +91,22 @@ public class Boid : MonoBehaviour
         }
     }
 
+    private IEnumerator IncreaseFood()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(delay);
+            foodNeeds += hungerRate;
+
+            if (firstTime)
+            {
+                firstTime = false;
+                delay = 1;
+            }
+
+        }
+    }
+
     public void UpdateBoid()
     {
         if (
@@ -95,10 +116,8 @@ public class Boid : MonoBehaviour
         )
         {
             Debug.Log("EIN FISCH IST AUSGEBROCHEN " + position);
+            LetMeDie();
         }
-
-
-
 
         Vector3 acceleration = Vector3.zero;
 
@@ -152,8 +171,6 @@ public class Boid : MonoBehaviour
                 }
 
             }
-
-
         }
 
 
@@ -238,6 +255,7 @@ public class Boid : MonoBehaviour
         }
 
 
+
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
         Vector3 dir = velocity / speed;
@@ -264,7 +282,6 @@ public class Boid : MonoBehaviour
 
     void setFoodNeeds()
     {
-        foodNeeds += hungerRate;
         if (foodNeeds > basicFoodNeed)
         {
             LetMeDie();
@@ -280,6 +297,7 @@ public class Boid : MonoBehaviour
     {
         if (alife)
         {
+            StopCoroutine(IncreaseFood());
             alife = false;
             gameObject.SetActive(false);
             ecoSystemManager.addDiedFish();
@@ -299,6 +317,8 @@ public class Boid : MonoBehaviour
         // reset state
         gameObject.SetActive(true);
         alife = true;
+
+        StartCoroutine(IncreaseFood());
     }
 
     bool IsHeadingForCollision()

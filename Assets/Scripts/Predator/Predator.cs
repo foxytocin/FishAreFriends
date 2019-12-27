@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using System.Collections;
 public class Predator : MonoBehaviour
 {
 
@@ -46,7 +46,7 @@ public class Predator : MonoBehaviour
         cachedTransform = transform;
     }
 
-    public void Start()
+    void Start()
     {
         foodNeeds = basicFoodNeed;
         position = cachedTransform.position;
@@ -54,6 +54,18 @@ public class Predator : MonoBehaviour
 
         float startSpeed = minSpeed;
         velocity = transform.forward * startSpeed;
+
+        StartCoroutine(DecreaseFood());
+    }
+
+
+    private IEnumerator DecreaseFood()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            foodNeeds -= 2;
+        }
     }
 
     public void IAmYourBoid(GameObject boid)
@@ -83,10 +95,6 @@ public class Predator : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-
-        // foodNeeds
-        foodNeeds -= 1;
-
         ecoSystemManager.setFoodDemandPredator(foodNeeds);
 
         Vector3 acceleration = Vector3.zero;
