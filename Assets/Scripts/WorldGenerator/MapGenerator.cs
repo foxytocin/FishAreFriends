@@ -36,6 +36,8 @@ public class MapGenerator : MonoBehaviour
     [Range(0, 0.5f)]
     public float thresholdGrass = 0.364f;
     public float grassScale = 13;
+    [Range(0, 1f)]
+    public float growDensityGrass = 0.25f;
 
 
     [Header("Seaweed")]
@@ -43,6 +45,8 @@ public class MapGenerator : MonoBehaviour
     [Range(0.5f, 1)]
     public float thresholdSeaweed = 0.835f;
     public float seaweedScale = 3;
+    [Range(0, 1f)]
+    public float growDensitySeaweed = 0.25f;
 
 
     [Header("General World Settings")]
@@ -151,7 +155,7 @@ public class MapGenerator : MonoBehaviour
                 float sample = noiseMap[x, y];
                 float heightOffset = sample * heightScale;
 
-                if (sample < thresholdGrass)
+                if (sample < thresholdGrass && Random.value < growDensityGrass)
                 {
                     GameObject go1 = Instantiate(prefabGrass, new Vector3(0, 0, 0), Quaternion.identity);
                     float gs1 = map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
@@ -170,7 +174,7 @@ public class MapGenerator : MonoBehaviour
 
                 }
 
-                if (sample > thresholdSeaweed)
+                if (sample > thresholdSeaweed && Random.value < growDensitySeaweed)
                 {
                     GameObject go2 = Instantiate(prefabSeaweed, new Vector3(0, 0, 0), Quaternion.identity);
                     float gs2 = sample * seaweedScale;
