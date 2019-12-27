@@ -20,7 +20,7 @@ public class FoodManager : MonoBehaviour
     public void dropFood()
     {
         float x = Random.Range(spawnOffset.x, mapSize.x - spawnOffset.x);
-        float y = Random.Range(spawnOffset.y, mapSize.y - spawnOffset.y);
+        float y = Random.Range(mapGenerator.heightScale + spawnOffset.y, mapSize.y - spawnOffset.y);
         float z = Random.Range(spawnOffset.z, mapSize.z - spawnOffset.z);
         spawnPoint = new Vector3(x, y, z);
 
