@@ -59,6 +59,7 @@ MonoBehaviour:
   basicFoodNeed: 1000
   foodNeeds: 0
   foodLeft: 0
+  hungerRate: 1
   alife: 0
 --- !u!205 &6029163333581138842
 LODGroup:
