@@ -23,11 +23,8 @@ public class Spawner : MonoBehaviour
             {
                 Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
                 Boid boid = Instantiate(prefab);
-                //boid.transform.position = pos;
                 boid.transform.parent = fishHolder;
-                //boid.transform.forward = Random.insideUnitSphere;
-                boid.SetColour(color1, color2);
-
+                boid.PassColor(color1, color2);
                 boid.RespawnBoid();
             }
         }
