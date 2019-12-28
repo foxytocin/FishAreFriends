@@ -9,7 +9,7 @@ public class CamTopView : MonoBehaviour
     void Awake()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
-        centerOverTank();
+        //centerOverTank();
     }
 
     private void centerOverTank()

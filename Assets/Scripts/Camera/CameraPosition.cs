@@ -48,7 +48,7 @@ public class CameraPosition : MonoBehaviour
         targetPosition = Side_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
-        Top_View.position = centerOfTank + new Vector3(0, mapGenerator.mapSize.y * 2, 0);
+        //Top_View.position = centerOfTank + new Vector3(0, mapGenerator.mapSize.y * 2, 0);
         lookAtCenterOfTank = centerOfTank;
         originalFogDensity = RenderSettings.fogDensity;
         originalFieldOfView = myCamera.fieldOfView;
@@ -68,7 +68,7 @@ public class CameraPosition : MonoBehaviour
         if (down & side)
         {
             side = false;
-            myCamera.farClipPlane = 300;
+            myCamera.farClipPlane = 1000;
             SwitchFieldOfViewToTop(true);
             startPosition = transform.position.y;
             targetPosition = Top_View;
@@ -177,6 +177,7 @@ public class CameraPosition : MonoBehaviour
         }
         else
         {
+            RenderSettings.fogDensity = 0;
             targetFogDensity = originalFogDensity;
         }
 
@@ -186,11 +187,27 @@ public class CameraPosition : MonoBehaviour
 
     private IEnumerator AnimateFogDensity()
     {
-        float speed = (side) ? 0.1f : 10f;
-        while (RenderSettings.fogDensity != targetFogDensity)
+        float speed = (side) ? 0.05f : 0.5f;
+
+        if (side)
         {
-            RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 0.1f * Time.deltaTime * speed);
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(1);
+            while (RenderSettings.fogDensity < targetFogDensity)
+            {
+                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                yield return new WaitForEndOfFrame();
+            }
+        }
+        else
+        {
+            while (RenderSettings.fogDensity > targetFogDensity)
+            {
+                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                yield return new WaitForEndOfFrame();
+            }
+
+            if (RenderSettings.fogDensity < 0)
+                RenderSettings.fogDensity = 0;
         }
     }
 
