@@ -280,13 +280,11 @@ public class Boid : MonoBehaviour
 
     public void setColor(Color col1, Color col2)
     {
-        for (int i = 0; i < material.Length - 1; i++)
+        for (int i = 0; i < material.Length; i++)
         {
             material[i].SetColor("_BaseColor1", col1);
             material[i].SetColor("_BaseColor2", col2);
         }
-
-        material[3].SetColor("_BaseColor", col1);
     }
 
     public void setWobbleSpeed(float speed)

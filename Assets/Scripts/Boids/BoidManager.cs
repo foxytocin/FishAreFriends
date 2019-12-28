@@ -77,7 +77,7 @@ public class BoidManager : MonoBehaviour
                 {
                     boids[i].setColor(Color.black, Color.black);
                     boids[i].setWobbleSpeed(0);
-                    boids[i].transform.eulerAngles = new Vector3(0, 0, 90);
+                    boids[i].transform.eulerAngles = new Vector3(180, 0, 0);
                 }
             }
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);

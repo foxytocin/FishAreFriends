@@ -77,5 +77,52 @@ Foto-Quelle: Getty Images/Last Resort
   - kann automatisch Futter generieren wenn das Gleichgewicht gefährdet ist
   - bei der Entwicklung dieser Erweiterung, sind 3.453.871 Alpha-Tester gestorben
     - sie mögen in Frieden ruhen - blubb, blubb
+    
+---
 
+## 28.12.2019: Voll prozeduraler Map-Generator, Predator (Hai), Player-Controller
+![Fish Are Friends](Doku/map-generator.jpg?raw=true "Underwater Scene")
+#### Full Procedural Map-Generator
+- voll prozedurale Generierung der Unterwasserwelt
+  - Meeresgrund mit
+    - Steine, Grass, Alrgen, Steinblöcke
+  - Wasseroberfläche
+  - undurchsichtige Begrenzungen
+- Platzierung aller Elemente unter Berücksichtigung von Save-Areas
+- Mesh-Auflösung kann individuell konfiguriert werden
+- Verteilung, Gruppierung und Häufung aller Elemente kontrollierbar
+- abhängige Platzierung und Skalierung der nötigen Partikelsysteme
+- Collider-Berechnung für Fisch-Navigation
 
+#### Predator (Hai)
+- Fressfein für unsere kleinen Fischfreunde
+- navigiert eigenständig
+- beginnt die Jagt unter einem bestimmen Schwellwert (es fließt Blut)
+  - Hai bekommt mehr Geschwindigkeit
+  - Hai folgt einem Fisch bis dieser erlegt ist
+  - (sometimes food) wird unweigerlich wahr
+  - Rest-Lebensenergie der Fische geht auf den Hai über
+- Jagt endet erst über einem bestimmten Schwellwert (so lange herrscht Panik)
+  - Hai drosselt das Tempo und schwimmt gemütlich umher
+- Fische flüchten aktiv vor dem übermächtigen Feind
+
+#### Dead-Animation
+- verstorbene Fische treiben mit dem Bauch nach Oben zur Wasseroberfläche
+- werden innerhalb von Gras-Elementen neu gespawnt
+
+#### Player-Controller
+- neues System verhindert Kollision mit Elementen (Boden, Wände, Steine usw.)
+  - Player wird automatisch an diesen Elementen vorbei gelenkt
+  - Ray-Cast-System der Fische übernommen
+- Schwimm-Animation passt sich an tatsächliche Geschwindigkeit an
+
+#### Optimierungen
+- allgemein Coroutinen für asynchrone Animationen
+  - z.B. der Futterquellen
+- Coroutinen für Futterbedarf um korrektes Timing sicherzustellen
+- vier LOD (level of detail) Stufen für das Fishmodell
+  - automatischer switch je nach Entfernung zur Kamera
+  - spart bis zu 250.000 Tris
+  - Boden- und Wasser-Detailstunfen: bis zu 95% weniger Mesh
+
+---
