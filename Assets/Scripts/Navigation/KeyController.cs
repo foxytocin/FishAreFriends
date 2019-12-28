@@ -11,6 +11,7 @@ public class KeyController : MonoBehaviour
     Vector3 velocity;
 
     Transform cachedTransform;
+    Material material;
 
     private float maxSpeed = 3f;
     public float maxSteerForce = 2f;
@@ -33,6 +34,7 @@ public class KeyController : MonoBehaviour
     {
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cachedTransform = transform;
+        material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
     }
 
     public void Start()
@@ -128,6 +130,25 @@ public class KeyController : MonoBehaviour
         position = cachedTransform.position;
         forward = dir;
 
+        float ws = material.GetFloat("_WobbleSpeed");
+        if (ws != speed)
+        {
+            if (speed < 0)
+                speed = 0;
+
+            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
+        }
+
+        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+    }
+
+
+    public void setWobbleSpeed(float speed)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            material.SetFloat("_WobbleSpeed", speed);
+        }
     }
 
 

@@ -22,8 +22,6 @@ public class BoidManager : MonoBehaviour
 
     void Start()
     {
-        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-
         if (spawner.spawnBoids)
         {
             boids = FindObjectsOfType<Boid>();
@@ -77,9 +75,9 @@ public class BoidManager : MonoBehaviour
                 }
                 else
                 {
-                    boids[i].LetMeDie();
-                    boids[i].RespawnBoid();
-                    ecoSystemManager.addFishToFishCount();
+                    boids[i].setColor(Color.black, Color.black);
+                    boids[i].setWobbleSpeed(0);
+                    boids[i].transform.eulerAngles = new Vector3(0, 0, 90);
                 }
             }
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);

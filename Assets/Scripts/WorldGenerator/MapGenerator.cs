@@ -140,10 +140,6 @@ public class MapGenerator : MonoBehaviour
             PlaceBricks(noiseMap);
     }
 
-    float map(float s, float a1, float a2, float b1, float b2)
-    {
-        return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
-    }
 
     public void PlantPlants(float[,] noiseMap)
     {
@@ -160,7 +156,7 @@ public class MapGenerator : MonoBehaviour
                 if (sample < thresholdGrass && Random.value < growDensityGrass)
                 {
                     GameObject go1 = Instantiate(prefabGrass, new Vector3(0, 0, 0), Quaternion.identity);
-                    float gs1 = map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
+                    float gs1 = Map.map(sample, 0f, thresholdGrass, 1, 0.1f) * grassScale;
                     go1.transform.localScale = new Vector3(gs1, gs1, gs1);
                     go1.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
                     go1.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);

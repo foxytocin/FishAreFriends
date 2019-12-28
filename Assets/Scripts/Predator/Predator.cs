@@ -34,6 +34,7 @@ public class Predator : MonoBehaviour
 
     public int foodNeeds;
     private bool isHunting = false;
+    Material[] material;
 
     // Debug
     bool showDebug = false;
@@ -46,6 +47,11 @@ public class Predator : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         guiMessages = FindObjectOfType<GUIMessages>();
         cachedTransform = transform;
+        material = new Material[3];
+        Transform child = gameObject.transform.GetChild(0);
+        material[0] = child.GetChild(0).GetComponent<MeshRenderer>().material;
+        material[1] = child.GetChild(0).GetComponent<MeshRenderer>().material;
+        material[2] = child.GetChild(0).GetComponent<MeshRenderer>().material;
     }
 
     void Start()
@@ -135,7 +141,27 @@ public class Predator : MonoBehaviour
         cachedTransform.forward = dir;
         position = cachedTransform.position;
         forward = dir;
+
+        float ws = material[0].GetFloat("_SpeedZ");
+        if (ws != speed)
+        {
+            if (speed < 0)
+                speed = 0;
+
+            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
+        }
+
+        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
+
+    public void setWobbleSpeed(float speed)
+    {
+        for (int i = 0; i < material.Length; i++)
+        {
+            material[i].SetFloat("_SpeedZ", speed);
+        }
+    }
+
 
     bool IsHeadingForCollision()
     {

@@ -11,6 +11,7 @@ public class Boid : MonoBehaviour
 
     private Color originalColor1;
     private Color originalColor2;
+    private float originalWobbleSpeed;
 
     // State
     [HideInInspector]
@@ -63,6 +64,7 @@ public class Boid : MonoBehaviour
         material[1] = gameObject.transform.GetChild(1).GetComponent<MeshRenderer>().material;
         material[2] = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         material[3] = gameObject.transform.GetChild(3).GetComponent<MeshRenderer>().material;
+        originalWobbleSpeed = 1;
         cachedTransform = transform;
         delay = Random.Range(5, 31);
     }
@@ -78,10 +80,12 @@ public class Boid : MonoBehaviour
         float startSpeed = (settings.minSpeed + settings.maxSpeed) / 2;
         velocity = transform.forward * startSpeed;
 
+        setColor(originalColor1, originalColor2);
+
         StartCoroutine(IncreaseFood());
     }
 
-    public void SetColour(Color col1, Color col2)
+    public void PassColor(Color col1, Color col2)
     {
         if (material != null)
         {
@@ -115,7 +119,6 @@ public class Boid : MonoBehaviour
             position.z < -1 || position.z > mapGenerator.mapSize.z + 1
         )
         {
-            Debug.Log("EIN FISCH IST AUSGEBROCHEN " + position);
             LetMeDie();
         }
 
@@ -254,8 +257,6 @@ public class Boid : MonoBehaviour
             }
         }
 
-
-
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
         Vector3 dir = velocity / speed;
@@ -266,11 +267,19 @@ public class Boid : MonoBehaviour
         cachedTransform.forward = dir;
         position = cachedTransform.position;
         forward = dir;
+
+        float ws = material[0].GetFloat("_WobbleSpeed");
+        if (ws != speed && speed > 0)
+        {
+            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
+        }
+
+        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
 
-    void setColor(Color col1, Color col2)
-    {
 
+    public void setColor(Color col1, Color col2)
+    {
         for (int i = 0; i < material.Length - 1; i++)
         {
             material[i].SetColor("_BaseColor1", col1);
@@ -279,6 +288,15 @@ public class Boid : MonoBehaviour
 
         material[3].SetColor("_BaseColor", col1);
     }
+
+    public void setWobbleSpeed(float speed)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            material[i].SetFloat("_WobbleSpeed", speed);
+        }
+    }
+
 
     void setFoodNeeds()
     {
@@ -293,16 +311,35 @@ public class Boid : MonoBehaviour
         }
     }
 
+
     public void LetMeDie()
     {
         if (alife)
         {
             StopCoroutine(IncreaseFood());
             alife = false;
-            gameObject.SetActive(false);
             ecoSystemManager.addDiedFish();
+            StartDeadAnimation();
         }
     }
+
+
+    public void StartDeadAnimation()
+    {
+        StartCoroutine(Animate());
+    }
+
+    private IEnumerator Animate()
+    {
+        while (transform.position.y < mapGenerator.mapSize.y * 1.3f)
+        {
+            transform.position += new Vector3(0, 1f * Time.deltaTime, 0);
+            yield return new WaitForEndOfFrame();
+        }
+
+        RespawnBoid();
+    }
+
 
     public void RespawnBoid()
     {
@@ -315,8 +352,11 @@ public class Boid : MonoBehaviour
         gameObject.transform.forward = Random.insideUnitSphere;
 
         // reset state
-        gameObject.SetActive(true);
+        ecoSystemManager.addFishToFishCount();
+        //gameObject.SetActive(true);
         alife = true;
+        setColor(originalColor1, originalColor2);
+        setWobbleSpeed(originalWobbleSpeed);
 
         StartCoroutine(IncreaseFood());
     }
