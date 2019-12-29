@@ -35,5 +35,5 @@ Material:
     - _Smoothness: 0.5
     m_Colors:
     - Color_67DC14BD: {r: 0.002149545, g: 0, b: 0.11320745, a: 0}
-    - _BaseColor: {r: 0.0058643767, g: 0, b: 0.21698111, a: 0}
+    - _BaseColor: {r: 0.2673492, g: 0.26188144, b: 0.5188679, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}
