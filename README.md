@@ -94,6 +94,7 @@ Foto-Quelle: Getty Images/Last Resort
 - abhängige Platzierung und Skalierung der nötigen Partikelsysteme
 - Collider-Berechnung für Fisch-Navigation
 
+![Fish Are Friends](Doku/predator_1.jpg?raw=true "Underwater Scene")
 #### Predator (Hai)
 - Fressfein für unsere kleinen Fischfreunde
 - navigiert eigenständig
