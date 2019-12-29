@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Unity.Collections;
 
+[System.Serializable]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapGenerator : MonoBehaviour
 {
@@ -77,6 +78,9 @@ public class MapGenerator : MonoBehaviour
     public float groundResolution = 0.25f;
     private int stepXGround;
     private int stepYGround;
+    public Gradient gradient = new Gradient();
+    private float minHeight;
+    private float maxHeight;
 
 
     [Header("Water Setting")]
@@ -96,13 +100,13 @@ public class MapGenerator : MonoBehaviour
 
     void Awake()
     {
-        verticesGround = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
     }
 
     private void Start()
     {
-        GenerateMap();
+        if (proceduralGround == null)
+            GenerateMap();
     }
 
     public void GenerateMap()
@@ -304,24 +308,33 @@ public class MapGenerator : MonoBehaviour
         underwaterDust.transform.position = new Vector3(mapSize.x / 2, mapSize.y / 2, mapSize.z / 2);
     }
 
+    private GameObject proceduralGround;
+
     private void GenerateGround(float[,] noiseMap)
     {
-        GameObject proceduralGround = new GameObject("ProceduralGround");
-        proceduralGround.tag = "Enviroment";
-        proceduralGround.AddComponent<MeshRenderer>();
-        proceduralGround.GetComponent<Renderer>().material = groundMaterial;
-        proceduralGround.AddComponent<MeshFilter>();
-        proceduralGround.GetComponent<MeshFilter>().mesh = meshGround = new Mesh();
-        proceduralGround.AddComponent<MeshCollider>();
-        proceduralGround.GetComponent<MeshCollider>().enabled = false;
-        proceduralGround.layer = 11;
-        meshGround.name = "ProceduralGround";
+        if (proceduralGround == null)
+        {
+            proceduralGround = new GameObject("ProceduralGround");
+            proceduralGround.tag = "Enviroment";
+            proceduralGround.AddComponent<MeshRenderer>();
+            proceduralGround.GetComponent<Renderer>().material = groundMaterial;
+            proceduralGround.AddComponent<MeshFilter>();
+            proceduralGround.GetComponent<MeshFilter>().mesh = meshGround = new Mesh();
+            proceduralGround.AddComponent<MeshCollider>();
+            proceduralGround.GetComponent<MeshCollider>().enabled = false;
+            proceduralGround.layer = 11;
+            meshGround.name = "ProceduralGround";
+        }
 
         verticesGround = new Vector3[((int)mapSize.x + 1) * ((int)mapSize.z + 1)];
         Vector2[] uv = new Vector2[verticesGround.Length];
+        Color[] color = new Color[verticesGround.Length];
 
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
+
+        minHeight = float.MaxValue;
+        maxHeight = float.MinValue;
 
         for (int i = 0, y = 0; y <= (int)mapSize.z; y += stepYGround)
         {
@@ -331,11 +344,35 @@ public class MapGenerator : MonoBehaviour
                 int yMax = Mathf.Clamp(y, 0, height - 1);
                 float heightOffset = noiseMap[xMax, yMax] * heightScale;
                 verticesGround[i] = new Vector3(x, heightOffset, y);
-                uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
+                uv[i] = new Vector2((float)x / (float)mapSize.x, (float)y / (float)mapSize.z);
+
+                if (heightOffset > maxHeight)
+                {
+                    maxHeight = heightOffset;
+                }
+                if (heightOffset < minHeight)
+                {
+                    minHeight = heightOffset;
+                }
             }
         }
+
+
+        for (int j = 0, y = 0; y <= (int)mapSize.z; y += stepYGround)
+        {
+            for (int x = 0; x <= (int)mapSize.x; x += stepXGround, j++)
+            {
+                int xMax = Mathf.Clamp(x, 0, width - 1);
+                int yMax = Mathf.Clamp(y, 0, height - 1);
+                float heightOffset = verticesGround[j].y;
+                color[j] = gradient.Evaluate(Mathf.InverseLerp(0, 15, heightOffset));
+            }
+        }
+
+        meshGround.Clear();
         meshGround.vertices = verticesGround;
         meshGround.uv = uv;
+        meshGround.colors = color;
 
         int[] triangles = new int[(int)mapSize.x * (int)mapSize.z * 6];
         for (int ti = 0, vi = 0, y = 0; y < (int)mapSize.z; y += stepYGround, vi++)
@@ -353,15 +390,19 @@ public class MapGenerator : MonoBehaviour
         proceduralGround.GetComponent<MeshCollider>().enabled = true;
     }
 
+    private GameObject proceduralWater;
     private void GenerateWater()
     {
-        GameObject proceduralWater = new GameObject("ProceduralWater");
-        proceduralWater.tag = "Enviroment";
-        proceduralWater.AddComponent<MeshRenderer>();
-        proceduralWater.GetComponent<Renderer>().material = waterMaterial;
-        proceduralWater.AddComponent<MeshFilter>();
-        proceduralWater.GetComponent<MeshFilter>().mesh = meshWater = new Mesh();
-        proceduralWater.layer = 4;
+        if (proceduralWater == null)
+        {
+            proceduralWater = new GameObject("ProceduralWater");
+            proceduralWater.tag = "Enviroment";
+            proceduralWater.AddComponent<MeshRenderer>();
+            proceduralWater.GetComponent<Renderer>().material = waterMaterial;
+            proceduralWater.AddComponent<MeshFilter>();
+            proceduralWater.GetComponent<MeshFilter>().mesh = meshWater = new Mesh();
+            proceduralWater.layer = 4;
+        }
 
         meshWater.name = "ProceduralWater";
 
@@ -376,6 +417,8 @@ public class MapGenerator : MonoBehaviour
                 uv[i] = new Vector2(x / mapSize.x, y / mapSize.z);
             }
         }
+
+        meshWater.Clear();
         meshWater.vertices = verticesWater;
         meshWater.uv = uv;
 
