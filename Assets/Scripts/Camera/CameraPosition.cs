@@ -55,11 +55,6 @@ public class CameraPosition : MonoBehaviour
         startPosition = transform.position.y;
     }
 
-    float map(float s, float a1, float a2, float b1, float b2)
-    {
-        return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
-    }
-
 
     // Update is called once per frame
     void FixedUpdate()
@@ -215,7 +210,7 @@ public class CameraPosition : MonoBehaviour
     private IEnumerator SetClippingPlane()
     {
         yield return new WaitForSeconds(10);
-        myCamera.farClipPlane = 80;
+        myCamera.farClipPlane = 300;
     }
 
 
