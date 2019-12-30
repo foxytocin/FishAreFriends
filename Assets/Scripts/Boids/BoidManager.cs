@@ -5,11 +5,9 @@ public class BoidManager : MonoBehaviour
 
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
-    const int threadGroupSize = 512;
 
     public BoidSettings settings;
-    public ComputeShader compute;
-    private ComputeBuffer boidBuffer;
+
     public float distance = 1;
     Boid[] boids;
     private int numBoids;
@@ -38,51 +36,48 @@ public class BoidManager : MonoBehaviour
     {
         if (boids != null)
         {
-            var boidData = new BoidData[numBoids];
+           
+            int quaterBoids = numBoids / 100;
+            for(int x = 0; x < 100; x++) {
 
-            for (int i = 0; i < boids.Length; i++)
-            {
-                boidData[i].position = boids[i].position;
-                boidData[i].direction = boids[i].forward;
-            }
+                int index1 = 0;
+                int foodNeedsSum = 0;
+                for (int indexA = (x * quaterBoids); indexA < quaterBoids * (x + 1); indexA ++) {
 
-            boidBuffer = new ComputeBuffer(numBoids, BoidData.Size);
-            boidBuffer.SetData(boidData);
+                    Boid actBoid = boids[indexA];   
+                    for (int indexB = (x * quaterBoids); indexB < quaterBoids * (x + 1); indexB ++) {
+                        if (actBoid != boids[indexB]) {
+                            Boid boidB = boids[indexB];
+                            Vector3 offset = boidB.position - actBoid.position;
+                            float sqrDst = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 
-            compute.SetBuffer(0, "boids", boidBuffer);
-            compute.SetInt("numBoids", boids.Length);
-            compute.SetFloat("viewRadius", settings.perceptionRadius);
-            compute.SetFloat("avoidRadius", settings.avoidanceRadius);
+                            if (sqrDst < settings.perceptionRadius * settings.perceptionRadius) {
+                                actBoid.numPerceivedFlockmates += 1;
+                                actBoid.avgFlockHeading += boidB.dir;
+                                actBoid.centreOfFlockmates += boidB.position;
 
-            int threadGroups = Mathf.CeilToInt(numBoids / (float)threadGroupSize);
-            compute.Dispatch(0, threadGroups, 1, 1);
+                                if (sqrDst < settings.avoidanceRadius * settings.avoidanceRadius) {
+                                    actBoid.avgAvoidanceHeading -= offset / sqrDst;
+                                }
+                            }
+                        }
+                    }
 
-            boidBuffer.GetData(boidData);
+                    if (actBoid.alife)
+                    {
+                        foodNeedsSum += actBoid.foodNeeds;
 
-            int foodNeedsSum = 0;
-            for (int i = 0; i < numBoids; i++)
-            {
-                if (boids[i].alife)
-                {
-                    boids[i].avgFlockHeading = boidData[i].flockHeading;
-                    boids[i].centreOfFlockmates = boidData[i].flockCentre;
-                    boids[i].avgAvoidanceHeading = boidData[i].avoidanceHeading;
-                    boids[i].numPerceivedFlockmates = boidData[i].numFlockmates;
-
-                    foodNeedsSum += boids[i].foodNeeds;
-
-                    boids[i].UpdateBoid();
+                        actBoid.UpdateBoid();
+                    }
+                    else
+                    {
+                        actBoid.setColor(Color.black, Color.black);
+                        actBoid.setWobbleSpeed(0);
+                        actBoid.transform.eulerAngles = new Vector3(180, 0, 0);
+                    }
                 }
-                else
-                {
-                    boids[i].setColor(Color.black, Color.black);
-                    boids[i].setWobbleSpeed(0);
-                    boids[i].transform.eulerAngles = new Vector3(180, 0, 0);
-                }
+                ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
             }
-            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
-
-            boidBuffer.Release();
         }
     }
 

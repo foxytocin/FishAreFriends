@@ -31,6 +31,8 @@ public class Boid : MonoBehaviour
     [HideInInspector]
     public int numPerceivedFlockmates;
 
+public Vector3 dir;
+
     // Cached
     Material[] material;
 
@@ -259,7 +261,7 @@ public class Boid : MonoBehaviour
 
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
-        Vector3 dir = velocity / speed;
+        dir = velocity / speed;
         speed = Mathf.Clamp(speed, settings.minSpeed, settings.maxSpeed);
         velocity = dir * speed;
 
