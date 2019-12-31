@@ -4,6 +4,7 @@ using System.Collections;
 public class Boid : MonoBehaviour
 {
 
+    CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
@@ -39,6 +40,7 @@ public class Boid : MonoBehaviour
 
     // Swarm handling varialbes
     Leader myLeader = null;
+    public int cellIndex = 0;
 
     // Food
     public int basicFoodNeed = 1000;
@@ -57,6 +59,7 @@ public class Boid : MonoBehaviour
         alife = true;
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
+        cellGroups = FindObjectOfType<CellGroups>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = new Material[4];
@@ -68,6 +71,7 @@ public class Boid : MonoBehaviour
         cachedTransform = transform;
         delay = Random.Range(5, 31);
     }
+
 
     public void Initialize(BoidSettings settings, Transform target)
     {
@@ -81,6 +85,9 @@ public class Boid : MonoBehaviour
         velocity = transform.forward * startSpeed;
 
         setColor(originalColor1, originalColor2);
+
+        cellIndex = cellGroups.GetIndex(transform.position);
+        cellGroups.RegisterAtCell(this);
 
         StartCoroutine(IncreaseFood());
     }
@@ -113,6 +120,8 @@ public class Boid : MonoBehaviour
 
     public void UpdateBoid()
     {
+        cellGroups.CheckCell(this);
+
         if (
             position.x < -1 || position.x > mapGenerator.mapSize.x + 1 ||
             position.y < -1 || position.y > mapGenerator.mapSize.y + 1 ||

@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class BoidManager : MonoBehaviour
 {
 
+    CellGroups cellGroups;
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
     const int threadGroupSize = 512;
@@ -10,79 +12,72 @@ public class BoidManager : MonoBehaviour
     public BoidSettings settings;
     public ComputeShader compute;
     private ComputeBuffer boidBuffer;
-    public float distance = 1;
-    Boid[] boids;
-    private int numBoids;
 
-    void Awake()
-    {
-        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        spawner = FindObjectOfType<Spawner>();
-    }
 
     void Start()
     {
-        if (spawner.spawnBoids)
-        {
-            boids = FindObjectsOfType<Boid>();
-            numBoids = boids.Length;
-            foreach (Boid b in boids)
-            {
-                b.Initialize(settings, null);
-            }
-            ecoSystemManager.setFishCount(numBoids);
-        }
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        cellGroups = FindObjectOfType<CellGroups>();
+        spawner = FindObjectOfType<Spawner>();
     }
+
 
     void Update()
     {
-        if (boids != null)
+        int foodNeedsSum = 0;
+        if (cellGroups.allBoidCells != null)
         {
-            var boidData = new BoidData[numBoids];
-
-            for (int i = 0; i < boids.Length; i++)
+            foreach (List<Boid> boidsList in cellGroups.allBoidCells)
             {
-                boidData[i].position = boids[i].position;
-                boidData[i].direction = boids[i].forward;
-            }
+                //print("BOIDS-ON-LISTEN: " + boidsList.Count);
 
-            boidBuffer = new ComputeBuffer(numBoids, BoidData.Size);
-            boidBuffer.SetData(boidData);
-
-            compute.SetBuffer(0, "boids", boidBuffer);
-            compute.SetInt("numBoids", boids.Length);
-            compute.SetFloat("viewRadius", settings.perceptionRadius);
-            compute.SetFloat("avoidRadius", settings.avoidanceRadius);
-
-            int threadGroups = Mathf.CeilToInt(numBoids / (float)threadGroupSize);
-            compute.Dispatch(0, threadGroups, 1, 1);
-
-            boidBuffer.GetData(boidData);
-
-            int foodNeedsSum = 0;
-            for (int i = 0; i < numBoids; i++)
-            {
-                if (boids[i].alife)
+                if (boidsList.Count > 0)
                 {
-                    boids[i].avgFlockHeading = boidData[i].flockHeading;
-                    boids[i].centreOfFlockmates = boidData[i].flockCentre;
-                    boids[i].avgAvoidanceHeading = boidData[i].avoidanceHeading;
-                    boids[i].numPerceivedFlockmates = boidData[i].numFlockmates;
+                    var boidData = new BoidData[boidsList.Count];
 
-                    foodNeedsSum += boids[i].foodNeeds;
+                    for (int i = 0; i < boidsList.Count; i++)
+                    {
+                        boidData[i].position = boidsList[i].position;
+                        boidData[i].direction = boidsList[i].forward;
+                    }
 
-                    boids[i].UpdateBoid();
-                }
-                else
-                {
-                    boids[i].setColor(Color.black, Color.black);
-                    boids[i].setWobbleSpeed(0);
-                    boids[i].transform.eulerAngles = new Vector3(180, 0, 0);
+                    boidBuffer = new ComputeBuffer(boidsList.Count, BoidData.Size);
+                    boidBuffer.SetData(boidData);
+
+                    compute.SetBuffer(0, "boids", boidBuffer);
+                    compute.SetInt("numBoids", boidsList.Count);
+                    compute.SetFloat("viewRadius", settings.perceptionRadius);
+                    compute.SetFloat("avoidRadius", settings.avoidanceRadius);
+
+                    int threadGroups = Mathf.CeilToInt(boidsList.Count / (float)threadGroupSize);
+                    compute.Dispatch(0, threadGroups, 1, 1);
+
+                    boidBuffer.GetData(boidData);
+
+                    for (int i = 0; i < boidsList.Count; i++)
+                    {
+                        if (boidsList[i].alife)
+                        {
+                            boidsList[i].avgFlockHeading = boidData[i].flockHeading;
+                            boidsList[i].centreOfFlockmates = boidData[i].flockCentre;
+                            boidsList[i].avgAvoidanceHeading = boidData[i].avoidanceHeading;
+                            boidsList[i].numPerceivedFlockmates = boidData[i].numFlockmates;
+
+                            foodNeedsSum += boidsList[i].foodNeeds;
+
+                            boidsList[i].UpdateBoid();
+                        }
+                        else
+                        {
+                            boidsList[i].setColor(Color.black, Color.black);
+                            boidsList[i].setWobbleSpeed(0);
+                            boidsList[i].transform.eulerAngles = new Vector3(180, 0, 0);
+                        }
+                    }
+                    boidBuffer.Release();
                 }
             }
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
-
-            boidBuffer.Release();
         }
     }
 
