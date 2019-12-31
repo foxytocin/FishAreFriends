@@ -3,6 +3,7 @@
 public class Spawner : MonoBehaviour
 {
     CellGroups cellGroups;
+    EcoSystemManager ecoSystemManager;
     public BoidSettings settings;
     public enum GizmoType { Never, SelectedOnly, Always }
     public bool spawnBoids = true;
@@ -19,6 +20,7 @@ public class Spawner : MonoBehaviour
     void Awake()
     {
         cellGroups = FindObjectOfType<CellGroups>();
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         fishHolder = new GameObject("Fishes").transform;
     }
 
@@ -35,6 +37,7 @@ public class Spawner : MonoBehaviour
                 boid.Initialize(settings, null);
                 boid.RespawnBoid();
             }
+            ecoSystemManager.setFishCount(spawnCount);
         }
     }
 
