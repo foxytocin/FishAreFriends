@@ -293,8 +293,9 @@ public class MapGenerator : MonoBehaviour
                     rgo.transform.eulerAngles = new Vector3(Random.Range(0, 180), Random.Range(0, 180), Random.Range(0, 180));
                     // Material material = rgo.GetComponent<MeshRenderer>().material;
                     // Color color = new Color();
-                    Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
-                    rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+                    //Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
+                    //rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+                    
                     rgo.transform.parent = enviromentHolder;
                     rgo.tag = "Enviroment";
                 }

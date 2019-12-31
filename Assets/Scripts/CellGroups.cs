@@ -39,12 +39,10 @@ public class CellGroups : MonoBehaviour
     }
 
 
-    int index;
     public int GetIndex(Vector3 pos)
     {
-        index = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
-        index = Mathf.Clamp(index, 0, allBoidCells.Count - 1);
-        return index;
+        int index = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
+        return Mathf.Clamp(index, 0, allBoidCells.Count - 1);
     }
 
 
@@ -62,7 +60,14 @@ public class CellGroups : MonoBehaviour
     }
 
 
-    void OnDrawGizmos()
+    int playerCell;
+    public void SetPlayerCell(Vector3 pos)
+    {
+        playerCell = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
+    }
+
+    
+    void OnDrawGizmosSelected()
     {
         if (Debug)
         {
@@ -74,7 +79,7 @@ public class CellGroups : MonoBehaviour
                     {
                         Vector3 size = new Vector3(widthStep, heightStep, depthStep);
                         Vector3 position = new Vector3(x * widthStep, y * heightStep, z * depthStep);
-                        if (index == (x + z * resolution.x + (resolution.x * resolution.z * y)))
+                        if (playerCell == (x + z * resolution.x + (resolution.x * resolution.z * y)))
                         {
                             Gizmos.color = new Color(0, 1, 0, 0.5f);
                         }

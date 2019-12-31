@@ -12,6 +12,9 @@ public class BoidManager : MonoBehaviour
     public ComputeShader compute;
     private ComputeBuffer boidBuffer;
 
+    Boid boid;
+    BoidData data;
+
 
     void Start()
     {
@@ -53,22 +56,25 @@ public class BoidManager : MonoBehaviour
 
                     for (int i = 0; i < boidsList.Count; i++)
                     {
-                        if (boidsList[i].alife)
+                        boid = boidsList[i];
+                        data = boidData[i];
+
+                        if (boid.alife)
                         {
-                            boidsList[i].avgFlockHeading = boidData[i].flockHeading;
-                            boidsList[i].centreOfFlockmates = boidData[i].flockCentre;
-                            boidsList[i].avgAvoidanceHeading = boidData[i].avoidanceHeading;
-                            boidsList[i].numPerceivedFlockmates = boidData[i].numFlockmates;
+                            boid.avgFlockHeading = data.flockHeading;
+                            boid.centreOfFlockmates = data.flockCentre;
+                            boid.avgAvoidanceHeading = data.avoidanceHeading;
+                            boid.numPerceivedFlockmates = data.numFlockmates;
 
-                            foodNeedsSum += boidsList[i].foodNeeds;
+                            foodNeedsSum += boid.foodNeeds;
 
-                            boidsList[i].UpdateBoid();
+                            boid.UpdateBoid();
                         }
                         else
                         {
-                            boidsList[i].setColor(Color.black, Color.black);
-                            boidsList[i].setWobbleSpeed(0);
-                            boidsList[i].transform.eulerAngles = new Vector3(180, 0, 0);
+                            boid.setColor(Color.black, Color.black);
+                            boid.setWobbleSpeed(0);
+                            boid.transform.eulerAngles = new Vector3(180, 0, 0);
                         }
                     }
                     boidBuffer.Release();

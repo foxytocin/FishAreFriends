@@ -3,6 +3,8 @@
 public class KeyController : MonoBehaviour
 {
 
+    CellGroups cellGroups;
+
     // State
     [HideInInspector]
     public Vector3 position;
@@ -33,6 +35,7 @@ public class KeyController : MonoBehaviour
     void Awake()
     {
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
+        cellGroups = FindObjectOfType<CellGroups>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
     }
@@ -49,6 +52,8 @@ public class KeyController : MonoBehaviour
 
     void Update()
     {
+
+        cellGroups.SetPlayerCell(transform.position);
 
         Vector3 acceleration = Vector3.zero;
         bool isHeadingForCollision = IsHeadingForCollision();
