@@ -1,83 +1,78 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class BoidManager : MonoBehaviour
 {
-
+    CellGroups cellGroups;
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
-
     public BoidSettings settings;
+    public ComputeShader compute;
+    private ComputeBuffer boidBuffer;
 
-    public float distance = 1;
-    Boid[] boids;
-    private int numBoids;
-
-    void Awake()
-    {
-        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        spawner = FindObjectOfType<Spawner>();
-    }
 
     void Start()
     {
-        if (spawner.spawnBoids)
-        {
-            boids = FindObjectsOfType<Boid>();
-            numBoids = boids.Length;
-            foreach (Boid b in boids)
-            {
-                b.Initialize(settings, null);
-            }
-            ecoSystemManager.setFishCount(numBoids);
-        }
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        cellGroups = FindObjectOfType<CellGroups>();
+        spawner = FindObjectOfType<Spawner>();
     }
+
 
     void Update()
     {
-        if (boids != null)
+        int foodNeedsSum = 0;
+        if (cellGroups.allBoidCells != null)
         {
-           
-            int quaterBoids = numBoids / 100;
-            for(int x = 0; x < 100; x++) {
+            foreach (List<Boid> boidsList in cellGroups.allBoidCells)
+            {
+                if (boidsList.Count > 0)
+                {
+                    var boidData = new BoidData[boidsList.Count];
 
-                int index1 = 0;
-                int foodNeedsSum = 0;
-                for (int indexA = (x * quaterBoids); indexA < quaterBoids * (x + 1); indexA ++) {
+                    for (int i = 0; i < boidsList.Count; i++)
+                    {
+                        boidData[i].position = boidsList[i].position;
+                        boidData[i].direction = boidsList[i].forward;
+                    }
 
-                    Boid actBoid = boids[indexA];   
-                    for (int indexB = (x * quaterBoids); indexB < quaterBoids * (x + 1); indexB ++) {
-                        if (actBoid != boids[indexB]) {
-                            Boid boidB = boids[indexB];
-                            Vector3 offset = boidB.position - actBoid.position;
-                            float sqrDst = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
+                    boidBuffer = new ComputeBuffer(boidsList.Count, BoidData.Size);
+                    boidBuffer.SetData(boidData);
 
-                            if (sqrDst < settings.perceptionRadius * settings.perceptionRadius) {
-                                actBoid.numPerceivedFlockmates += 1;
-                                actBoid.avgFlockHeading += boidB.dir;
-                                actBoid.centreOfFlockmates += boidB.position;
+                    compute.SetBuffer(0, "boids", boidBuffer);
+                    compute.SetInt("numBoids", boidsList.Count);
+                    compute.SetFloat("viewRadius", settings.perceptionRadius);
+                    compute.SetFloat("avoidRadius", settings.avoidanceRadius);
 
-                                if (sqrDst < settings.avoidanceRadius * settings.avoidanceRadius) {
-                                    actBoid.avgAvoidanceHeading -= offset / sqrDst;
-                                }
-                            }
+                    int threadGroups = Mathf.CeilToInt(boidsList.Count / (float)threadGroupSize);
+                    compute.Dispatch(0, threadGroups, 1, 1);
+
+                    boidBuffer.GetData(boidData);
+
+                    for (int i = 0; i < boidsList.Count; i++)
+                    {
+                        if (boidsList[i].alife)
+                        {
+                            boidsList[i].avgFlockHeading = boidData[i].flockHeading;
+                            boidsList[i].centreOfFlockmates = boidData[i].flockCentre;
+                            boidsList[i].avgAvoidanceHeading = boidData[i].avoidanceHeading;
+                            boidsList[i].numPerceivedFlockmates = boidData[i].numFlockmates;
+
+                            foodNeedsSum += boidsList[i].foodNeeds;
+
+                            boidsList[i].UpdateBoid();
+                        }
+                        else
+                        {
+                            boidsList[i].setColor(Color.black, Color.black);
+                            boidsList[i].setWobbleSpeed(0);
+                            boidsList[i].transform.eulerAngles = new Vector3(180, 0, 0);
                         }
                     }
-
-                    if (actBoid.alife)
-                    {
-                        foodNeedsSum += actBoid.foodNeeds;
-
-                        actBoid.UpdateBoid();
-                    }
-                    else
-                    {
-                        actBoid.setColor(Color.black, Color.black);
-                        actBoid.setWobbleSpeed(0);
-                        actBoid.transform.eulerAngles = new Vector3(180, 0, 0);
-                    }
+                    boidBuffer.Release();
                 }
-                ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
             }
+            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
         }
     }
 
