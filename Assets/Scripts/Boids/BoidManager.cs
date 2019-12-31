@@ -7,7 +7,7 @@ public class BoidManager : MonoBehaviour
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
     
-    static int threadGroupSize = 1024;
+    static int threadGroupSize = 512;
     public BoidSettings settings;
     public ComputeShader compute;
     private ComputeBuffer boidBuffer;

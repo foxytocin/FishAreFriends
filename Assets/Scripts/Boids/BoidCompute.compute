@@ -1,5 +1,5 @@
 ﻿#pragma kernel CSMain
-static const int threadGroupSize = 1024;
+static const int threadGroupSize = 512;
 
 struct Boid {
     float3 position;
