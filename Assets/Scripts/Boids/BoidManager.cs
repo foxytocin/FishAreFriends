@@ -6,6 +6,8 @@ public class BoidManager : MonoBehaviour
     CellGroups cellGroups;
     EcoSystemManager ecoSystemManager;
     Spawner spawner;
+    
+    static int threadGroupSize = 1024;
     public BoidSettings settings;
     public ComputeShader compute;
     private ComputeBuffer boidBuffer;
