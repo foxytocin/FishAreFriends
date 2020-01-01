@@ -46,11 +46,11 @@ public class Boid : MonoBehaviour
 
     // Food
     public int basicFoodNeed = 1000;
-    public int foodNeeds;
+    public int foodNeeds = 0;
     public int foodLeft;
     public int hungerRate = 1;
-    public bool alife;
-    private int delay;
+    public bool alife = true;
+    private int delay = 30;
     private bool firstTime = true;
 
     // Debug
@@ -91,8 +91,6 @@ public class Boid : MonoBehaviour
 
         cellIndex = cellGroups.GetIndex(transform.position);
         cellGroups.RegisterAtCell(this);
-
-        StartCoroutine(IncreaseFood());
     }
 
     public void PassColor(Color col1, Color col2)
@@ -123,18 +121,16 @@ public class Boid : MonoBehaviour
 
     public void UpdateBoid()
     {
-
-
         cellGroups.CheckCell(this);
 
-        if (
-            position.x < -1 || position.x > mapGenerator.mapSize.x + 1 ||
-            position.y < -1 || position.y > mapGenerator.mapSize.y + 1 ||
-            position.z < -1 || position.z > mapGenerator.mapSize.z + 1
-        )
-        {
-            LetMeDie();
-        }
+        // if (
+        //     position.x < -1 || position.x > mapGenerator.mapSize.x + 1 ||
+        //     position.y < -1 || position.y > mapGenerator.mapSize.y + 1 ||
+        //     position.z < -1 || position.z > mapGenerator.mapSize.z + 1
+        // )
+        // {
+        //     LetMeDie();
+        // }
 
         Vector3 acceleration = Vector3.zero;
 
@@ -165,6 +161,7 @@ public class Boid : MonoBehaviour
             Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
             acceleration += collisionAvoidForce;
         }
+
 
         // avoid predator
         Collider[] hitCollidersPredator = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));

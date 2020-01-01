@@ -13,8 +13,20 @@ public class BoidManager : MonoBehaviour
     public BoidSettings settings;
 
 
+    NativeArray<float3> positionArray;
+    NativeArray<float3> directionArray;
+    NativeArray<int> numFlockmatesArray;
+    NativeArray<float3> flockHeadingArray;
+    NativeArray<float3> flockCentreArray;
+    NativeArray<float3> avoidanceHeadingArray;
+    float viewRadius;
+    float avoidRadius;
+
+
     void Start()
     {
+        viewRadius = settings.perceptionRadius;
+        avoidRadius = settings.avoidanceRadius;
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         cellGroups = FindObjectOfType<CellGroups>();
         spawner = FindObjectOfType<Spawner>();
@@ -30,14 +42,12 @@ public class BoidManager : MonoBehaviour
                 List<Boid> boidsList = cellGroups.allBoidCells[j];
 
                 int Count = boidsList.Count;
-                NativeArray<float3> positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
-                NativeArray<float3> directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
-                NativeArray<int> numFlockmatesArray = new NativeArray<int>(Count, Allocator.TempJob);
-                NativeArray<float3> flockHeadingArray = new NativeArray<float3>(Count, Allocator.TempJob);
-                NativeArray<float3> flockCentreArray = new NativeArray<float3>(Count, Allocator.TempJob);
-                NativeArray<float3> avoidanceHeadingArray = new NativeArray<float3>(Count, Allocator.TempJob);
-                float viewRadius = settings.perceptionRadius;
-                float avoidRadius = settings.avoidanceRadius;
+                positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
+                directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
+                numFlockmatesArray = new NativeArray<int>(Count, Allocator.TempJob);
+                flockHeadingArray = new NativeArray<float3>(Count, Allocator.TempJob);
+                flockCentreArray = new NativeArray<float3>(Count, Allocator.TempJob);
+                avoidanceHeadingArray = new NativeArray<float3>(Count, Allocator.TempJob);
 
                 for (int i = 0; i < Count; i++)
                 {
@@ -62,13 +72,22 @@ public class BoidManager : MonoBehaviour
 
                 for (int i = 0; i < Count; i++)
                 {
-                    boidsList[i].avgFlockHeading = flockHeadingArray[i];
-                    boidsList[i].centreOfFlockmates = flockCentreArray[i];
-                    boidsList[i].avgAvoidanceHeading = avoidanceHeadingArray[i];
-                    boidsList[i].numPerceivedFlockmates = numFlockmatesArray[i];
+                    if (boidsList[i].alife)
+                    {
+                        boidsList[i].avgFlockHeading = flockHeadingArray[i];
+                        boidsList[i].centreOfFlockmates = flockCentreArray[i];
+                        boidsList[i].avgAvoidanceHeading = avoidanceHeadingArray[i];
+                        boidsList[i].numPerceivedFlockmates = numFlockmatesArray[i];
 
-                    foodNeedsSum += boidsList[i].foodNeeds;
-                    boidsList[i].UpdateBoid();
+                        foodNeedsSum += boidsList[i].foodNeeds;
+                        boidsList[i].UpdateBoid();
+                    }
+                    else
+                    {
+                        boidsList[i].setColor(Color.black, Color.black);
+                        boidsList[i].setWobbleSpeed(0);
+                        boidsList[i].transform.eulerAngles = new Vector3(180, 0, 0);
+                    }
                 }
 
                 positionArray.Dispose();
@@ -79,7 +98,6 @@ public class BoidManager : MonoBehaviour
                 avoidanceHeadingArray.Dispose();
             }
         }
-
         ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
     }
 }
@@ -112,8 +130,6 @@ public struct CellBoidParallelJob : IJobParallelFor
         {
             if (index != i)
             {
-
-                //Debug.Log("INDEX: " + index);
                 float3 offset = positionArray[i] - positionArray[index];
                 float sqrDst = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 

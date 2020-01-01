@@ -37,7 +37,6 @@ public class Spawner : MonoBehaviour
                 boid.Initialize(settings, null);
                 boid.RespawnBoid();
             }
-            ecoSystemManager.setFishCount(spawnCount);
         }
     }
 
