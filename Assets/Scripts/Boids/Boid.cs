@@ -19,7 +19,7 @@ public class Boid : MonoBehaviour
     public Vector3 position;
     [HideInInspector]
     public Vector3 forward;
-    Vector3 velocity;
+    public Vector3 velocity;
 
     // To update:
     Vector3 acceleration;
@@ -32,13 +32,13 @@ public class Boid : MonoBehaviour
     [HideInInspector]
     public int numPerceivedFlockmates;
 
-public Vector3 dir;
+    public Vector3 dir;
 
     // Cached
     Material[] material;
 
     Transform cachedTransform;
-    Transform target;
+    public Transform target;
 
     // Swarm handling varialbes
     Leader myLeader = null;
@@ -71,6 +71,7 @@ public Vector3 dir;
         material[3] = gameObject.transform.GetChild(3).GetComponent<MeshRenderer>().material;
         originalWobbleSpeed = 1;
         cachedTransform = transform;
+        position = cachedTransform.position;
         delay = Random.Range(5, 31);
     }
 
@@ -122,6 +123,8 @@ public Vector3 dir;
 
     public void UpdateBoid()
     {
+
+
         cellGroups.CheckCell(this);
 
         if (

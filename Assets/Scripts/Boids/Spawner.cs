@@ -30,7 +30,7 @@ public class Spawner : MonoBehaviour
         {
             for (int i = 0; i < spawnCount; i++)
             {
-                Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
+                Vector3 pos = Random.insideUnitSphere * spawnRadius;
                 Boid boid = Instantiate(prefab, pos, Quaternion.identity);
                 boid.transform.parent = fishHolder;
                 boid.PassColor(color1, color2);
