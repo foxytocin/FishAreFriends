@@ -169,6 +169,12 @@ public struct CellBoidParallelJob : IJobParallelFor
 //     EcoSystemManager ecoSystemManager;
 //     Spawner spawner;
 //     public BoidSettings settings;
+//     NativeArray<float3> positionArray;
+//     NativeArray<float3> directionArray;
+//     NativeArray<float3> accelerationArray;
+//     NativeArray<float3> velocityArray;
+//     //NativeArray<float3> targetPositionArray;
+//     //NativeArray<bool> hasTargetArray;
 
 
 //     void Start()
@@ -188,12 +194,12 @@ public struct CellBoidParallelJob : IJobParallelFor
 //                 //List<Boid> boidsList = cellGroups.allBoidCells[j];
 
 //                 int Count = boidsList.Count;
-//                 NativeArray<float3> positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
-//                 NativeArray<float3> directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
-//                 NativeArray<float3> accelerationArray = new NativeArray<float3>(Count, Allocator.TempJob);
-//                 NativeArray<float3> velocityArray = new NativeArray<float3>(Count, Allocator.TempJob);
-//                 NativeArray<float3> targetPositionArray = new NativeArray<float3>(Count, Allocator.TempJob);
-//                 NativeArray<bool> hasTargetArray = new NativeArray<bool>(Count, Allocator.TempJob);
+//                 positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
+//                 directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
+//                 accelerationArray = new NativeArray<float3>(Count, Allocator.TempJob);
+//                 velocityArray = new NativeArray<float3>(Count, Allocator.TempJob);
+//                 //targetPositionArray = new NativeArray<float3>(Count, Allocator.TempJob);
+//                 //hasTargetArray = new NativeArray<bool>(Count, Allocator.TempJob);
 //                 float viewRadius = settings.perceptionRadius;
 //                 float avoidRadius = settings.avoidanceRadius;
 //                 float alignWeight = settings.alignWeight;
@@ -207,30 +213,27 @@ public struct CellBoidParallelJob : IJobParallelFor
 //                 {
 //                     positionArray[i] = boidsList[i].position;
 //                     directionArray[i] = boidsList[i].dir;
-//                     accelerationArray[i] = new float3(0, 0, 0);
+//                     velocityArray[i] = boidsList[i].velocity;
 
-//                     if (boidsList[i].velocity != null)
-//                     {
-//                         velocityArray[i] = boidsList[i].velocity;
-//                     }
-//                     else
-//                     {
-//                         velocityArray[i] = new float3(0, 0, 0);
-//                     }
+//                     // if (boidsList[i].velocity != null)
+//                     // {
+//                     //     velocityArray[i] = boidsList[i].velocity;
+//                     // }
+//                     // else
+//                     // {
+//                     //     velocityArray[i] = new float3(0, 0, 0);
+//                     // }
 
-
-
-
-//                     hasTargetArray[i] = (bool)boidsList[i].target;
-//                     if ((bool)boidsList[i].target)
-//                         targetPositionArray[i] = boidsList[i].target.position;
+//                     // hasTargetArray[i] = (bool)boidsList[i].target;
+//                     // if ((bool)boidsList[i].target)
+//                     //     targetPositionArray[i] = boidsList[i].target.position;
 //                 }
 
 //                 CellBoidParallelJob cellBoidParallelJob = new CellBoidParallelJob
 //                 {
 //                     positionArray = positionArray,
-//                     targetPositionArray = targetPositionArray,
-//                     hasTargetArray = hasTargetArray,
+//                     //targetPositionArray = targetPositionArray,
+//                     //hasTargetArray = hasTargetArray,
 //                     directionArray = directionArray,
 //                     accelerationArray = accelerationArray,
 //                     velocityArray = velocityArray,
@@ -244,7 +247,7 @@ public struct CellBoidParallelJob : IJobParallelFor
 //                     targetWeight = targetWeight
 //                 };
 
-//                 JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 125);
+//                 JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 256);
 //                 jobHandle.Complete();
 
 //                 for (int i = 0; i < Count; i++)
@@ -257,8 +260,8 @@ public struct CellBoidParallelJob : IJobParallelFor
 //                 directionArray.Dispose();
 //                 accelerationArray.Dispose();
 //                 velocityArray.Dispose();
-//                 targetPositionArray.Dispose();
-//                 hasTargetArray.Dispose();
+//                 //targetPositionArray.Dispose();
+//                 //hasTargetArray.Dispose();
 //             }
 //         }
 
@@ -270,8 +273,8 @@ public struct CellBoidParallelJob : IJobParallelFor
 // public struct CellBoidParallelJob : IJobParallelFor
 // {
 //     [ReadOnly] public NativeArray<float3> positionArray;
-//     public NativeArray<float3> targetPositionArray;
-//     public NativeArray<bool> hasTargetArray;
+//     //public NativeArray<float3> targetPositionArray;
+//     //public NativeArray<bool> hasTargetArray;
 //     [ReadOnly] public NativeArray<float3> directionArray;
 //     public NativeArray<float3> accelerationArray;
 //     public NativeArray<float3> velocityArray;
@@ -288,12 +291,13 @@ public struct CellBoidParallelJob : IJobParallelFor
 //     public void Execute(int index)
 //     {
 
-//         float viewRadiusSqr = math.sqrt(viewRadius);
-//         float avoidRadiusSqr = math.sqrt(avoidRadius);
+//         float viewRadiusSqr = viewRadius * viewRadius;
+//         float avoidRadiusSqr = avoidRadius * avoidRadius;
 //         int numFlockmates = 0;
 //         float3 flockHeading = new float3();
 //         float3 flockCentre = new float3();
 //         float3 separationHeading = new float3();
+//         float3 acceleration = new float3();
 
 //         for (int i = 0; i < positionArray.Length; i++)
 //         {
@@ -316,22 +320,20 @@ public struct CellBoidParallelJob : IJobParallelFor
 //             }
 //         }
 
-//         Vector3 acceleration = Vector3.zero;
-
-//         if (hasTargetArray[index])
-//         {
-//             float3 offsetToTarget = targetPositionArray[index] - positionArray[index];
-//             acceleration = Vector3.ClampMagnitude(math.normalize(offsetToTarget) * maxSpeed - velocityArray[index], maxSteerForce) * targetWeight;
-//         }
+//         // if (hasTargetArray[index])
+//         // {
+//         //     float3 offsetToTarget = targetPositionArray[index] - positionArray[index];
+//         //     acceleration = Vector3.ClampMagnitude(math.normalize(offsetToTarget) * maxSpeed - velocityArray[index], maxSteerForce) * targetWeight;
+//         // }
 
 //         if (numFlockmates != 0)
 //         {
 //             flockCentre /= numFlockmates;
 //             float3 offsetToFlockmatesCentre = (flockCentre - positionArray[index]);
 
-//             var alignmentForce = Vector3.ClampMagnitude(math.normalize(flockHeading) * maxSpeed - velocityArray[index], maxSteerForce) * alignWeight;
-//             var cohesionForce = Vector3.ClampMagnitude(math.normalize(offsetToFlockmatesCentre) * maxSpeed - velocityArray[index], maxSteerForce) * cohesionWeight;
-//             var seperationForce = Vector3.ClampMagnitude(math.normalize(separationHeading) * maxSpeed - velocityArray[index], maxSteerForce) * seperateWeight;
+//             float3 alignmentForce = Vector3.ClampMagnitude(math.normalize(flockHeading) * maxSpeed - velocityArray[index], maxSteerForce) * alignWeight;
+//             float3 cohesionForce = Vector3.ClampMagnitude(math.normalize(offsetToFlockmatesCentre) * maxSpeed - velocityArray[index], maxSteerForce) * cohesionWeight;
+//             float3 seperationForce = Vector3.ClampMagnitude(math.normalize(separationHeading) * maxSpeed - velocityArray[index], maxSteerForce) * seperateWeight;
 
 //             acceleration += alignmentForce;
 //             acceleration += cohesionForce;
