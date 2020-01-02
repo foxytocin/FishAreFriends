@@ -119,8 +119,8 @@ public struct CellBoidParallelJob : IJobParallelFor
     public void Execute(int index)
     {
 
-        float viewRadiusSqr = math.sqrt(viewRadius);
-        float avoidRadiusSqr = math.sqrt(avoidRadius);
+        float viewRadiusSqr = viewRadius * viewRadius;
+        float avoidRadiusSqr = avoidRadius * avoidRadius;
         int numFlockmates = 0;
         float3 flockHeading = new float3();
         float3 flockCentre = new float3();

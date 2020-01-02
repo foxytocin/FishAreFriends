@@ -498,7 +498,10 @@ public class Boid : MonoBehaviour
             Debug.DrawRay(position, forward, Color.green);
         }
 
-
+        // if (position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
+        // position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
+        // position.z < 5 || position.z > mapGenerator.mapSize.z - 5)
+        // {
         RaycastHit hit;
         if (Physics.SphereCast(position, settings.boundsRadius, forward, out hit, settings.collisionAvoidDst, settings.obstacleMask))
         {
@@ -506,6 +509,8 @@ public class Boid : MonoBehaviour
         }
         else { }
         return false;
+        // }
+        // return false;
     }
 
     Vector3 ObstacleRays()
