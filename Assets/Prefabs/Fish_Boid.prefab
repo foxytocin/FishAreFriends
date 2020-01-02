@@ -95,11 +95,17 @@ MonoBehaviour:
   prefabBlood: {fileID: 0}
   position: {x: 0, y: 0, z: 0}
   forward: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: 0}
   avgFlockHeading: {x: 0, y: 0, z: 0}
   avgAvoidanceHeading: {x: 0, y: 0, z: 0}
   centreOfFlockmates: {x: 0, y: 0, z: 0}
   numPerceivedFlockmates: 0
+  dir: {x: 0, y: 0, z: 0}
+  optimiert: 1
+  target: {fileID: 0}
+  cellIndex: 0
   basicFoodNeed: 1000
   foodNeeds: 0
   foodLeft: 0
-  alife: 0
+  hungerRate: 1
+  alife: 1

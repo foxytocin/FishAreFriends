@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minSpeed: 2
   maxSpeed: 4
-  perceptionRadius: 2
+  perceptionRadius: 2.5
   avoidanceRadius: 1
   maxSteerForce: 2
-  alignWeight: 1.5
+  alignWeight: 2
   cohesionWeight: 2
-  seperateWeight: 2
+  seperateWeight: 2.5
   targetWeight: 2
   obstacleMask:
     serializedVersion: 2

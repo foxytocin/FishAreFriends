@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class FoodBehavior : MonoBehaviour
+public class Food : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
+    FoodManager foodManager;
     private int availableFood;
     private BoxCollider b_collider;
     private float size;
@@ -13,6 +15,7 @@ public class FoodBehavior : MonoBehaviour
     void Awake()
     {
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        foodManager = FindObjectOfType<FoodManager>();
         availableFood = Random.Range(5000, 40000);
         ecoSystemManager.setAvailableFood(availableFood);
         size = (float)availableFood / 10000f;
@@ -69,6 +72,7 @@ public class FoodBehavior : MonoBehaviour
 
     private IEnumerator Destroy()
     {
+        RemoveFromFoodList();
         gameObject.layer = 2;
         b_collider.enabled = false;
         yield return new WaitForSeconds(5);
@@ -78,5 +82,15 @@ public class FoodBehavior : MonoBehaviour
     public float checkAmount()
     {
         return availableFood;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
+    public void RemoveFromFoodList()
+    {
+        foodManager.RemoveFromList(this);
     }
 }

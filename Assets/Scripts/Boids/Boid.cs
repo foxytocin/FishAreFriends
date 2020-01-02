@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 public class Boid : MonoBehaviour
 {
 
+    Predator predator;
+    Leader leader;
     CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
     MapGenerator mapGenerator;
+    FoodManager foodManager;
 
     private Color originalColor1;
     private Color originalColor2;
@@ -33,6 +36,8 @@ public class Boid : MonoBehaviour
     public int numPerceivedFlockmates;
 
     public Vector3 dir;
+
+    public bool optimiert;
 
     // Cached
     Material[] material;
@@ -59,9 +64,12 @@ public class Boid : MonoBehaviour
     void Awake()
     {
         alife = true;
+        foodManager = FindObjectOfType<FoodManager>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
+        predator = FindObjectOfType<Predator>();
+        leader = FindObjectOfType<Leader>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = new Material[4];
@@ -163,106 +171,218 @@ public class Boid : MonoBehaviour
         }
 
 
-        // avoid predator
-        Collider[] hitCollidersPredator = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
-        if (hitCollidersPredator.Length > 0)
+        Collider[] hitCollidersPredator = new Collider[1];
+        if (optimiert)
         {
-            GameObject predator = hitCollidersPredator[0].gameObject;
-            var positionToPredator = predator.transform.position - position;
-            acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
-
-            Predator predatorScript = predator.GetComponent<Predator>();
-            predatorScript.IAmYourBoid(gameObject);
-
-            float distanceToPredator = Vector3.Distance(position, predator.transform.position);
-            if (distanceToPredator <= 1.5f)
+            // avoid predator
+            float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+            if (distanceToPredator < 5f)
             {
-                if (predatorScript.BoidDied(this, foodLeft))
-                {
-                    Instantiate(prefabBlood, position, Quaternion.identity);
-                    ecoSystemManager.addKilledFish();
-                    LetMeDie();
-                }
+                Vector3 positionToPredator = predator.getPosition() - position;
+                acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
 
+                predator.IAmYourBoid(gameObject);
+
+                if (distanceToPredator <= 1.5f)
+                {
+                    if (predator.BoidDied(this, foodLeft))
+                    {
+                        Instantiate(prefabBlood, position, Quaternion.identity);
+                        ecoSystemManager.addKilledFish();
+                        LetMeDie();
+                    }
+                }
+            }
+        }
+        else
+        {
+            // OHNE OPTIMIERUNG
+            hitCollidersPredator = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
+            if (hitCollidersPredator.Length > 0)
+            {
+                GameObject predator = hitCollidersPredator[0].gameObject;
+                var positionToPredator = predator.transform.position - position;
+                acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
+
+                Predator predatorScript = predator.GetComponent<Predator>();
+                predatorScript.IAmYourBoid(gameObject);
+
+                float distanceToPredator = Vector3.Distance(position, predator.transform.position);
+                if (distanceToPredator <= 1.5f)
+                {
+                    if (predatorScript.BoidDied(this, foodLeft))
+                    {
+                        Instantiate(prefabBlood, position, Quaternion.identity);
+                        ecoSystemManager.addKilledFish();
+                        LetMeDie();
+                    }
+
+                }
             }
         }
 
 
-        // follow leader
-        Collider[] hitCollidersLeader = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
-        if (hitCollidersPredator.Length == 0 && hitCollidersLeader.Length > 0)
+        if (optimiert)
         {
-            GameObject leaderGameObject = hitCollidersLeader[0].gameObject;
-            var positionToLeader = leaderGameObject.transform.position - position;
-            acceleration += positionToLeader * settings.leadingForce;
-
-
-            Leader leaderScript = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
-            if (leaderScript == null)
-                return;
-
-            setColor(leaderScript.leaderColor1, leaderScript.leaderColor2);
-
-            if (myLeader == null)
+            // if (cellIndex == leader.getCellInfo())
+            // {
+            float distanceToLeader = Vector3.Distance(position, leader.getPosition());
+            if (distanceToLeader < 2f) //Predator-Test fehlt
             {
-                myLeader = leaderScript;
-                leaderScript.AddBoidToSwarm(this);
+                Vector3 positionToLeader = leader.getPosition() - position;
+                acceleration += positionToLeader * settings.leadingForce;
+
+                setColor(leader.leaderColor1, leader.leaderColor2);
+
+                if (myLeader == null)
+                {
+                    myLeader = leader;
+                    leader.AddBoidToSwarm(this);
+                }
             }
+            else
+            {
+                setColor(originalColor1, originalColor2);
+
+                if (myLeader != null)
+                {
+                    myLeader.RemoveBoidFromSwarm(this);
+                    myLeader = null;
+                }
+
+            }
+            // }
+
 
         }
         else
         {
-            setColor(originalColor1, originalColor2);
 
-            if (myLeader != null)
+            //follow leader
+            Collider[] hitCollidersLeader = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
+            if (hitCollidersPredator.Length == 0 && hitCollidersLeader.Length > 0)
             {
-                myLeader.RemoveBoidFromSwarm(this);
-                myLeader = null;
-            }
+                GameObject leaderGameObject = hitCollidersLeader[0].gameObject;
+                var positionToLeader = leaderGameObject.transform.position - position;
+                acceleration += positionToLeader * settings.leadingForce;
 
+
+                Leader leaderScript = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
+                if (leaderScript == null)
+                    return;
+
+                setColor(leaderScript.leaderColor1, leaderScript.leaderColor2);
+
+                if (myLeader == null)
+                {
+                    myLeader = leaderScript;
+                    leaderScript.AddBoidToSwarm(this);
+                }
+
+            }
+            else
+            {
+                setColor(originalColor1, originalColor2);
+
+                if (myLeader != null)
+                {
+                    myLeader.RemoveBoidFromSwarm(this);
+                    myLeader = null;
+                }
+
+            }
         }
 
 
-        // chaising for food
-        setFoodNeeds();
-        if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
+        if (optimiert)
         {
-            setColor(Color.red, Color.red);
-
-            Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
-            if (hitCollidersFood.Length > 0)
+            setFoodNeeds();
+            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
             {
-                // find nearest food
-                float nearestFood = float.PositiveInfinity;
-                int nearestFoodIndex = 0;
-                for (int i = 0; i < hitCollidersFood.Length; i++)
+                setColor(Color.red, Color.red);
+
+                List<Food> foodList = foodManager.GetFoodList();
+                if (foodList.Count > 0)
                 {
-                    float dist = Vector3.Distance(transform.position, hitCollidersFood[i].gameObject.transform.position);
-                    if (dist < nearestFood)
+                    // find nearest food
+                    float nearestFood = float.PositiveInfinity;
+                    int nearestFoodIndex = 0;
+                    for (int i = 0; i < foodList.Count; i++)
                     {
-                        nearestFood = dist;
-                        nearestFoodIndex = i;
+                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                        if (dist < nearestFood)
+                        {
+                            nearestFood = dist;
+                            nearestFoodIndex = i;
+                        }
+                    }
+
+                    if (nearestFood < 15f)
+                    {
+                        // swim towards food
+                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
+                        acceleration += positionToFood * settings.chaisingForFoodForce;
+
+                        //Debug.DrawRay(position, positionToFood, Color.red);
+
+                        // eat when nearby
+                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
+                        {
+                            setColor(originalColor1, originalColor2);
+
+                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
+                            setFoodNeeds();
+                        }
                     }
                 }
+            }
 
-                // get nearest food gameobject
-                GameObject fo = hitCollidersFood[nearestFoodIndex].gameObject;
 
-                if (fo)
+        }
+        else
+        {
+
+            // chaising for food
+            setFoodNeeds();
+            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
+            {
+                setColor(Color.red, Color.red);
+
+                Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
+                if (hitCollidersFood.Length > 0)
                 {
-                    // swim towards food
-                    var positionToFood = fo.transform.position - position;
-                    acceleration += positionToFood * settings.chaisingForFoodForce;
-
-                    //Debug.DrawRay(position, positionToFood, Color.red);
-
-                    // eat when nearby
-                    if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
+                    // find nearest food
+                    float nearestFood = float.PositiveInfinity;
+                    int nearestFoodIndex = 0;
+                    for (int i = 0; i < hitCollidersFood.Length; i++)
                     {
-                        setColor(originalColor1, originalColor2);
+                        float dist = Vector3.Distance(transform.position, hitCollidersFood[i].gameObject.transform.position);
+                        if (dist < nearestFood)
+                        {
+                            nearestFood = dist;
+                            nearestFoodIndex = i;
+                        }
+                    }
 
-                        foodNeeds -= fo.GetComponent<FoodBehavior>().getFood(foodNeeds);
-                        setFoodNeeds();
+                    // get nearest food gameobject
+                    GameObject fo = hitCollidersFood[nearestFoodIndex].gameObject;
+
+                    if (fo)
+                    {
+                        // swim towards food
+                        var positionToFood = fo.transform.position - position;
+                        acceleration += positionToFood * settings.chaisingForFoodForce;
+
+                        //Debug.DrawRay(position, positionToFood, Color.red);
+
+                        // eat when nearby
+                        if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
+                        {
+                            setColor(originalColor1, originalColor2);
+
+                            foodNeeds -= fo.GetComponent<Food>().getFood(foodNeeds);
+                            setFoodNeeds();
+                        }
                     }
                 }
             }
