@@ -2,7 +2,9 @@
 
 public class Spawner : MonoBehaviour
 {
-
+    CellGroups cellGroups;
+    EcoSystemManager ecoSystemManager;
+    public BoidSettings settings;
     public enum GizmoType { Never, SelectedOnly, Always }
     public bool spawnBoids = true;
     public Boid prefab;
@@ -12,19 +14,27 @@ public class Spawner : MonoBehaviour
     public Color color2;
     public bool debug = false;
     public GizmoType showSpawnRegion;
+    Transform fishHolder;
+
+
+    void Awake()
+    {
+        cellGroups = FindObjectOfType<CellGroups>();
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        fishHolder = new GameObject("Fishes").transform;
+    }
 
     void Start()
     {
-        var fishHolder = new GameObject("Fishes").transform;
-
         if (spawnBoids)
         {
             for (int i = 0; i < spawnCount; i++)
             {
-                Vector3 pos = transform.position + Random.insideUnitSphere * spawnRadius;
-                Boid boid = Instantiate(prefab);
+                Vector3 pos = Random.insideUnitSphere * spawnRadius;
+                Boid boid = Instantiate(prefab, pos, Quaternion.identity);
                 boid.transform.parent = fishHolder;
                 boid.PassColor(color1, color2);
+                boid.Initialize(settings, null);
                 boid.RespawnBoid();
             }
         }

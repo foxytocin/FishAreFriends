@@ -1,16 +1,20 @@
 ﻿using UnityEngine;
+using Unity.Collections;
+using System.Collections.Generic;
 
 public class FoodManager : MonoBehaviour
 {
     MapGenerator mapGenerator;
     private Vector3 spawnPoint;
-    public GameObject Food;
+    public Food foodPrefab;
     private Vector3 spawnOffset;
     private Vector3 mapSize;
     Transform foodHolder;
+    public List<Food> foodList;
 
     void Awake()
     {
+        foodList = new List<Food>();
         foodHolder = new GameObject("Food").transform;
         mapGenerator = FindObjectOfType<MapGenerator>();
         mapSize = mapGenerator.mapSize;
@@ -24,7 +28,25 @@ public class FoodManager : MonoBehaviour
         float z = Random.Range(spawnOffset.z, mapSize.z - spawnOffset.z);
         spawnPoint = new Vector3(x, y, z);
 
-        GameObject go = Instantiate(Food, spawnPoint, Quaternion.identity);
-        go.transform.parent = foodHolder;
+        Food food = Instantiate(foodPrefab, spawnPoint, Quaternion.identity);
+        foodList.Add(food);
+        Debug.Log("FoodList: " + foodList.Count);
+        food.transform.parent = foodHolder;
     }
+
+    public List<Food> GetFoodList()
+    {
+        return foodList;
+    }
+
+    public void RemoveFromList(Food food)
+    {
+        foodList.Remove(food);
+        Debug.Log("FoodList: " + foodList.Count);
+    }
+
+
+
+
+
 }

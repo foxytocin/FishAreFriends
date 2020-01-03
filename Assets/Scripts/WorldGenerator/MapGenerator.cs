@@ -295,6 +295,7 @@ public class MapGenerator : MonoBehaviour
                     // Color color = new Color();
                     //Color color = Color.Lerp(Color.black, Color.white, Random.Range(0.2f, 0.8f));
                     //rgo.GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+
                     rgo.transform.parent = enviromentHolder;
                     rgo.tag = "Enviroment";
                 }

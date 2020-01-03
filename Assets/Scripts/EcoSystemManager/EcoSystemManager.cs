@@ -29,7 +29,7 @@ public class EcoSystemManager : MonoBehaviour
     private Vector3 mapSize;
     private Vector3 spawnOffset;
 
-    // Start is called before the first frame update
+
     void Awake()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
@@ -38,10 +38,6 @@ public class EcoSystemManager : MonoBehaviour
         spawnPoints = new Queue<Vector3>();
         initialSpawnPoints = new Queue<Vector3>();
         foodManager = FindObjectOfType<FoodManager>();
-    }
-
-    void Start()
-    {
         availableFood = 0;
         foodDemandFishes = 0;
         fishCount = 0;
@@ -102,7 +98,7 @@ public class EcoSystemManager : MonoBehaviour
         spawnPoints.Enqueue(point);
     }
 
-    
+
     public Vector3 GetNextSpawnPoint()
     {
         Vector3 point;
