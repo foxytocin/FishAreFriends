@@ -19,7 +19,7 @@ public struct QuadrantData {
 }
 
 
-public class QuadratSystem : ComponentSystem
+public class QuadrantSystem : ComponentSystem
 {
     private static NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap;
 
