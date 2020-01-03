@@ -10,7 +10,7 @@ using UnityEngine;
 
 
 public struct QuadrantEntity : IComponentData {
-
+    public int dummy;
 }
 
 public struct QuadrantData {

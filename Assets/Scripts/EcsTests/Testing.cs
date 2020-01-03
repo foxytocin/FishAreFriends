@@ -25,7 +25,7 @@ public class Testing : MonoBehaviour
             typeof(QuadrantEntity)
         );
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
+        NativeArray<Entity> entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
        
 
@@ -49,11 +49,18 @@ public class Testing : MonoBehaviour
                 moveSpeedZ = Random.Range(1f, 3f)
             });
 
+            entityManager.SetComponentData(entity, new QuadrantEntity
+            {
+                dummy = 1
+            });
+
             entityManager.SetSharedComponentData(entity, new RenderMesh
             {
                 mesh = mesh,
                 material = mat
             });
+
+
         }
 
 
