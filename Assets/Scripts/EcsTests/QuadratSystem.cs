@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -37,6 +39,7 @@ public class QuadratSystem : ComponentSystem
         EntityQuery entityQuery = GetEntityQuery(typeof(Translation));
         NativeMultiHashMap<int, Entity> quadrantMultiHashMap = new NativeMultiHashMap<int, Entity>(entityQuery.CalculateEntityCount(), Allocator.TempJob);
 
+        /*
         Entities.ForEach((Entity entity, ref Translation translation) => {
             int hashMapKey = GetPositionHashMapKey(translation.Value);
             //Debug.Log(hashMapKey);
@@ -46,13 +49,40 @@ public class QuadratSystem : ComponentSystem
         
             DrawDebugLines(translation.Value);
         });
+        */
 
-        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, 1));
+        
+
+        SetQuadrantDataHashMapJob setQuadrantDataHashMapJob = new SetQuadrantDataHashMapJob
+        {
+            quadrantMultiHashMap = quadrantMultiHashMap.AsParallelWriter(),
+        };
+
+        JobHandle jobHandle = JobForEachExtensions.Schedule(setQuadrantDataHashMapJob, entityQuery);
+        jobHandle.Complete();
+
+
+        Vector3 position = new Vector3(0, 3, 0);
+        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)));
 
         quadrantMultiHashMap.Dispose();
 
 
     }
+
+    [BurstCompile]
+    private struct SetQuadrantDataHashMapJob : IJobForEachWithEntity<Translation>
+    {
+        public NativeMultiHashMap<int, Entity>.ParallelWriter quadrantMultiHashMap;
+
+        public void Execute(Entity entity, int index, ref Translation translation)
+        {
+            int hashMapKey = GetPositionHashMapKey(translation.Value);
+            quadrantMultiHashMap.Add(hashMapKey, entity);
+        }
+    }
+
+
 
     private void DrawDebugLines(float3 position)
     {

@@ -18,7 +18,6 @@ public class Testing : MonoBehaviour
 
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
-            typeof(LevelComponent),
             typeof(Translation),
             typeof(RenderMesh),
             typeof(LocalToWorld),
@@ -32,7 +31,6 @@ public class Testing : MonoBehaviour
         for( int i= 0; i < entityArray.Length; i++)
         {
             Entity entity = entityArray[i];
-            entityManager.SetComponentData(entity, new LevelComponent { level = Random.Range(10, 20) });
 
             entityManager.SetComponentData(
                 entity, 
