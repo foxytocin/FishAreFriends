@@ -19,6 +19,10 @@ float avoidRadius;
 [numthreads(threadGroupSize,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+
+    float viewRadiusSqr = viewRadius * viewRadius;
+    float avoidRadiusSqr = avoidRadius * avoidRadius;
+
     for (int indexB = 0; indexB < numBoids; indexB ++) {
         if (id.x != indexB) {
             Boid boidB = boids[indexB];
@@ -26,12 +30,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             float sqrDst = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 
 
-            if (sqrDst < viewRadius * viewRadius) {
+            if (sqrDst < viewRadiusSqr) {
                 boids[id.x].numFlockmates += 1;
                 boids[id.x].flockHeading += boidB.direction;
                 boids[id.x].flockCentre += boidB.position;
 
-                if (sqrDst < avoidRadius * avoidRadius) {
+                if (sqrDst < avoidRadiusSqr) {
                     boids[id.x].separationHeading -= offset / sqrDst;
                 }
             }

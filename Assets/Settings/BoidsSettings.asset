@@ -17,7 +17,7 @@ MonoBehaviour:
   perceptionRadius: 2.5
   avoidanceRadius: 1
   maxSteerForce: 2
-  alignWeight: 2
+  alignWeight: 1.5
   cohesionWeight: 2
   seperateWeight: 2.5
   targetWeight: 2
@@ -27,3 +27,6 @@ MonoBehaviour:
   boundsRadius: 0.27
   avoidCollisionWeight: 20
   collisionAvoidDst: 5
+  predatorAvoidanceForce: 2
+  leadingForce: 4
+  chaisingForFoodForce: 5

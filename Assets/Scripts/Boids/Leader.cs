@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Leader : MonoBehaviour
 {
+
+    CellGroups cellGroups;
     MapGenerator mapGenerator;
     private List<Boid> swarmList;
 
@@ -13,6 +15,7 @@ public class Leader : MonoBehaviour
     private void Awake()
     {
         //leaderColor = Random.ColorHSV();
+        cellGroups = FindObjectOfType<CellGroups>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         transform.position = mapGenerator.mapSize / 2;
         material = gameObject.GetComponentInChildren<MeshRenderer>().material;
@@ -20,6 +23,12 @@ public class Leader : MonoBehaviour
         material.SetColor("_BaseColor2", leaderColor2);
         swarmList = new List<Boid>();
     }
+
+    public int getCellInfo()
+    {
+        return cellGroups.GetIndex(transform.position);
+    }
+
 
     public void AddBoidToSwarm(Boid boid)
     {
@@ -36,6 +45,11 @@ public class Leader : MonoBehaviour
     public List<Boid> GetSwarmList()
     {
         return swarmList;
+    }
+
+    public Vector3 getPosition()
+    {
+        return transform.position;
     }
 
 

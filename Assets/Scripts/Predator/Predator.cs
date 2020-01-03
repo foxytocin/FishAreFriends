@@ -66,6 +66,11 @@ public class Predator : MonoBehaviour
         StartCoroutine(DecreaseFood());
     }
 
+    public Vector3 getPosition()
+    {
+        return position;
+    }
+
 
     private IEnumerator DecreaseFood()
     {
