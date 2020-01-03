@@ -62,8 +62,8 @@ public class QuadratSystem : ComponentSystem
         jobHandle.Complete();
 
 
-        Vector3 position = new Vector3(0, 3, 0);
-        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)));
+        //Vector3 position = new Vector3(0, 3, 0);
+        //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)));
 
         quadrantMultiHashMap.Dispose();
 
