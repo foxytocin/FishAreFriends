@@ -21,7 +21,8 @@ public class Testing : MonoBehaviour
             typeof(Translation),
             typeof(RenderMesh),
             typeof(LocalToWorld),
-            typeof(MoveSpeedComponent)
+            typeof(MoveSpeedComponent),
+            typeof(QuadrantEntity)
         );
 
         NativeArray<Entity> entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
