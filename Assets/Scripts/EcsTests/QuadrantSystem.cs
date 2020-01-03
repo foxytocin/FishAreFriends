@@ -21,14 +21,16 @@ public struct QuadrantData {
 
 public class QuadrantSystem : ComponentSystem
 {
-    private static NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap;
+    public static NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap;
 
-    private const int quadrantZMultiplier = 1000;
-    private const int quadratCellSize = 50;
+    public const int quadrantYMultiplier = 1000;
+    public const int quadrantZMultiplier = 3000;
+    public const int quadrantCellSize = 50;
 
     private static int GetPositionHashMapKey(float3 position) {
-        return (int) (math.floor(position.x / quadratCellSize) + (quadrantZMultiplier * math.floor(position.z / quadratCellSize)));
-
+        //return (int) (math.floor(position.x / quadratCellSize) + (quadrantZMultiplier * math.floor(position.z / quadratCellSize)));
+        return (int) (math.floor(position.x / quadrantCellSize) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize))));
+       
         //playerCell = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
     }
 
@@ -79,10 +81,18 @@ public class QuadrantSystem : ComponentSystem
         jobHandle.Complete();
 
 
-        //Vector3 position = new Vector3(0, 3, 0);
-        //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)));
-
-
+        for(int x = -250; x < 250; x += quadrantCellSize) {
+            for (int y = 0; y < 150; y += quadrantCellSize) {
+                for (int z = -250; z < 250; z += quadrantCellSize) {
+                    float3 position = new float3(x, y, z);
+                    if(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)) > 0)
+                    {
+                        DrawDebugLines(position);
+                    }
+                    
+                }
+             }
+        }
 
     }
 
@@ -94,6 +104,7 @@ public class QuadrantSystem : ComponentSystem
         public void Execute(Entity entity, int index, ref Translation translation, ref QuadrantEntity quadrantEntity)
         {
             int hashMapKey = GetPositionHashMapKey(translation.Value);
+            Debug.Log(hashMapKey);
             quadrantMultiHashMap.Add(hashMapKey,
                 new QuadrantData {
                     entity = entity,
@@ -106,27 +117,27 @@ public class QuadrantSystem : ComponentSystem
 
     private void DrawDebugLines(float3 position)
     {
-        Vector3 lowerLeft = new Vector3(quadratCellSize * math.floor(position.x / quadratCellSize), quadratCellSize * math.floor(position.y / quadratCellSize), quadratCellSize * math.floor(position.z / quadratCellSize));
+        Vector3 lowerLeft = new Vector3(quadrantCellSize * math.floor(position.x / quadrantCellSize), quadrantCellSize * math.floor(position.y / quadrantCellSize), quadrantCellSize * math.floor(position.z / quadrantCellSize));
         // bottom
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+1, +0, +0) * quadratCellSize);
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +0, +1) * quadratCellSize);
+        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize);
 
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadratCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadratCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadratCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadratCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize);
 
         // wall
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +1, +0) * quadratCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadratCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadratCellSize);
+        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize);
 
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadratCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadratCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +1) * quadratCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadratCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
 
         // top
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadratCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadratCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadratCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadratCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize);
 
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +1, +0) * quadratCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadratCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +1) * quadratCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadratCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
 
     }
 
