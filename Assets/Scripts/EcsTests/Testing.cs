@@ -24,7 +24,7 @@ public class Testing : MonoBehaviour
             typeof(MoveSpeedComponent)
         );
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
+        NativeArray<Entity> entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
        
 
