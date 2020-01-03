@@ -21,6 +21,8 @@ public struct QuadrantData {
 
 public class QuadratSystem : ComponentSystem
 {
+    private static NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap;
+
     private const int quadrantZMultiplier = 1000;
     private const int quadratCellSize = 50;
 
@@ -46,10 +48,27 @@ public class QuadratSystem : ComponentSystem
         return count;
     }
 
+    protected override void OnCreate()
+    {
+        quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(0, Allocator.Persistent);
+        base.OnCreate();
+    }
+
+    protected override void OnDestroy()
+    {
+        quadrantMultiHashMap.Dispose();
+        base.OnDestroy();
+    }
+
     protected override void OnUpdate() {
         EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(QuadrantEntity));
-        NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(entityQuery.CalculateEntityCount(), Allocator.TempJob);
-               
+
+        quadrantMultiHashMap.Clear();
+        if(entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity) {
+            quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
+
+        }
+
 
         SetQuadrantDataHashMapJob setQuadrantDataHashMapJob = new SetQuadrantDataHashMapJob
         {
@@ -63,7 +82,6 @@ public class QuadratSystem : ComponentSystem
         //Vector3 position = new Vector3(0, 3, 0);
         //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)));
 
-        quadrantMultiHashMap.Dispose();
 
 
     }
