@@ -88,7 +88,7 @@ public class CameraPosition : MonoBehaviour
 
         if (targetPosition.position != transform.position)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.3f * Time.deltaTime * 5);
+            transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.2f * Time.deltaTime * 5);
             // float percentOfWay = Mathf.Abs(transform.position.y - startPosition) / totalDistanceToTarget;
             // percentOfWay = Mathf.Clamp(percentOfWay, 0.01f, 1f);
 
@@ -112,7 +112,7 @@ public class CameraPosition : MonoBehaviour
 
             if (tmpLookAtTarget != lookAtLeader)
             {
-                tmpLookAtTarget = Vector3.Lerp(tmpLookAtTarget, lookAtLeader, 0.4f * Time.deltaTime * 5);
+                tmpLookAtTarget = Vector3.Lerp(tmpLookAtTarget, lookAtLeader, 0.2f * Time.deltaTime * 5);
                 transform.LookAt(tmpLookAtTarget);
             }
         }
