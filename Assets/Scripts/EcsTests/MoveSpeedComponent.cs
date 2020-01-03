@@ -5,5 +5,7 @@ using UnityEngine;
 
 public struct MoveSpeedComponent : IComponentData
 {
-    public float moveSpeed;
+    public float moveSpeedX;
+    public float moveSpeedY;
+    public float moveSpeedZ;
 }

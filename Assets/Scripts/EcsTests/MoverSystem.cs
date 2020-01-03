@@ -10,17 +10,34 @@ public class MoverSystem : ComponentSystem
     {
         Entities.ForEach((ref Translation translation, ref MoveSpeedComponent moveSpeedComponent) =>
         {
-            translation.Value.y +=  moveSpeedComponent.moveSpeed * Time.DeltaTime;
+            // y
+            translation.Value.y +=  moveSpeedComponent.moveSpeedY * Time.DeltaTime;
 
-            if(translation.Value.y > 5f)
-            {
-                moveSpeedComponent.moveSpeed = -Mathf.Abs(moveSpeedComponent.moveSpeed);
-            }
+            if(translation.Value.y > 100f)
+                moveSpeedComponent.moveSpeedY = -Mathf.Abs(moveSpeedComponent.moveSpeedY);
 
             if (translation.Value.y < 0f)
-            {
-                moveSpeedComponent.moveSpeed = +Mathf.Abs(moveSpeedComponent.moveSpeed);
-            }
+                moveSpeedComponent.moveSpeedY = +Mathf.Abs(moveSpeedComponent.moveSpeedY);
+
+            // z
+            translation.Value.z += moveSpeedComponent.moveSpeedZ * Time.DeltaTime;
+
+            if (translation.Value.z > 250f)
+                moveSpeedComponent.moveSpeedZ = -Mathf.Abs(moveSpeedComponent.moveSpeedZ);
+
+            if (translation.Value.z < -250f)
+                moveSpeedComponent.moveSpeedZ = +Mathf.Abs(moveSpeedComponent.moveSpeedZ);
+
+            // x
+            translation.Value.x += moveSpeedComponent.moveSpeedX * Time.DeltaTime;
+
+            if (translation.Value.x > 250f)
+                moveSpeedComponent.moveSpeedX = -Mathf.Abs(moveSpeedComponent.moveSpeedX);
+
+            if (translation.Value.x < -250f)
+                moveSpeedComponent.moveSpeedX = +Mathf.Abs(moveSpeedComponent.moveSpeedX);
+
+
         });
     }
 }

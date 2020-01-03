@@ -25,7 +25,7 @@ public class Testing : MonoBehaviour
             typeof(MoveSpeedComponent)
         );
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(10000, Allocator.Temp);
+        NativeArray<Entity> entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
        
 
@@ -39,12 +39,16 @@ public class Testing : MonoBehaviour
                 new Translation {
                     Value = new Unity.Mathematics
                     .float3(
-                        Random.Range(-50, 50), 
-                        Random.Range(0, 5), 
-                        0)
+                        Random.Range(-250, 250), 
+                        Random.Range(0, 5),
+                        Random.Range(-250, 250))
                 });
 
-            entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeed = Random.Range(1f, 2f) });
+            entityManager.SetComponentData(entity, new MoveSpeedComponent {
+                moveSpeedX = Random.Range(1f, 3f),
+                moveSpeedY = Random.Range(1f, 3f),
+                moveSpeedZ = Random.Range(1f, 3f)
+            });
 
             entityManager.SetSharedComponentData(entity, new RenderMesh
             {
