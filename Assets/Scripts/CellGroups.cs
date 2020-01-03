@@ -27,7 +27,6 @@ public class CellGroups : MonoBehaviour
         {
             allBoidCells.Add(new List<Boid>());
         }
-        print(allBoidCells.Count);
     }
 
 
@@ -66,7 +65,7 @@ public class CellGroups : MonoBehaviour
         playerCell = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
     }
 
-    
+
     void OnDrawGizmosSelected()
     {
         if (Debug)
