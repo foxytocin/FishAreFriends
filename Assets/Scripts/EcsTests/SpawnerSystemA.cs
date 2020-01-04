@@ -40,6 +40,16 @@ public class SpawnerSystemA : JobComponentSystem
             {
                 Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
             });
+
+            entityCommandBuffer.SetComponent(index, instance, new MoveSpeedComponent
+            {
+                moveSpeedX = random.NextFloat(2f, 10f),
+                moveSpeedY = random.NextFloat(2f, 10f),
+                moveSpeedZ = random.NextFloat(2f, 10f)
+            });
+
+            
+
         }
     }
 

@@ -146,8 +146,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 736165606}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 32.8, z: 0}
+  m_LocalScale: {x: 1, y: 1.8915, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -168,5 +168,5 @@ MonoBehaviour:
   moveSpeedX: 0
   moveSpeedY: 0
   moveSpeedZ: 0
-  maxDistanceFromSpawner: 150
-  spawnRate: 1000
+  maxDistanceFromSpawner: 0
+  spawnRate: 5

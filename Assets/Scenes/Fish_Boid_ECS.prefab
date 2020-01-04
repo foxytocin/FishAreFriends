@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 4072494296809950113}
   - component: {fileID: 3123924996412573102}
   - component: {fileID: 4576410737229663555}
+  - component: {fileID: -9046264736893137962}
+  - component: {fileID: -8238147803428320333}
   m_Layer: 0
   m_Name: Fish_Boid_ECS
   m_TagString: Untagged
@@ -79,3 +81,32 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &-9046264736893137962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5454107561852931696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6632402195236d6438bd50b6cf6efb4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  degreesPerSecond: 10
+  moveSpeedX: 30
+  moveSpeedY: 30
+  moveSpeedZ: 30
+--- !u!114 &-8238147803428320333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5454107561852931696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7d7495833204790ba1d3a8755397f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConversionMode: 0

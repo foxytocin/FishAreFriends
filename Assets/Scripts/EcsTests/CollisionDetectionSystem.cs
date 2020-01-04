@@ -10,7 +10,7 @@ public class CollisionDetectionSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        
+     /*   
          Entities.ForEach((Entity entity, ref Translation translation, ref QuadrantEntity quadrantEntity, ref MoveSpeedComponent moveSpeed) => {
 
              // get all keys, that should be considered
@@ -83,7 +83,7 @@ public class CollisionDetectionSystem : ComponentSystem
          });
         
 
-
+    */
 
     }
 }

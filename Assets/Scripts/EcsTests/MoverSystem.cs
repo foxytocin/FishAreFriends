@@ -32,6 +32,10 @@ public class MoverSystem : ComponentSystem
 
         public void Execute(ref Translation translation, ref MoveSpeedComponent moveSpeedComponent)
         {
+
+            
+
+
             // y
             translation.Value.y += moveSpeedComponent.moveSpeedY * deltaTime;
 

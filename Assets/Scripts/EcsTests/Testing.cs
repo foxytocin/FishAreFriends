@@ -19,6 +19,7 @@ public class Testing : MonoBehaviour
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(Translation),
+            typeof(Transform),
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(MoveSpeedComponent),

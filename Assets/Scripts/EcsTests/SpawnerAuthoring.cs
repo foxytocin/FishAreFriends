@@ -7,9 +7,6 @@ public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConve
 {
 
     [SerializeField] private GameObject prefab;
-    [SerializeField] private float moveSpeedX;
-    [SerializeField] private float moveSpeedY;
-    [SerializeField] private float moveSpeedZ;
     [SerializeField] private float maxDistanceFromSpawner;
     [SerializeField] private float spawnRate;
 
@@ -28,19 +25,5 @@ public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConve
             secondsBetweenSpawns = 1 / spawnRate,
             secondsToNextSpawn = 0
         });
-
-        dstManager.SetComponentData(entity, new MoveSpeedComponent
-        {
-            moveSpeedX = Random.Range(1f, 3f),
-            moveSpeedY = Random.Range(1f, 3f),
-            moveSpeedZ = Random.Range(1f, 3f)
-        });
-
-        dstManager.SetComponentData(entity, new QuadrantEntity
-        {
-            dummy = 1
-        });
-
-
     }
 }
