@@ -32,6 +32,11 @@ public class QuadrantSystem : ComponentSystem
         return (int) ((quadrantXMultiplier* math.floor(position.x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize)));
     }
 
+    private static int GetXYZHashMapKey(float x, float y, float z)
+    {
+        return (int)((quadrantXMultiplier * math.floor(x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(z / quadrantCellSize)));
+    }
+
     private static int GetEntityCountInHashMap(NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap, int hashMapKey)
     {
         QuadrantData quadrantData;
