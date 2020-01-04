@@ -25,7 +25,7 @@ public class Testing : MonoBehaviour
             typeof(QuadrantEntity)
         );
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(1, Allocator.Temp);
+        NativeArray<Entity> entityArray = new NativeArray<Entity>(10000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
        
 

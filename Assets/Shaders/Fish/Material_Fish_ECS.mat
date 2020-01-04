@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Material_Fish_ECS
+  m_Shader: {fileID: -6465566751694194690, guid: 1cae002705bb3417688cfffe4f186e47,
+    type: 3}
+  m_ShaderKeywords: BOOLEAN_DD5A9A0_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_5CFD3A42_Texture_1:
+        m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Boolean_73A18E88: 0
+    - Boolean_DD5A9A0: 1
+    - Vector1_22945F37: 1
+    - Vector1_29ADD563: 0.05
+    - Vector1_2D83228F: 6.3
+    - Vector1_341A007A: 0.5
+    - Vector1_47677611: 0.035
+    - Vector1_54EC8D1B: 5
+    - Vector1_5B8BD7A: 0.308
+    - Vector1_604A9DCA: 0.8
+    - Vector1_67434760: 6.06
+    - Vector1_814530F0: 0.5
+    - Vector1_85BF2D7B: 0.06
+    - Vector1_8D24CCBB: 3
+    - Vector1_8F3151A: 0.668
+    - Vector1_967624D6: 0.5
+    - Vector1_9B013F21: 11
+    - Vector1_9D53B248: 2
+    - Vector1_9F48B413: 1.45
+    - Vector1_B3FFAA06: 4
+    - Vector1_C01861B7: 10.8
+    - Vector1_C62E7565: 1.85
+    - Vector1_CBD19B6D: 0.45
+    - Vector1_DEAA95EA: 24.5
+    - Vector1_E0D0D54F: 1.98
+    - Vector1_EB0BDD0D: 0.3
+    - Vector1_FA5BD4D7: 0.03
+    - _AlphaClip: 0
+    - _Blend: 0
+    - _BumpScale: 1
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DitherDistance: 1
+    - _DitherScale: 0.5
+    - _DstBlend: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Metallic: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _Surface: 0
+    - _UVSec: 0
+    - _WobbleSpeed: 1
+    - _WorkflowMode: 1
+    - _ZWrite: 1
+    m_Colors:
+    - Color_1F9E15B2: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 0}
+    - Color_4F76334: {r: 0.94465625, g: 1, b: 0.517, a: 0}
+    - Color_781BF453: {r: 0, g: 0.122285366, b: 1, a: 0}
+    - Color_7956FFC3: {r: 0.825, g: 0.5382797, b: 0.202125, a: 0}
+    - Color_984BFD57: {r: 0, g: 0.18364668, b: 1, a: 0}
+    - Color_9B4593B7: {r: 1, g: 1, b: 1, a: 0}
+    - Color_9F8D9C85: {r: 0.72, g: 0.57833374, b: 0.12600002, a: 0}
+    - Color_D29ED1CF: {r: 0.42700002, g: 0.3402114, b: 0.21523578, a: 0}
+    - Vector2_3F1DBD37: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_51C5CA6A: {r: 0.42, g: -0.01, b: 0, a: 0}
+    - Vector2_6B794E2A: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_8AC5A996: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - Vector2_C50737C: {r: 0.4, g: 0, b: 0, a: 0}
+    - Vector2_C62675D8: {r: 0.36, g: 0, b: 0, a: 0}
+    - Vector2_CD1A50CC: {r: 0.34, g: 0.57, b: 0, a: 0}
+    - Vector2_DDB56B75: {r: 0.54, g: -0.74, b: 0, a: 0}
+    - _BaseColor1: {r: 1, g: 0, b: 0.088106155, a: 1}
+    - _BaseColor2: {r: 1, g: 0.54467565, b: 0, a: 0}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
