@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
 
 public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConvertGameObjectToEntity
 {
-
     [SerializeField] private GameObject prefab;
     [SerializeField] private float maxDistanceFromSpawner;
     [SerializeField] private float spawnRate;
@@ -14,7 +12,6 @@ public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConve
     {
         referencedPrefabs.Add(prefab);
     }
-
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {

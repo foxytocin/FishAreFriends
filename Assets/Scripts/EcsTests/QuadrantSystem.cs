@@ -8,7 +8,6 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-
 public struct QuadrantEntity : IComponentData {
     public int dummy;
 }
@@ -90,8 +89,6 @@ public class QuadrantSystem : ComponentSystem
         /*
         checkDuplicateHashCodes();
         */
-
-
     }
 
     /*
@@ -232,7 +229,5 @@ public class QuadrantSystem : ComponentSystem
 
         Debug.DrawLine(lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
         Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
-
     }
-
 } 

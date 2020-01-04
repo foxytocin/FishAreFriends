@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Transforms;
 using Unity.Jobs;
 using Random = Unity.Mathematics.Random;
@@ -47,9 +44,6 @@ public class SpawnerSystemA : JobComponentSystem
                 moveSpeedY = random.NextFloat(2f, 10f),
                 moveSpeedZ = random.NextFloat(2f, 10f)
             });
-
-            
-
         }
     }
 

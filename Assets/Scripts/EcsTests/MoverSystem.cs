@@ -12,7 +12,6 @@ public class MoverSystem : ComponentSystem
     {
         EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(MoveSpeedComponent));
 
-
         TranslateionJob translateionJob = new TranslateionJob
         {
             deltaTime = Time.DeltaTime,
@@ -23,7 +22,6 @@ public class MoverSystem : ComponentSystem
     }
 
 
-
     [BurstCompile]
     private struct TranslateionJob : IJobForEach<Translation, MoveSpeedComponent>
     {
@@ -32,10 +30,6 @@ public class MoverSystem : ComponentSystem
 
         public void Execute(ref Translation translation, ref MoveSpeedComponent moveSpeedComponent)
         {
-
-            
-
-
             // y
             translation.Value.y += moveSpeedComponent.moveSpeedY * deltaTime;
 

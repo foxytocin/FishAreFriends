@@ -14,58 +14,58 @@ public class Testing : MonoBehaviour
 
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        // EntityManager entityManager = World.Active.EntityManager;
 
 
-        EntityArchetype entityArchetype = entityManager.CreateArchetype(
-            typeof(Translation),
-            typeof(Transform),
-            typeof(RenderMesh),
-            typeof(LocalToWorld),
-            typeof(MoveSpeedComponent),
-            typeof(QuadrantEntity)
-        );
+        // EntityArchetype entityArchetype = entityManager.CreateArchetype(
+        //     typeof(Translation),
+        //     typeof(Transform),
+        //     typeof(RenderMesh),
+        //     typeof(LocalToWorld),
+        //     typeof(MoveSpeedComponent),
+        //     typeof(QuadrantEntity)
+        // );
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(20, Allocator.Temp);
-        entityManager.CreateEntity(entityArchetype, entityArray);
+        // NativeArray<Entity> entityArray = new NativeArray<Entity>(20, Allocator.Temp);
+        // entityManager.CreateEntity(entityArchetype, entityArray);
        
 
-        for( int i= 0; i < entityArray.Length; i++)
-        {
-            Entity entity = entityArray[i];
+        // for( int i= 0; i < entityArray.Length; i++)
+        // {
+        //     Entity entity = entityArray[i];
 
-            entityManager.SetComponentData(
-                entity, 
-                new Translation {
-                    Value = new Unity.Mathematics
-                    .float3(
-                        Random.Range(-250, 250), 
-                        Random.Range(0, 5),
-                        Random.Range(-250, 250))
-                });
+        //     entityManager.SetComponentData(
+        //         entity, 
+        //         new Translation {
+        //             Value = new Unity.Mathematics
+        //             .float3(
+        //                 Random.Range(-250, 250), 
+        //                 Random.Range(0, 5),
+        //                 Random.Range(-250, 250))
+        //         });
 
-            entityManager.SetComponentData(entity, new MoveSpeedComponent {
-                moveSpeedX = Random.Range(1f, 3f),
-                moveSpeedY = Random.Range(1f, 3f),
-                moveSpeedZ = Random.Range(1f, 3f)
-            });
+        //     entityManager.SetComponentData(entity, new MoveSpeedComponent {
+        //         moveSpeedX = Random.Range(1f, 3f),
+        //         moveSpeedY = Random.Range(1f, 3f),
+        //         moveSpeedZ = Random.Range(1f, 3f)
+        //     });
 
-            entityManager.SetComponentData(entity, new QuadrantEntity
-            {
-                dummy = 1
-            });
+        //     entityManager.SetComponentData(entity, new QuadrantEntity
+        //     {
+        //         dummy = 1
+        //     });
 
-            entityManager.SetSharedComponentData(entity, new RenderMesh
-            {
-                mesh = mesh,
-                material = mat
-            });
-
-
-        }
+        //     entityManager.SetSharedComponentData(entity, new RenderMesh
+        //     {
+        //         mesh = mesh,
+        //         material = mat
+        //     });
 
 
-        entityArray.Dispose();
+        // }
+
+
+        // entityArray.Dispose();
 
     }
 
