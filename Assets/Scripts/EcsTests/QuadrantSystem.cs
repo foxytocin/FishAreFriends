@@ -15,7 +15,8 @@ public struct QuadrantEntity : IComponentData {
 
 public struct QuadrantData {
     public Entity entity;
-    public QuadrantEntity quadrantEntity;
+    public float3 position;
+    //public QuadrantEntity quadrantEntity;
 }
 
 
@@ -142,7 +143,8 @@ public class QuadrantSystem : ComponentSystem
             quadrantMultiHashMap.Add(hashMapKey,
                 new QuadrantData {
                     entity = entity,
-                    quadrantEntity = quadrantEntity,
+                    position = translation.Value,
+                    //quadrantEntity = quadrantEntity,
             });
         }
     }
