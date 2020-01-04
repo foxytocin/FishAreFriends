@@ -114,13 +114,47 @@ public class QuadrantSystem : ComponentSystem
                     }
                 }
     }
- 
-
 
     /*
-     * Use this methode to test the hashCode function. If two Cubes are shown in the SceneView, 
-     * you have duplicate hashcodes for different positions
-     */
+     * This methode returns you a list<int> with all keys around your actual position
+     */ 
+    public static List<int> GetHashKeysForAroundData(float3 position)
+    {
+        List<int> list = new List<int>();
+        for (float x = position.x - quadrantCellSize; x < position.x + quadrantCellSize + 1; x += quadrantCellSize)
+            for (float y = position.y - quadrantCellSize; y < position.y + quadrantCellSize + 1; y += quadrantCellSize)
+                for (float z = position.z - quadrantCellSize; z < position.z + quadrantCellSize + 1; z += quadrantCellSize)
+                {
+                    list.Add(GetXYZHashMapKey(x, y, z));
+                }
+        return list;
+    }
+
+
+    [BurstCompile]
+    private struct SetQuadrantDataHashMapJob : IJobForEachWithEntity<Translation, QuadrantEntity>
+    {
+        public NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap;
+
+        public void Execute(Entity entity, int index, ref Translation translation, ref QuadrantEntity quadrantEntity)
+        {
+            int hashMapKey = GetPositionHashMapKey(translation.Value);
+            quadrantMultiHashMap.Add(hashMapKey,
+                new QuadrantData {
+                    entity = entity,
+                    quadrantEntity = quadrantEntity,
+            });
+        }
+    }
+
+    /////////////////////// 
+    /// Debug Functions ///
+    /////////////////////// 
+
+    /*
+    * Use this methode to test the hashCode function. If two Cubes are shown in the SceneView, 
+    * you have duplicate hashcodes for different positions
+    */
     private void checkDuplicateHashCodes()
     {
         Dictionary<int, float3> map = new Dictionary<int, float3>();
@@ -153,25 +187,10 @@ public class QuadrantSystem : ComponentSystem
         Debug.Log("No duplicates found");
     }
 
-    [BurstCompile]
-    private struct SetQuadrantDataHashMapJob : IJobForEachWithEntity<Translation, QuadrantEntity>
-    {
-        public NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap;
-
-        public void Execute(Entity entity, int index, ref Translation translation, ref QuadrantEntity quadrantEntity)
-        {
-            int hashMapKey = GetPositionHashMapKey(translation.Value);
-            quadrantMultiHashMap.Add(hashMapKey,
-                new QuadrantData {
-                    entity = entity,
-                    quadrantEntity = quadrantEntity,
-            });
-        }
-    }
 
     /*
      * Use this function to draw a box around a position according to the quadrantCellSize
-     */ 
+     */
     private void DrawDebugBoxAndBoxesAround(float3 position)
     {
         DrawDebugBox(position);
@@ -185,7 +204,9 @@ public class QuadrantSystem : ComponentSystem
                 }
     }
 
-
+    /*
+     * This methode draws a box with lines in SceneView
+     */ 
     private void DrawDebugBox(float3 position)
     {
         Vector3 lowerLeft = new Vector3(quadrantCellSize * math.floor(position.x / quadrantCellSize), quadrantCellSize * math.floor(position.y / quadrantCellSize), quadrantCellSize * math.floor(position.z / quadrantCellSize));
