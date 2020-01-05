@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 736165606}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 32.8, z: 0}
+  m_LocalPosition: {x: 142.6, y: 32.8, z: 143}
   m_LocalScale: {x: 1, y: 1.8915, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -166,4 +166,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 5454107561852931696, guid: 81b7086cf9b2e2145944a03afdd006f3, type: 3}
   maxDistanceFromSpawner: 50
-  spawnRate: 50
+  spawnRate: 3

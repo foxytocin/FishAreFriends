@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3123924996412573102}
   - component: {fileID: 4576410737229663555}
   - component: {fileID: -9046264736893137962}
-  - component: {fileID: -8238147803428320333}
   m_Layer: 0
   m_Name: Fish_Boid_ECS
   m_TagString: Untagged
@@ -28,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5454107561852931696}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.991169, y: 2.34, z: 16.23701}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -93,20 +92,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6632402195236d6438bd50b6cf6efb4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  degreesPerSecond: 10
-  moveSpeedX: 30
-  moveSpeedY: 30
-  moveSpeedZ: 30
---- !u!114 &-8238147803428320333
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5454107561852931696}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea7d7495833204790ba1d3a8755397f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ConversionMode: 0
+  CellRadius: 8
+  SeparationWeight: 1
+  AlignmentWeight: 1
+  TargetWeight: 2
+  ObstacleAversionDistance: 30
+  MoveSpeed: 25
