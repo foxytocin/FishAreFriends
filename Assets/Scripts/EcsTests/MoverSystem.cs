@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst;
+﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
@@ -11,7 +9,7 @@ public class MoverSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(Rotation), typeof(MoveSpeedComponent), typeof(LocalToWorld));
+        EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(Rotation), typeof(BoidComponent));
 
         TranslateionJob translateionJob = new TranslateionJob
         {
@@ -24,44 +22,35 @@ public class MoverSystem : ComponentSystem
 
 
     [BurstCompile]
-    private struct TranslateionJob : IJobForEach<Translation, Rotation, MoveSpeedComponent, LocalToWorld>
+    private struct TranslateionJob : IJobForEach<Translation, Rotation, BoidComponent>
     {
 
-    public float deltaTime;
+        public float deltaTime;
 
-        public void Execute(ref Translation translation, ref Rotation rotation, ref MoveSpeedComponent moveSpeedComponent, ref LocalToWorld localToWorld)
+        public void Execute(ref Translation translation, ref Rotation rotation, ref BoidComponent boidComponent)
         {
-            // Move
-            if (translation.Value.y > 100f)
-                moveSpeedComponent.moveSpeedY = -Mathf.Abs(moveSpeedComponent.moveSpeedY);
+            // flipp direction
+            if (translation.Value.y > 100f || translation.Value.y < 0f)
+                boidComponent.velocity.y *= -1;
 
-            if (translation.Value.y < 0f)
-                moveSpeedComponent.moveSpeedY = +Mathf.Abs(moveSpeedComponent.moveSpeedY);
+            if (translation.Value.z > 250f || translation.Value.z < -250f)
+                boidComponent.velocity.z *= -1;
 
-            if (translation.Value.z > 250f)
-                moveSpeedComponent.moveSpeedZ = -Mathf.Abs(moveSpeedComponent.moveSpeedZ);
+            if (translation.Value.x > 250f || translation.Value.x < -250f)
+                boidComponent.velocity.x *= -1;
 
-            if (translation.Value.z < -250f)
-                moveSpeedComponent.moveSpeedZ = +Mathf.Abs(moveSpeedComponent.moveSpeedZ);
 
-            if (translation.Value.x > 250f)
-                moveSpeedComponent.moveSpeedX = -Mathf.Abs(moveSpeedComponent.moveSpeedX);
-
-            if (translation.Value.x < -250f)
-                moveSpeedComponent.moveSpeedX = +Mathf.Abs(moveSpeedComponent.moveSpeedX);
-
-            float3 dir = new float3(moveSpeedComponent.moveSpeedX, moveSpeedComponent.moveSpeedY, moveSpeedComponent.moveSpeedZ);
+            // move
             float3 currentPosition = translation.Value;
-            float3 targetPosition = translation.Value + dir;
+            float3 targetPosition = currentPosition + boidComponent.velocity;
 
             targetPosition = math.lerp(currentPosition, targetPosition, 0.5f * deltaTime);
             translation.Value = targetPosition;
 
 
-
-            // Rotate
+            // rotate
             float3 lookVector = targetPosition - currentPosition;
-            quaternion rotationValue = math.slerp(rotation.Value, quaternion.LookRotationSafe(lookVector, math.up()), 0.5f * deltaTime);   //quaternion.LookRotationSafe(lookVector, math.up()); //Quaternion.Lerp(Quaternion.LookRotation(lookVector), 0.5f * deltaTime * 3);
+            quaternion rotationValue = math.slerp(rotation.Value, quaternion.LookRotationSafe(lookVector, math.up()), 0.75f * deltaTime);   //quaternion.LookRotationSafe(lookVector, math.up()); //Quaternion.Lerp(Quaternion.LookRotation(lookVector), 0.5f * deltaTime * 3);
             rotation.Value = rotationValue;
 
 
