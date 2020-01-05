@@ -7,17 +7,23 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public struct QuadrantEntity : IComponentData
-{
-    public int dummy;
-}
 
 public struct QuadrantData
 {
     public Entity entity;
     public float3 position;
-    //public QuadrantEntity quadrantEntity;
+
+    public TypeOfObject typeOfObject;
+
+    // boid data
+    public float3 velocity;
 }
+
+public enum TypeOfObject {
+    Boid,
+    Obstacle,
+    Player
+};
 
 
 public class QuadrantSystem : ComponentSystem
@@ -69,7 +75,7 @@ public class QuadrantSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(QuadrantEntity));
+        EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(QuadrantEntityComponent));
 
         quadrantMultiHashMap.Clear();
         if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity)
@@ -134,19 +140,23 @@ public class QuadrantSystem : ComponentSystem
 
 
     [BurstCompile]
-    private struct SetQuadrantDataHashMapJob : IJobForEachWithEntity<Translation, QuadrantEntity>
+    private struct SetQuadrantDataHashMapJob : IJobForEach<Translation, QuadrantEntityComponent>
     {
         public NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap;
 
-        public void Execute(Entity entity, int index, ref Translation translation, ref QuadrantEntity quadrantEntity)
+        public void Execute(ref Translation translation, ref QuadrantEntityComponent quadrantEntity)
         {
             int hashMapKey = GetPositionHashMapKey(translation.Value);
             quadrantMultiHashMap.Add(hashMapKey,
                 new QuadrantData
                 {
-                    entity = entity,
                     position = translation.Value,
-                    //quadrantEntity = quadrantEntity,
+                    typeOfObject = quadrantEntity.typeOfObject,
+
+
+                    // boid data
+                    velocity = quadrantEntity.velocity,
+                    
                 });
         }
     }

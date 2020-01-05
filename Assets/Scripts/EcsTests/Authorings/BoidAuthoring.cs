@@ -12,7 +12,7 @@ public class BoidAuthoring : MonoBehaviour, IConvertGameObjectToEntity
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
-        dstManager.AddComponentData(entity, new BoidComponent { });
-        dstManager.AddComponentData(entity, new QuadrantEntity { dummy = 1 });
+        dstManager.AddComponentData(entity, new BoidComponent {});
+        dstManager.AddComponentData(entity, new QuadrantEntityComponent { typeOfObject = TypeOfObject.Boid });
     }
 }

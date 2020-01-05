@@ -38,7 +38,11 @@ public class SpawnerSystemA : JobComponentSystem
                 Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
             });
 
-            entityCommandBuffer.SetComponent(index, instance, new BoidComponent
+            // just for filtering
+            entityCommandBuffer.SetComponent(index, instance, new BoidComponent {});
+
+
+            entityCommandBuffer.SetComponent(index, instance, new QuadrantEntityComponent
             {
                 velocity = new float3(random.NextFloat(2f, 10f), random.NextFloat(2f, 10f), random.NextFloat(2f, 10f))
             });
