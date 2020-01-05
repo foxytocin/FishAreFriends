@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 public class PlayerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
 {
@@ -26,5 +27,11 @@ public class PlayerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
             acceleration = acceleration,
             postion = position
         });
+
+
+        // Remove default transform system components
+        dstManager.RemoveComponent<Translation>(entity);
+        dstManager.RemoveComponent<Rotation>(entity);
+
     }
 }
