@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Food
+  - Eaten
+  - Enviroment
+  - Ground
+  - Particle
   layers:
   - Default
   - TransparentFX
@@ -14,14 +19,14 @@ TagManager:
   - 
   - 
   - GodRays
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Wall
+  - Boids
+  - Obstacle
+  - Leader
+  - Predator
+  - Food
+  - Ground
+  - Plants
   - 
   - 
   - 
