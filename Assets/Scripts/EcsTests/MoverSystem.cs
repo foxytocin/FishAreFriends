@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
-using UnityEngine;
 using Unity.Mathematics;
 
 public class MoverSystem : ComponentSystem
@@ -52,9 +51,6 @@ public class MoverSystem : ComponentSystem
             float3 lookVector = targetPosition - currentPosition;
             quaternion rotationValue = math.slerp(rotation.Value, quaternion.LookRotationSafe(lookVector, math.up()), 0.75f * deltaTime);   //quaternion.LookRotationSafe(lookVector, math.up()); //Quaternion.Lerp(Quaternion.LookRotation(lookVector), 0.5f * deltaTime * 3);
             rotation.Value = rotationValue;
-
-
-
         }
     }
 }

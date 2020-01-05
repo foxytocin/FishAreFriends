@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -8,11 +7,13 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public struct QuadrantEntity : IComponentData {
+public struct QuadrantEntity : IComponentData
+{
     public int dummy;
 }
 
-public struct QuadrantData {
+public struct QuadrantData
+{
     public Entity entity;
     public float3 position;
     //public QuadrantEntity quadrantEntity;
@@ -28,8 +29,9 @@ public class QuadrantSystem : ComponentSystem
     public const int quadrantZMultiplier = 7896;
     public const int quadrantCellSize = 20;
 
-    private static int GetPositionHashMapKey(float3 position) {
-        return (int) ((quadrantXMultiplier* math.floor(position.x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize)));
+    private static int GetPositionHashMapKey(float3 position)
+    {
+        return (int)((quadrantXMultiplier * math.floor(position.x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize)));
     }
 
     private static int GetXYZHashMapKey(float x, float y, float z)
@@ -42,7 +44,7 @@ public class QuadrantSystem : ComponentSystem
         QuadrantData quadrantData;
         NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
         int count = 0;
-        if(quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator))
+        if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator))
         {
             do
             {
@@ -65,11 +67,13 @@ public class QuadrantSystem : ComponentSystem
         base.OnDestroy();
     }
 
-    protected override void OnUpdate() {
+    protected override void OnUpdate()
+    {
         EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(QuadrantEntity));
 
         quadrantMultiHashMap.Clear();
-        if(entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity) {
+        if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity)
+        {
             quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
 
         }
@@ -115,7 +119,7 @@ public class QuadrantSystem : ComponentSystem
 
     /*
      * This methode returns you a list<int> with all keys around your actual position
-     */ 
+     */
     public static List<int> GetHashKeysForAroundData(float3 position)
     {
         List<int> list = new List<int>();
@@ -138,11 +142,12 @@ public class QuadrantSystem : ComponentSystem
         {
             int hashMapKey = GetPositionHashMapKey(translation.Value);
             quadrantMultiHashMap.Add(hashMapKey,
-                new QuadrantData {
+                new QuadrantData
+                {
                     entity = entity,
                     position = translation.Value,
                     //quadrantEntity = quadrantEntity,
-            });
+                });
         }
     }
 
@@ -194,9 +199,9 @@ public class QuadrantSystem : ComponentSystem
     {
         DrawDebugBox(position);
 
-        for(float x = position.x - quadrantCellSize; x < position.x + quadrantCellSize +1; x+= quadrantCellSize)
-            for (float y = position.y - quadrantCellSize; y < position.y + quadrantCellSize +1; y += quadrantCellSize)
-                for (float z = position.z - quadrantCellSize; z < position.z + quadrantCellSize +1; z += quadrantCellSize)
+        for (float x = position.x - quadrantCellSize; x < position.x + quadrantCellSize + 1; x += quadrantCellSize)
+            for (float y = position.y - quadrantCellSize; y < position.y + quadrantCellSize + 1; y += quadrantCellSize)
+                for (float z = position.z - quadrantCellSize; z < position.z + quadrantCellSize + 1; z += quadrantCellSize)
                 {
                     float3 tempPosition = new float3(x, y, z);
                     DrawDebugBox(tempPosition);
@@ -205,29 +210,30 @@ public class QuadrantSystem : ComponentSystem
 
     /*
      * This methode draws a box with lines in SceneView
-     */ 
+     */
     private void DrawDebugBox(float3 position)
     {
-        Vector3 lowerLeft = new Vector3(quadrantCellSize * math.floor(position.x / quadrantCellSize), quadrantCellSize * math.floor(position.y / quadrantCellSize), quadrantCellSize * math.floor(position.z / quadrantCellSize));
-        // bottom
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize);
+        float3 lowerLeft = new float3(quadrantCellSize * math.floor(position.x / quadrantCellSize), quadrantCellSize * math.floor(position.y / quadrantCellSize), quadrantCellSize * math.floor(position.z / quadrantCellSize));
 
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize);
+        // bottom
+        Debug.DrawLine(lowerLeft, lowerLeft + new float3(+1, +0, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft, lowerLeft + new float3(+0, +0, +1) * quadrantCellSize);
+
+        Debug.DrawLine(lowerLeft + new float3(+1, +0, +0) * quadrantCellSize, lowerLeft + new float3(+1, +0, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+0, +0, +1) * quadrantCellSize, lowerLeft + new float3(+1, +0, +1) * quadrantCellSize);
 
         // wall
-        Debug.DrawLine(lowerLeft, lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft, lowerLeft + new float3(+0, +1, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+1, +0, +0) * quadrantCellSize, lowerLeft + new float3(+1, +1, +0) * quadrantCellSize);
 
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +0, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+0, +0, +1) * quadrantCellSize, lowerLeft + new float3(+0, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+1, +0, +1) * quadrantCellSize, lowerLeft + new float3(+1, +1, +1) * quadrantCellSize);
 
         // top
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+0, +1, +0) * quadrantCellSize, lowerLeft + new float3(+1, +1, +0) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+0, +1, +0) * quadrantCellSize, lowerLeft + new float3(+0, +1, +1) * quadrantCellSize);
 
-        Debug.DrawLine(lowerLeft + new Vector3(+1, +1, +0) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
-        Debug.DrawLine(lowerLeft + new Vector3(+0, +1, +1) * quadrantCellSize, lowerLeft + new Vector3(+1, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+1, +1, +0) * quadrantCellSize, lowerLeft + new float3(+1, +1, +1) * quadrantCellSize);
+        Debug.DrawLine(lowerLeft + new float3(+0, +1, +1) * quadrantCellSize, lowerLeft + new float3(+1, +1, +1) * quadrantCellSize);
     }
-} 
+}
