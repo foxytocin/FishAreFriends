@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Transforms;
 using Unity.Jobs;
-using Random = Unity.Mathematics.Random;
+using Unity.Mathematics;
 using Time = UnityEngine.Time;
 
 public class SpawnerSystemA : JobComponentSystem
@@ -30,7 +30,7 @@ public class SpawnerSystemA : JobComponentSystem
             spawner.secondsToNextSpawn -= deltaTime;
 
             if (spawner.secondsToNextSpawn >= 0) { return; }
-            
+
             spawner.secondsToNextSpawn += spawner.secondsBetweenSpawns;
             Entity instance = entityCommandBuffer.Instantiate(index, spawner.prefab);
             entityCommandBuffer.SetComponent(index, instance, new Translation
@@ -38,11 +38,9 @@ public class SpawnerSystemA : JobComponentSystem
                 Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
             });
 
-            entityCommandBuffer.SetComponent(index, instance, new MoveSpeedComponent
+            entityCommandBuffer.SetComponent(index, instance, new BoidComponent
             {
-                moveSpeedX = random.NextFloat(2f, 10f),
-                moveSpeedY = random.NextFloat(2f, 10f),
-                moveSpeedZ = random.NextFloat(2f, 10f)
+                velocity = new float3(random.NextFloat(2f, 10f), random.NextFloat(2f, 10f), random.NextFloat(2f, 10f))
             });
         }
     }
