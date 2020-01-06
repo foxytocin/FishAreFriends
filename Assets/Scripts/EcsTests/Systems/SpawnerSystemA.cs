@@ -18,6 +18,7 @@ public class SpawnerSystemA : JobComponentSystem
         private EntityCommandBuffer.Concurrent entityCommandBuffer;
         private Unity.Mathematics.Random random;
         private readonly float deltaTime;
+
         public SpawnerJob(EntityCommandBuffer.Concurrent entityCommandBuffer, Random random, float deltaTime)
         {
             this.entityCommandBuffer = entityCommandBuffer;
@@ -28,24 +29,27 @@ public class SpawnerSystemA : JobComponentSystem
         public void Execute(Entity entity, int index, ref SpawnerA spawner, ref LocalToWorld localToWorld)
         {
             spawner.secondsToNextSpawn -= deltaTime;
-
             if (spawner.secondsToNextSpawn >= 0) { return; }
 
             spawner.secondsToNextSpawn += spawner.secondsBetweenSpawns;
-            Entity instance = entityCommandBuffer.Instantiate(index, spawner.prefab);
-            entityCommandBuffer.SetComponent(index, instance, new Translation
+            for (int i = 0; i < 50; i++)
             {
-                Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
-            });
+                Entity instance = entityCommandBuffer.Instantiate(index + i, spawner.prefab);
 
-            // just for filtering
-            entityCommandBuffer.SetComponent(index, instance, new BoidComponent {});
+                var dir = math.normalizesafe(random.NextFloat3() - new float3(0.5f, 0.5f, 0.5f));
+                var pos = localToWorld.Position + (dir * spawner.maxDistanceFromSpawner);
 
+                entityCommandBuffer.SetComponent(index + i, instance, new LocalToWorld
+                {
+                    Value = float4x4.TRS(pos, quaternion.LookRotationSafe(dir, math.up()), new float3(1.0f, 1.0f, 1.0f))
 
-            entityCommandBuffer.SetComponent(index, instance, new QuadrantEntityComponent
-            {
-                velocity = new float3(random.NextFloat(2f, 10f), random.NextFloat(2f, 10f), random.NextFloat(2f, 10f))
-            });
+                    //Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
+                });
+
+                // just for filtering
+                entityCommandBuffer.SetComponent(index + i, instance, new BoidComponent { });
+                entityCommandBuffer.SetComponent(index + i, instance, new QuadrantEntityComponent { });
+            }
         }
     }
 
