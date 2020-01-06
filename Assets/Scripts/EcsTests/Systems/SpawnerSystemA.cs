@@ -37,7 +37,7 @@ public class SpawnerSystemA : JobComponentSystem
                 Entity instance = entityCommandBuffer.Instantiate(index + i, spawner.prefab);
 
                 var dir = math.normalizesafe(random.NextFloat3() - new float3(0.5f, 0.5f, 0.5f));
-                var pos = localToWorld.Position + (dir * spawner.maxDistanceFromSpawner);
+                var pos = dir * spawner.maxDistanceFromSpawner;
 
                 entityCommandBuffer.SetComponent(index + i, instance, new LocalToWorld
                 {

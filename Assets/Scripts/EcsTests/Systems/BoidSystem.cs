@@ -17,11 +17,11 @@ public class BoidSystem : ComponentSystem
     public float MoveSpeed = 25.0f;
     */
 
-    float AlignmentWeight = 0.1f;
-    float SeparationWeight = 0.1f;
-    float TargetWeight = 0.1f;
-    float ObstacleAversionDistance = 0.1f;
-    float MoveSpeed = 2f;
+    float AlignmentWeight = 2f;
+    float SeparationWeight = 2f;
+    float TargetWeight = 2f;
+    float ObstacleAversionDistance = 3f;
+    float MoveSpeed = 3f;
 
 
     protected override void OnUpdate()
@@ -35,19 +35,19 @@ public class BoidSystem : ComponentSystem
             // get all keys, that should be considered
             List<int> hashMapKeyList = QuadrantSystem.GetHashKeysForAroundData(localToWorld.Position);
 
-            QuadrantData nearestQuadrantData = default;
-            bool foundNearestQuadrantData = false;
+            QuadrantData nearestQuadrantDataBoid = default;
+            bool foundNearestQuadrantDataBoid = false;
+
+            QuadrantData nearestQuadrantDataObstacle = default;
+            bool foundNearestQuadrantDataObstacle = false;
 
             int neighborCount = 0;
-            float3 alignment = new float3(0);
-            float3 separation = new float3(0);
-            float nearestObstacleDistance = 0;
+            float3 alignment = math.float3(0, 0, 0);
+            float3 separation = math.float3(0);
 
             foreach (int hashMapKey in hashMapKeyList)
             {
                 QuadrantData quadrantData;
-                neighborCount = 0;
-
                 NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
                 if (QuadrantSystem.quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator))
                 {
@@ -56,47 +56,78 @@ public class BoidSystem : ComponentSystem
                         if (quadrantData.entity.Equals(entity))
                             continue;
 
-                        if (!foundNearestQuadrantData)
+                        // nearest boid searching
+                        if (!foundNearestQuadrantDataBoid && quadrantData.typeOfObject.Equals(TypeOfObject.Boid))
                         {
-                            nearestQuadrantData = quadrantData;
-                            foundNearestQuadrantData = true;
+                            nearestQuadrantDataBoid = quadrantData;
+                            foundNearestQuadrantDataBoid = true;
                         }
 
-                        if (math.abs(math.distance(nearestQuadrantData.position, localToWorld.Position)) > math.abs(math.distance(quadrantData.position, localToWorld.Position)))
+                        if (math.abs(math.distance(nearestQuadrantDataBoid.position, localToWorld.Position)) > math.abs(math.distance(quadrantData.position, localToWorld.Position)) && quadrantData.typeOfObject.Equals(TypeOfObject.Boid))
+                            nearestQuadrantDataBoid = quadrantData;
+
+
+                        // nearest obstacle searching
+                        if (!foundNearestQuadrantDataObstacle && quadrantData.typeOfObject.Equals(TypeOfObject.Obstacle))
                         {
-                            nearestObstacleDistance = math.distance(nearestQuadrantData.position, localToWorld.Position);
-                            nearestQuadrantData = quadrantData;
-                            neighborCount = 1;
-                            alignment = nearestQuadrantData.position;
-                            separation = nearestQuadrantData.position;
+                            nearestQuadrantDataObstacle = quadrantData;
+                            foundNearestQuadrantDataObstacle = true;
                         }
+
+                        if (math.abs(math.distance(nearestQuadrantDataObstacle.position, localToWorld.Position)) > math.abs(math.distance(quadrantData.position, localToWorld.Position)) && quadrantData.typeOfObject.Equals(TypeOfObject.Obstacle))
+                            nearestQuadrantDataObstacle = quadrantData;
+
+
+                        if (quadrantData.typeOfObject.Equals(TypeOfObject.Boid))
+                        {
+                            neighborCount++;
+                            alignment += quadrantData.forward;
+                            separation += quadrantData.position;
+
+                            Debug.Log("quadrantData.forward: " + quadrantData.forward);
+
+                            Debug.Log("quadrantData.position: " + quadrantData.position);
+                        }
+
 
 
                     } while (QuadrantSystem.quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
                 }
             }
 
-            // todo dummy data
+
+            // temporarily storing the values for code readability
             float3 forward = localToWorld.Forward;
             float3 currentPosition = localToWorld.Position;
-            float3 nearestObstaclePosition = nearestQuadrantData.position;
-            float3 nearestTargetPosition = nearestQuadrantData.position;
+            //int cellIndex = cellIndices[entityInQueryIndex];
+            
+            
+            
+            float nearestObstacleDistance = math.distance(nearestQuadrantDataObstacle.position, localToWorld.Position);
 
-            // correct rules
+
+
+            float3 nearestObstaclePosition = nearestQuadrantDataObstacle.position;
+            float3 nearestTargetPosition = math.float3(0,0,1);
+
             float3 alignmentResult = AlignmentWeight * math.normalizesafe((alignment / neighborCount) - forward);
             float3 separationResult = SeparationWeight * math.normalizesafe((currentPosition * neighborCount) - separation);
+
+            Debug.Log("separationResult: " + separationResult);
+            Debug.Log("alignmentResult: " + alignmentResult);
+            Debug.Log("neighborCount: " + neighborCount);
+
             float3 targetHeading = TargetWeight * math.normalizesafe(nearestTargetPosition - currentPosition);
+            var obstacleSteering = currentPosition - nearestObstaclePosition;
+            var avoidObstacleHeading = (nearestObstaclePosition + math.normalizesafe(obstacleSteering) * ObstacleAversionDistance) - currentPosition;
 
-            float3 obstacleSteering = currentPosition - nearestObstaclePosition;
-            float3 avoidObstacleHeading = (nearestObstaclePosition + math.normalizesafe(obstacleSteering) * ObstacleAversionDistance) - currentPosition;
+            var nearestObstacleDistanceFromRadius = nearestObstacleDistance - ObstacleAversionDistance;
+            var normalHeading = math.normalizesafe(alignmentResult + separationResult + targetHeading);
+            var targetForward = math.select(normalHeading, avoidObstacleHeading, nearestObstacleDistanceFromRadius < 0);
 
-            float3 nearestObstacleDistanceFromRadius = nearestObstacleDistance - ObstacleAversionDistance;
-            float3 normalHeading = math.normalizesafe(alignmentResult + separationResult + targetHeading);
-            float3 targetForward = math.select(normalHeading, avoidObstacleHeading, nearestObstacleDistanceFromRadius < 0);
+            var nextHeading = math.normalizesafe(forward + deltaTime * (targetForward - forward));
 
-            float3 nextHeading = math.normalizesafe(forward + deltaTime * (targetForward - forward));
 
-            // correct placement
             localToWorld = new LocalToWorld
             {
                 Value = float4x4.TRS(
@@ -104,6 +135,8 @@ public class BoidSystem : ComponentSystem
                     quaternion.LookRotationSafe(nextHeading, math.up()),
                     new float3(1.0f, 1.0f, 1.0f))
             };
+
+
 
             /*
             // flipp direction

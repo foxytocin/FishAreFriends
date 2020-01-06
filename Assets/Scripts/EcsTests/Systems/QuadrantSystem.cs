@@ -16,6 +16,7 @@ public struct QuadrantData
     public TypeOfObject typeOfObject;
 
     // boid data
+    public float3 forward;
 }
 
 public enum TypeOfObject
@@ -151,7 +152,8 @@ public class QuadrantSystem : ComponentSystem
                 new QuadrantData
                 {
                     position = localToWorld.Position,
-                    typeOfObject = quadrantEntity.typeOfObject
+                    typeOfObject = quadrantEntity.typeOfObject,
+                    forward = localToWorld.Forward
                 });
         }
     }
