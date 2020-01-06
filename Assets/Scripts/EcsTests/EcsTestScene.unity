@@ -469,6 +469,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontal: 0
   vertical: 0
+  speed: 0
+  velocity:
+    x: 0
+    y: 0
+    z: 0
+  acceleration:
+    x: 0
+    y: 0
+    z: 0
+  position:
+    x: 0
+    y: 0
+    z: 0
 --- !u!65 &1909629972
 BoxCollider:
   m_ObjectHideFlags: 0
