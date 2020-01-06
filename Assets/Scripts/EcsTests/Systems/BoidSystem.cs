@@ -18,12 +18,12 @@ public class BoidSystem : ComponentSystem
     */
 
     float AlignmentWeight = 2f;
-    float SeparationWeight = 2f;
-    float TargetWeight = 2f;
+    float SeparationWeight = 1f;
+    float TargetWeight = 3f;
     float ObstacleAversionDistance = 3f;
     float MoveSpeed = 3f;
 
-    float viewWidth = 4f;
+    float viewWidth = 8f;
 
 
     protected override void OnUpdate()
@@ -44,7 +44,7 @@ public class BoidSystem : ComponentSystem
             bool foundNearestQuadrantDataObstacle = false;
 
             int neighborCount = 0;
-            float3 alignment = math.float3(0, 0, 0);
+            float3 alignment = math.float3(0);
             float3 separation = math.float3(0);
             float3 cohesion = math.float3(0);
 
@@ -92,6 +92,7 @@ public class BoidSystem : ComponentSystem
                                 neighborCount++;
                                 alignment += quadrantData.forward;
                                 separation += quadrantData.position;
+                                cohesion += quadrantData.position;
 
                                 //Debug.Log("quadrantData.forward: " + quadrantData.forward);
                                 //Debug.Log("quadrantData.position: " + quadrantData.position);
@@ -117,7 +118,7 @@ public class BoidSystem : ComponentSystem
 
             float3 nearestObstaclePosition = nearestQuadrantDataObstacle.position;
             //float3 nearestTargetPosition = math.float3(0,3,200);
-            float3 nearestTargetPosition = currentPosition + forward;
+            float3 nearestTargetPosition = cohesion / neighborCount;
 
             float3 alignmentResult = AlignmentWeight * math.normalizesafe((alignment / neighborCount) - forward);
             float3 separationResult = SeparationWeight * math.normalizesafe((currentPosition * neighborCount) - separation);
@@ -136,7 +137,7 @@ public class BoidSystem : ComponentSystem
 
             var nextHeading = math.normalizesafe(forward + deltaTime * (targetForward - forward));
 
-            
+
             localToWorld = new LocalToWorld
             {
                 Value = float4x4.TRS(
