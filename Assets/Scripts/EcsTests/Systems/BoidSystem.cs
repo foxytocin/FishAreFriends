@@ -23,6 +23,8 @@ public class BoidSystem : ComponentSystem
     float ObstacleAversionDistance = 3f;
     float MoveSpeed = 3f;
 
+    float viewWidth = 4f;
+
 
     protected override void OnUpdate()
     {
@@ -44,6 +46,8 @@ public class BoidSystem : ComponentSystem
             int neighborCount = 0;
             float3 alignment = math.float3(0, 0, 0);
             float3 separation = math.float3(0);
+            float3 cohesion = math.float3(0);
+
 
             foreach (int hashMapKey in hashMapKeyList)
             {
@@ -74,19 +78,25 @@ public class BoidSystem : ComponentSystem
                             foundNearestQuadrantDataObstacle = true;
                         }
 
-                        if (math.abs(math.distance(nearestQuadrantDataObstacle.position, localToWorld.Position)) > math.abs(math.distance(quadrantData.position, localToWorld.Position)) && quadrantData.typeOfObject.Equals(TypeOfObject.Obstacle))
+                        float distance = math.abs(math.distance(quadrantData.position, localToWorld.Position));
+
+                        if (math.abs(math.distance(nearestQuadrantDataObstacle.position, localToWorld.Position)) > distance && quadrantData.typeOfObject.Equals(TypeOfObject.Obstacle))
                             nearestQuadrantDataObstacle = quadrantData;
 
 
                         if (quadrantData.typeOfObject.Equals(TypeOfObject.Boid))
                         {
-                            neighborCount++;
-                            alignment += quadrantData.forward;
-                            separation += quadrantData.position;
+                            if(distance <= viewWidth){
 
-                            Debug.Log("quadrantData.forward: " + quadrantData.forward);
+                            
+                                neighborCount++;
+                                alignment += quadrantData.forward;
+                                separation += quadrantData.position;
 
-                            Debug.Log("quadrantData.position: " + quadrantData.position);
+                                //Debug.Log("quadrantData.forward: " + quadrantData.forward);
+                                //Debug.Log("quadrantData.position: " + quadrantData.position);
+
+                            }
                         }
 
 
@@ -98,9 +108,7 @@ public class BoidSystem : ComponentSystem
 
             // temporarily storing the values for code readability
             float3 forward = localToWorld.Forward;
-            float3 currentPosition = localToWorld.Position;
-            //int cellIndex = cellIndices[entityInQueryIndex];
-            
+            float3 currentPosition = localToWorld.Position;            
             
             
             float nearestObstacleDistance = math.distance(nearestQuadrantDataObstacle.position, localToWorld.Position);
@@ -108,14 +116,15 @@ public class BoidSystem : ComponentSystem
 
 
             float3 nearestObstaclePosition = nearestQuadrantDataObstacle.position;
-            float3 nearestTargetPosition = math.float3(0,0,1);
+            //float3 nearestTargetPosition = math.float3(0,3,200);
+            float3 nearestTargetPosition = currentPosition + forward;
 
             float3 alignmentResult = AlignmentWeight * math.normalizesafe((alignment / neighborCount) - forward);
             float3 separationResult = SeparationWeight * math.normalizesafe((currentPosition * neighborCount) - separation);
 
-            Debug.Log("separationResult: " + separationResult);
-            Debug.Log("alignmentResult: " + alignmentResult);
-            Debug.Log("neighborCount: " + neighborCount);
+            //Debug.Log("separationResult: " + separationResult);
+            //Debug.Log("alignmentResult: " + alignmentResult);
+            //Debug.Log("neighborCount: " + neighborCount);
 
             float3 targetHeading = TargetWeight * math.normalizesafe(nearestTargetPosition - currentPosition);
             var obstacleSteering = currentPosition - nearestObstaclePosition;
@@ -127,7 +136,7 @@ public class BoidSystem : ComponentSystem
 
             var nextHeading = math.normalizesafe(forward + deltaTime * (targetForward - forward));
 
-
+            
             localToWorld = new LocalToWorld
             {
                 Value = float4x4.TRS(
@@ -135,6 +144,8 @@ public class BoidSystem : ComponentSystem
                     quaternion.LookRotationSafe(nextHeading, math.up()),
                     new float3(1.0f, 1.0f, 1.0f))
             };
+            
+            
 
 
 

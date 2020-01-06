@@ -1,4 +1,6 @@
-﻿using Unity.Entities;
+﻿
+/*
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Burst;
@@ -7,7 +9,6 @@ public class RotationSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        /*
         EntityQuery entityQuery = GetEntityQuery(typeof(Rotate), typeof(RotationEulerXYZ));
 
         TranslateionJob translateionJob = new TranslateionJob
@@ -17,11 +18,9 @@ public class RotationSystem : ComponentSystem
 
         JobHandle jobHandle = JobForEachExtensions.Schedule(translateionJob, entityQuery);
         jobHandle.Complete();
-        */
 
     }
 
-    /*
     [BurstCompile]
     private struct TranslateionJob : IJobForEach<Rotate, RotationEulerXYZ>
     {
@@ -34,5 +33,6 @@ public class RotationSystem : ComponentSystem
         }
         
     }
-    */
+
 }
+    */

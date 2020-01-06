@@ -34,21 +34,15 @@ public class SpawnerSystemA : JobComponentSystem
             spawner.secondsToNextSpawn += spawner.secondsBetweenSpawns;
             for (int i = 0; i < 50; i++)
             {
-                Entity instance = entityCommandBuffer.Instantiate(index + i, spawner.prefab);
+                Entity instance = entityCommandBuffer.Instantiate(index, spawner.prefab);
 
                 var dir = math.normalizesafe(random.NextFloat3() - new float3(0.5f, 0.5f, 0.5f));
                 var pos = dir * spawner.maxDistanceFromSpawner;
 
-                entityCommandBuffer.SetComponent(index + i, instance, new LocalToWorld
+                entityCommandBuffer.SetComponent(index, instance, new LocalToWorld
                 {
                     Value = float4x4.TRS(pos, quaternion.LookRotationSafe(dir, math.up()), new float3(1.0f, 1.0f, 1.0f))
-
-                    //Value = localToWorld.Position + random.NextFloat3Direction() * random.NextFloat() * spawner.maxDistanceFromSpawner,
                 });
-
-                // just for filtering
-                entityCommandBuffer.SetComponent(index + i, instance, new BoidComponent { });
-                entityCommandBuffer.SetComponent(index + i, instance, new QuadrantEntityComponent { });
             }
         }
     }

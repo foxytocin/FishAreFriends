@@ -1,4 +1,4 @@
-﻿using Unity.Burst;
+﻿/*using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
@@ -8,7 +8,7 @@ public class MoverSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        /*
+
         EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(Rotation), typeof(BoidComponent));
 
         TranslateionJob translateionJob = new TranslateionJob
@@ -18,10 +18,9 @@ public class MoverSystem : ComponentSystem
 
         JobHandle jobHandle = JobForEachExtensions.Schedule(translateionJob, entityQuery);
         jobHandle.Complete();
-        */
+
     }
 
-    /*
     [BurstCompile]
     private struct TranslateionJob : IJobForEach<Translation, Rotation, BoidComponent>
     {
@@ -33,5 +32,6 @@ public class MoverSystem : ComponentSystem
            
         }
     }
-    */
+
 }
+*/

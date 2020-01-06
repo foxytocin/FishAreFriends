@@ -36,18 +36,15 @@ public class QuadrantSystem : ComponentSystem
     public const int quadrantZMultiplier = 7896;
     public const int quadrantCellSize = 20;
 
-    private static int GetPositionHashMapKey(float3 position)
-    {
+    private static int GetPositionHashMapKey(float3 position) {
         return (int)((quadrantXMultiplier * math.floor(position.x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize)));
     }
 
-    private static int GetXYZHashMapKey(float x, float y, float z)
-    {
+    private static int GetXYZHashMapKey(float x, float y, float z) {
         return (int)((quadrantXMultiplier * math.floor(x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(z / quadrantCellSize)));
     }
 
-    private static int GetEntityCountInHashMap(NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap, int hashMapKey)
-    {
+    private static int GetEntityCountInHashMap(NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap, int hashMapKey) {
         QuadrantData quadrantData;
         NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
         int count = 0;
@@ -62,27 +59,22 @@ public class QuadrantSystem : ComponentSystem
         return count;
     }
 
-    protected override void OnCreate()
-    {
+    protected override void OnCreate() {
         quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(0, Allocator.Persistent);
         base.OnCreate();
     }
 
-    protected override void OnDestroy()
-    {
+    protected override void OnDestroy() {
         quadrantMultiHashMap.Dispose();
         base.OnDestroy();
     }
 
-    protected override void OnUpdate()
-    {
+    protected override void OnUpdate() {
         EntityQuery entityQuery = GetEntityQuery(typeof(LocalToWorld), typeof(QuadrantEntityComponent));
 
         quadrantMultiHashMap.Clear();
-        if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity)
-        {
+        if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity) {
             quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
-
         }
 
 
@@ -147,6 +139,8 @@ public class QuadrantSystem : ComponentSystem
 
         public void Execute(ref LocalToWorld localToWorld, ref QuadrantEntityComponent quadrantEntity)
         {
+            //Debug.Log("QuadrantSystem.localToWorld.Forward: " + localToWorld.Forward);
+
             int hashMapKey = GetPositionHashMapKey(localToWorld.Position);
             quadrantMultiHashMap.Add(hashMapKey,
                 new QuadrantData
