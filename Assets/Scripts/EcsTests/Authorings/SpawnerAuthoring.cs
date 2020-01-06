@@ -6,7 +6,7 @@ public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConve
 {
     [SerializeField] private GameObject prefab;
     [SerializeField] private float maxDistanceFromSpawner;
-    [SerializeField] private float spawnRate;
+    [SerializeField] private float secondsBetweenSpawns;
 
     public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
     {
@@ -19,7 +19,7 @@ public class SpawnerAuthoring : MonoBehaviour, IDeclareReferencedPrefabs, IConve
         {
             prefab = conversionSystem.GetPrimaryEntity(prefab),
             maxDistanceFromSpawner = maxDistanceFromSpawner,
-            secondsBetweenSpawns = 1 / spawnRate,
+            secondsBetweenSpawns = secondsBetweenSpawns,
             secondsToNextSpawn = 0
         });
     }
