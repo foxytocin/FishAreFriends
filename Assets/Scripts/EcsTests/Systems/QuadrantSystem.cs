@@ -16,10 +16,10 @@ public struct QuadrantData
     public TypeOfObject typeOfObject;
 
     // boid data
-    public float3 velocity;
 }
 
-public enum TypeOfObject {
+public enum TypeOfObject
+{
     Boid,
     Obstacle,
     Player
@@ -75,7 +75,7 @@ public class QuadrantSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        EntityQuery entityQuery = GetEntityQuery(typeof(Translation), typeof(QuadrantEntityComponent));
+        EntityQuery entityQuery = GetEntityQuery(typeof(LocalToWorld), typeof(QuadrantEntityComponent));
 
         quadrantMultiHashMap.Clear();
         if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity)
@@ -140,23 +140,18 @@ public class QuadrantSystem : ComponentSystem
 
 
     [BurstCompile]
-    private struct SetQuadrantDataHashMapJob : IJobForEach<Translation, QuadrantEntityComponent>
+    private struct SetQuadrantDataHashMapJob : IJobForEach<LocalToWorld, QuadrantEntityComponent>
     {
         public NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap;
 
-        public void Execute(ref Translation translation, ref QuadrantEntityComponent quadrantEntity)
+        public void Execute(ref LocalToWorld localToWorld, ref QuadrantEntityComponent quadrantEntity)
         {
-            int hashMapKey = GetPositionHashMapKey(translation.Value);
+            int hashMapKey = GetPositionHashMapKey(localToWorld.Position);
             quadrantMultiHashMap.Add(hashMapKey,
                 new QuadrantData
                 {
-                    position = translation.Value,
-                    typeOfObject = quadrantEntity.typeOfObject,
-
-
-                    // boid data
-                    velocity = quadrantEntity.velocity,
-                    
+                    position = localToWorld.Position,
+                    typeOfObject = quadrantEntity.typeOfObject
                 });
         }
     }
