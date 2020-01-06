@@ -28,6 +28,7 @@ public class BoidSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
+        /*
 
         Entities.ForEach((Entity entity, ref QuadrantEntityComponent quadrantEntity, ref LocalToWorld localToWorld, ref BoidComponent boidComponent) =>
         {
@@ -150,7 +151,7 @@ public class BoidSystem : ComponentSystem
 
 
 
-            /*
+            / *
             // flipp direction
             if (translation.Value.y > 100f || translation.Value.y < 0f)
                 quadrantEntity.velocity.y *= -1;
@@ -175,12 +176,13 @@ public class BoidSystem : ComponentSystem
             quaternion rotationValue = math.slerp(rotation.Value, quaternion.LookRotationSafe(lookVector, math.up()), 0.75f * deltaTime);
             //quaternion.LookRotationSafe(lookVector, math.up()); //Quaternion.Lerp(Quaternion.LookRotation(lookVector), 0.5f * deltaTime * 3);
             rotation.Value = rotationValue;
-            */
+            * /
 
-        });
+    });
 
 
-
+    */
 
     }
+
 }
