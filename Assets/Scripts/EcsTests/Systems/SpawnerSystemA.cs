@@ -32,7 +32,7 @@ public class SpawnerSystemA : JobComponentSystem
             if (spawner.secondsToNextSpawn >= 0) { return; }
 
             spawner.secondsToNextSpawn += spawner.secondsBetweenSpawns;
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Entity instance = entityCommandBuffer.Instantiate(index, spawner.prefab);
 

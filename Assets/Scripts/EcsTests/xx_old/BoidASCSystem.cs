@@ -6,20 +6,23 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using static Unity.Mathematics.math;
 
+/*
+
 public class BoidASCSystem : JobComponentSystem
 {
     [BurstCompile]
-    struct BoidASCSystemJob : IJobForEach<BoidComponent>
+    struct BoidASCSystemJob : IJobForEach<BoidMasterComponent>
     {
 
 
         [DeallocateOnJobCompletion]
         [ReadOnly] public NativeArray<ArchetypeChunk> chunks;
 
-        public ArchetypeChunkComponentType<LocalToWorld> localToWorldType;
+
+        public ArchetypeChunkComponentType<BoidSlaveComponent> boidSlaveComponentType;
 
 
-        public void Execute(ref BoidComponent boidComponentMain)
+        public void Execute(ref BoidMasterComponent boidMasterComponent)
         {
             float3 separation = math.float3(0);
             float3 cohesion = math.float3(0);
@@ -27,20 +30,25 @@ public class BoidASCSystem : JobComponentSystem
 
             for (int chunksIndex = 0; chunksIndex < chunks.Length; chunksIndex++)
             {
-                NativeArray<LocalToWorld> localToWorldSlave = chunks[chunksIndex].GetNativeArray(localToWorldType);
+                NativeArray<BoidSlaveComponent> boidSlaveComponent = chunks[chunksIndex].GetNativeArray(boidSlaveComponentType);
 
                 for (int i = 0; i < chunks[chunksIndex].Count; i++)
                 {
-                    separation += localToWorldSlave[i].Position;
-                    cohesion += localToWorldSlave[i].Position;
-                    alignment += localToWorldSlave[i].Forward;
+                    if (math.distance(boidSlaveComponent[i].position, boidMasterComponent.position) > 5)
+                    {
+
+                    }
+
+                    separation += boidSlaveComponent[i].position;
+                    cohesion += boidSlaveComponent[i].position;
+                    alignment += boidSlaveComponent[i].forward;
                     
                 }
             }
 
-            boidComponentMain.separation = separation;
-            boidComponentMain.cohesion = cohesion;
-            boidComponentMain.alignment = alignment;
+            boidMasterComponent.separation = separation;
+            boidMasterComponent.cohesion = cohesion;
+            boidMasterComponent.alignment = alignment;
             // boidComponentMain.boidLength = chunks.Length;
 
         }
@@ -49,13 +57,15 @@ public class BoidASCSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDependencies)
     {
 
-        EntityQuery entityQuery = GetEntityQuery(typeof(LocalToWorld));
+        EntityQuery entityQuery = GetEntityQuery(typeof(BoidSlaveComponent));
 
         var job = new BoidASCSystemJob();
         job.chunks = entityQuery.CreateArchetypeChunkArray(Allocator.TempJob);
-        job.localToWorldType = GetArchetypeChunkComponentType<LocalToWorld>();
+        job.boidSlaveComponentType = GetArchetypeChunkComponentType<BoidSlaveComponent>();
 
 
         return job.Schedule(this, inputDependencies);
     }
 }
+
+    */

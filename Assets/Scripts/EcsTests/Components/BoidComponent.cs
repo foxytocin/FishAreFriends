@@ -5,7 +5,10 @@ using Unity.Transforms;
 [WriteGroup(typeof(LocalToWorld))]
 public struct BoidComponent : IComponentData
 {
-    public float3 cohesion;
-    public float3 alignment;
-    public float3 separation;
+    public float AlignmentWeight;
+    public float SeparationWeight;
+    public float TargetWeight;
+    public float ObstacleAversionDistance;
+    public float MoveSpeed;
+    public float viewWidth;
 }
