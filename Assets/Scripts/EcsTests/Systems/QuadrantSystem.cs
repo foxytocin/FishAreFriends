@@ -8,44 +8,14 @@ using Unity.Transforms;
 using UnityEngine;
 
 
-public struct QuadrantData
+public class QuadrantSystem 
 {
-    public Entity entity;
-    public float3 position;
+    /////////////////////// 
+    /// Debug Functions ///
+    /////////////////////// 
 
-    public TypeOfObject typeOfObject;
-
-    // boid data
-    public float3 forward;
-}
-
-public enum TypeOfObject
-{
-    Boid,
-    Obstacle,
-    Player
-};
-
-
-public class QuadrantSystem : ComponentSystem
-{
-    public static NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap;
-
-    public const int quadrantXMultiplier = 569;
-    public const int quadrantYMultiplier = 3658;
-    public const int quadrantZMultiplier = 7896;
-    public const int quadrantCellSize = 20;
-
-    private static int GetPositionHashMapKey(float3 position) {
-        return (int)((quadrantXMultiplier * math.floor(position.x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(position.y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(position.z / quadrantCellSize)));
-    }
-
-    private static int GetXYZHashMapKey(float x, float y, float z) {
-        return (int)((quadrantXMultiplier * math.floor(x / quadrantCellSize)) + (quadrantYMultiplier * math.floor(y / quadrantCellSize)) + (quadrantZMultiplier * math.floor(z / quadrantCellSize)));
-    }
-
-    private static int GetEntityCountInHashMap(NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap, int hashMapKey) {
-        QuadrantData quadrantData;
+    public static int GetEntityCountInHashMap(NativeMultiHashMap<int, int> quadrantMultiHashMap, int hashMapKey) {
+        int quadrantData;
         NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
         int count = 0;
         if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator))
@@ -59,59 +29,26 @@ public class QuadrantSystem : ComponentSystem
         return count;
     }
 
-    protected override void OnCreate() {
-        quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(0, Allocator.Persistent);
-        base.OnCreate();
-    }
 
-    protected override void OnDestroy() {
-        quadrantMultiHashMap.Dispose();
-        base.OnDestroy();
-    }
-
-    protected override void OnUpdate() {
-        EntityQuery entityQuery = GetEntityQuery(typeof(LocalToWorld), typeof(QuadrantEntityComponent));
-
-        quadrantMultiHashMap.Clear();
-        if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity) {
-            quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
-        }
-
-
-        SetQuadrantDataHashMapJob setQuadrantDataHashMapJob = new SetQuadrantDataHashMapJob
-        {
-            quadrantMultiHashMap = quadrantMultiHashMap.AsParallelWriter(),
-        };
-
-        JobHandle jobHandle = JobForEachExtensions.Schedule(setQuadrantDataHashMapJob, entityQuery);
-        jobHandle.Complete();
-
-
-        drawBoxesAroundEntities();
-
-        /*
-        checkDuplicateHashCodes();
-        */
-    }
 
     /*
      * Use this function to draw box/boxes around an entitiy.
      */
-    private void drawBoxesAroundEntities()
+    public static void drawBoxesAroundEntities(NativeMultiHashMap<int, int> quadrantMultiHashMap, int quadrantCellSize, int hashKey)
     {
         for (int x = -250; x < 250; x += quadrantCellSize)
             for (int y = 0; y < 150; y += quadrantCellSize)
                 for (int z = -250; z < 250; z += quadrantCellSize)
                 {
                     float3 position = new float3(x, y, z);
-                    if (GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(position)) > 0)
+                    if (GetEntityCountInHashMap(quadrantMultiHashMap, hashKey) > 0)
                     {
                         // you can trigger here between
                         // - show one box around the entity
                         // - show all boxes that will later be used for neighbour searching
 
                         //DrawDebugBoxAndBoxesAround(position);
-                        DrawDebugBox(position);
+                        DrawDebugBox(position, quadrantCellSize);
                     }
                 }
     }
@@ -119,48 +56,28 @@ public class QuadrantSystem : ComponentSystem
     /*
      * This methode returns you a list<int> with all keys around your actual position
      */
-    public static List<int> GetHashKeysForAroundData(float3 position)
+    public static List<int> GetHashKeysForAroundData(float3 position, int quadrantCellSize, int hashKey)
     {
         List<int> list = new List<int>();
         for (float x = position.x - quadrantCellSize; x < position.x + quadrantCellSize + 1; x += quadrantCellSize)
             for (float y = position.y - quadrantCellSize; y < position.y + quadrantCellSize + 1; y += quadrantCellSize)
                 for (float z = position.z - quadrantCellSize; z < position.z + quadrantCellSize + 1; z += quadrantCellSize)
                 {
-                    list.Add(GetXYZHashMapKey(x, y, z));
+                    list.Add(hashKey);
                 }
         return list;
     }
 
 
-    [BurstCompile]
-    private struct SetQuadrantDataHashMapJob : IJobForEach<LocalToWorld, QuadrantEntityComponent>
-    {
-        public NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap;
 
-        public void Execute(ref LocalToWorld localToWorld, ref QuadrantEntityComponent quadrantEntity)
-        {
-            //Debug.Log("QuadrantSystem.localToWorld.Forward: " + localToWorld.Forward);
 
-            int hashMapKey = GetPositionHashMapKey(localToWorld.Position);
-            quadrantMultiHashMap.Add(hashMapKey,
-                new QuadrantData
-                {
-                    position = localToWorld.Position,
-                    typeOfObject = quadrantEntity.typeOfObject,
-                    forward = localToWorld.Forward
-                });
-        }
-    }
 
-    /////////////////////// 
-    /// Debug Functions ///
-    /////////////////////// 
 
     /*
     * Use this methode to test the hashCode function. If two Cubes are shown in the SceneView, 
     * you have duplicate hashcodes for different positions
     */
-    private void checkDuplicateHashCodes()
+    public static void checkDuplicateHashCodes(int quadrantCellSize, int hashKey)
     {
         Dictionary<int, float3> map = new Dictionary<int, float3>();
 
@@ -171,14 +88,13 @@ public class QuadrantSystem : ComponentSystem
                 for (int z = -250; z < 250; z += quadrantCellSize)
                 {
                     float3 position = new float3(x, y, z);
-                    int hashKey = GetPositionHashMapKey(position);
                     if (map.ContainsKey(hashKey))
                     {
-                        DrawDebugBox(position);
+                        DrawDebugBox(position, quadrantCellSize);
 
                         float3 outPosition;
                         map.TryGetValue(hashKey, out outPosition);
-                        DrawDebugBox(outPosition);
+                        DrawDebugBox(outPosition, quadrantCellSize);
                     }
                     else
                     {
@@ -196,23 +112,23 @@ public class QuadrantSystem : ComponentSystem
     /*
      * Use this function to draw a box around a position according to the quadrantCellSize
      */
-    private void DrawDebugBoxAndBoxesAround(float3 position)
+    public static void DrawDebugBoxAndBoxesAround(float3 position, int quadrantCellSize)
     {
-        DrawDebugBox(position);
+        DrawDebugBox(position, quadrantCellSize);
 
         for (float x = position.x - quadrantCellSize; x < position.x + quadrantCellSize + 1; x += quadrantCellSize)
             for (float y = position.y - quadrantCellSize; y < position.y + quadrantCellSize + 1; y += quadrantCellSize)
                 for (float z = position.z - quadrantCellSize; z < position.z + quadrantCellSize + 1; z += quadrantCellSize)
                 {
                     float3 tempPosition = new float3(x, y, z);
-                    DrawDebugBox(tempPosition);
+                    DrawDebugBox(tempPosition, quadrantCellSize);
                 }
     }
 
     /*
      * This methode draws a box with lines in SceneView
      */
-    private void DrawDebugBox(float3 position)
+    public static void DrawDebugBox(float3 position, int quadrantCellSize)
     {
         float3 lowerLeft = new float3(quadrantCellSize * math.floor(position.x / quadrantCellSize), quadrantCellSize * math.floor(position.y / quadrantCellSize), quadrantCellSize * math.floor(position.z / quadrantCellSize));
 
@@ -237,4 +153,5 @@ public class QuadrantSystem : ComponentSystem
         Debug.DrawLine(lowerLeft + new float3(+1, +1, +0) * quadrantCellSize, lowerLeft + new float3(+1, +1, +1) * quadrantCellSize);
         Debug.DrawLine(lowerLeft + new float3(+0, +1, +1) * quadrantCellSize, lowerLeft + new float3(+1, +1, +1) * quadrantCellSize);
     }
+
 }

@@ -15,7 +15,7 @@ public class BoidAuthoring : MonoBehaviour, IConvertGameObjectToEntity
             viewWidth = 8f,
         });
 
-        dstManager.AddComponentData(entity, new QuadrantEntityComponent { typeOfObject = TypeOfObject.Boid });
+        dstManager.AddComponentData(entity, new QuadrantEntityComponent {});
 
         // Remove default transform system components
         dstManager.RemoveComponent<Translation>(entity);
