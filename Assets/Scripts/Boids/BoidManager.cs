@@ -143,7 +143,7 @@ public class BoidManager : MonoBehaviour
                         separationHeading = separationHeading
                     };
 
-                    JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 100);
+                    JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 64);
                     jobHandle.Complete();
 
                     for (int i = 0; i < Count; i++)
