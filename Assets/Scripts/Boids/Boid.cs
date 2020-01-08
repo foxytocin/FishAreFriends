@@ -132,7 +132,8 @@ public class Boid : MonoBehaviour
     }
 
 
-    public bool CollisionAhead() {
+    public bool CollisionAhead()
+    {
         return (
             position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
             position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
@@ -196,7 +197,7 @@ public class Boid : MonoBehaviour
                 }
             }
         }
-    
+
 
         // find leader
         float distanceToLeader = Vector3.Distance(position, leader.getPosition());
