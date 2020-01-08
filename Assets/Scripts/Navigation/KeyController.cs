@@ -16,7 +16,7 @@ public class KeyController : MonoBehaviour
     Transform cachedTransform;
     Material material;
 
-    private float maxSpeed = 3f;
+    public float maxSpeed = 3f;
     public float maxSteerForce = 2f;
     public float avoidCollisionWeight = 10f;
     public float boundsRadius = 0.27f;
