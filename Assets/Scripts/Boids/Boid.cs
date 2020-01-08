@@ -7,7 +7,7 @@ public class Boid : MonoBehaviour
 {
 
     Predator predator;
-    Leader leader;
+    Leader otherLeader;
     CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
@@ -71,7 +71,7 @@ public class Boid : MonoBehaviour
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
         predator = FindObjectOfType<Predator>();
-        leader = FindObjectOfType<Leader>();
+        // leader = FindObjectOfType<Leader>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = new Material[4];
@@ -176,29 +176,65 @@ public class Boid : MonoBehaviour
 
 
         // find leader
-        float distanceToLeader = Vector3.Distance(position, leader.getPosition());
-        if (distanceToLeader < 5f) //Predator-Test fehlt
+        float distanceToLeader = float.MaxValue;
+        if (Leader.leaderList != null)
         {
-            Vector3 positionToLeader = leader.getPosition() - position;
-            acceleration += positionToLeader * settings.leadingForce;
-
-            setColor(leader.leaderColor1, leader.leaderColor2);
-
-            if (myLeader == null)
+            foreach (Leader l in Leader.leaderList)
             {
-                myLeader = leader;
-                leader.AddBoidToSwarm(this);
+                float tempDistance = Vector3.Distance(position, l.getPosition());
+                if (tempDistance < distanceToLeader)
+                {
+                    otherLeader = l;
+                    distanceToLeader = tempDistance;
+                }
             }
         }
-        else
-        {
-            setColor(originalColor1, originalColor2);
 
-            if (myLeader != null)
+        // if i have no leader already, use the nearest, if distance < 5
+        if(myLeader == null && distanceToLeader < 5f)
+        {
+                myLeader = otherLeader;
+                setColor(otherLeader.leaderColor1, otherLeader.leaderColor2);
+        }
+
+
+        // myLeader is already the nearest
+        if (myLeader != null && myLeader.Equals(otherLeader))
+        {
+            if (distanceToLeader < 5f)
             {
+                // my leader is near to me
+                Vector3 positionToLeader = otherLeader.getPosition() - position;
+                acceleration += positionToLeader * settings.leadingForce;
+            }
+            else
+            {
+                // myLeader is to far away
+                setColor(originalColor1, originalColor2);
                 myLeader.RemoveBoidFromSwarm(this);
                 myLeader = null;
             }
+        }
+        else if(myLeader != null)
+        {
+            // an other leader is nearer to me than myLeader
+            //  check size of both leaders swarm
+            int myLeaderSwarmSize = myLeader.GetSwarmSize();
+            int otherLeaderSwarmSize = otherLeader.GetSwarmSize();
+
+            // TODO calculate other (devide by zero)
+            float value = otherLeaderSwarmSize / myLeaderSwarmSize;
+
+            if(myLeaderSwarmSize < otherLeaderSwarmSize)
+                value = myLeaderSwarmSize / otherLeaderSwarmSize;
+
+            if (UnityEngine.Random.value > value) {
+                myLeader.RemoveBoidFromSwarm(this);
+                myLeader = otherLeader;
+                myLeader.AddBoidToSwarm(this);
+            }
+
+
 
         }
 
