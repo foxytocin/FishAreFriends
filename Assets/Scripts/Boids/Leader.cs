@@ -8,12 +8,20 @@ public class Leader : MonoBehaviour
     MapGenerator mapGenerator;
     private List<Boid> swarmList;
 
+    public static List<Leader> leaderList;
+
     public Color leaderColor1;
     public Color leaderColor2;
     private Material material;
 
     private void Awake()
     {
+
+        if (leaderList == null)
+            leaderList = new List<Leader>();
+
+        leaderList.Add(this);
+
         //leaderColor = Random.ColorHSV();
         cellGroups = FindObjectOfType<CellGroups>();
         mapGenerator = FindObjectOfType<MapGenerator>();
@@ -41,6 +49,10 @@ public class Leader : MonoBehaviour
         swarmList.Remove(boid);
     }
 
+    public int GetSwarmSize()
+    {
+        return swarmList.Count;
+    }
 
     public List<Boid> GetSwarmList()
     {

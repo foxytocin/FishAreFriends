@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7844469402631009760}
   - component: {fileID: 5710547402565735817}
   - component: {fileID: 6888253757789405867}
-  - component: {fileID: 2576643245609042701}
   m_Layer: 0
   m_Name: Fish_Leader
   m_TagString: Untagged
@@ -80,26 +79,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &2576643245609042701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4888085044608353030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3caeddb08852c9e40952912927dfa857, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabBlood: {fileID: 0}
-  position: {x: 0, y: 0, z: 0}
-  forward: {x: 0, y: 0, z: 0}
-  avgFlockHeading: {x: 0, y: 0, z: 0}
-  avgAvoidanceHeading: {x: 0, y: 0, z: 0}
-  centreOfFlockmates: {x: 0, y: 0, z: 0}
-  numPerceivedFlockmates: 0
-  basicFoodNeed: 1000
-  foodNeeds: 0
-  foodLeft: 0
-  alife: 0
