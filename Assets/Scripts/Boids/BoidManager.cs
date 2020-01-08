@@ -48,9 +48,10 @@ public class BoidManager : MonoBehaviour
 
     void Update()
     {
-        int foodNeedsSum = 0;
+       
         if (cellGroups.allBoidCells != null)
         {
+            int foodNeedsSum = 0;
             foreach (List<Boid> boidsList in cellGroups.allBoidCells)
             {
                 //List<Boid> boidsList = cellGroups.allBoidCells[j];
@@ -109,12 +110,23 @@ public class BoidManager : MonoBehaviour
 
                 for (int i = 0; i < Count; i++)
                 {
-                    foodNeedsSum += boidsList[i].foodNeeds;
-                    boidsList[i].UpdateBoid(accelerationArray[i]);
+                    Boid boid = boidsList[i];
+
+                    if(boid.alife)
+                    {
+                        foodNeedsSum += boid.foodNeeds;
+                        boid.UpdateBoid(accelerationArray[i]);
+                    } else {
+                        boid.setColor(Color.black, Color.black);
+                        boid.setWobbleSpeed(0);
+                        boid.transform.eulerAngles = new Vector3(180, 0, 0);
+                    }
                 }
 
                 accelerationArray.Dispose();            
             }
+            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
+
 
             // calculate all new cell positions
             // error if raster larger then 1 - 1 - 1
@@ -164,8 +176,6 @@ public class BoidManager : MonoBehaviour
             }
         
         }
-
-        ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
     }
 }
 
