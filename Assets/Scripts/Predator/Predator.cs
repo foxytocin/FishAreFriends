@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Unity.Mathematics;
+
 public class Predator : MonoBehaviour
 {
 
@@ -187,7 +189,7 @@ public class Predator : MonoBehaviour
 
     Vector3 ObstacleRays()
     {
-        Vector3[] rayDirections = BoidHelper.directions;
+        float3[] rayDirections = BoidHelper.directions;
 
 
         for (int i = 0; i < rayDirections.Length; i++)

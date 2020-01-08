@@ -10,7 +10,7 @@ Material:
   m_Name: Seaweed
   m_Shader: {fileID: -6465566751694194690, guid: 3e3a20b9b3d4c4ffc836e9d40869e00f,
     type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0

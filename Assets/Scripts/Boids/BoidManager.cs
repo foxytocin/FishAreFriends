@@ -97,8 +97,20 @@ public class BoidManager : MonoBehaviour
                 flockCentreArray.Dispose();
                 avoidanceHeadingArray.Dispose();
             }
+    
+            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
+
+            // for (int j = 0; j < cellGroups.allBoidCells.Count; j++)
+            // {
+            //     List<Boid> boidsList = cellGroups.allBoidCells[j];
+
+            //     int Count = boidsList.Count;
+            //     for (int i = 0; i < Count; i++)
+            //     {
+            //         cellGroups.CheckCell(boidsList[i]);
+            //     }
+            // }
         }
-        ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
     }
 }
 

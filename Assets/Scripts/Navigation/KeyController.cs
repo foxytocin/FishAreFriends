@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Unity.Mathematics;
 
 public class KeyController : MonoBehaviour
 {
@@ -176,7 +177,7 @@ public class KeyController : MonoBehaviour
 
     Vector3 ObstacleRays()
     {
-        Vector3[] rayDirections = BoidHelper.directions;
+        float3[] rayDirections = BoidHelper.directions;
 
 
         for (int i = 0; i < rayDirections.Length; i++)
