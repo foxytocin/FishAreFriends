@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
 
 public class CellGroups : MonoBehaviour
 {
@@ -8,10 +8,10 @@ public class CellGroups : MonoBehaviour
     MapGenerator mapGenerator;
 
     public bool Debug = true;
-    public Vector3Int resolution = new Vector3Int(3, 2, 2);
-    private float widthStep;
-    private float depthStep;
-    private float heightStep;
+    public float3 resolution = new float3(3, 2, 2);
+    public float widthStep;
+    public float depthStep;
+    public float heightStep;
 
     public List<List<Boid>> allBoidCells = new List<List<Boid>>();
 
@@ -38,10 +38,10 @@ public class CellGroups : MonoBehaviour
     }
 
 
-    public int GetIndex(Vector3 pos)
+    public int GetIndex(float3 pos)
     {
-        int index = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
-        return Mathf.Clamp(index, 0, allBoidCells.Count - 1);
+        float index = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
+        return (int)(Mathf.Clamp(index, 0, allBoidCells.Count - 1));
     }
 
 
@@ -59,8 +59,8 @@ public class CellGroups : MonoBehaviour
     }
 
 
-    int playerCell;
-    public void SetPlayerCell(Vector3 pos)
+    float playerCell;
+    public void SetPlayerCell(float3 pos)
     {
         playerCell = ((int)(pos.x / widthStep) + (int)(pos.z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(pos.y / heightStep)));
     }
@@ -76,8 +76,8 @@ public class CellGroups : MonoBehaviour
                 {
                     for (int x = 0; x < resolution.x; x++)
                     {
-                        Vector3 size = new Vector3(widthStep, heightStep, depthStep);
-                        Vector3 position = new Vector3(x * widthStep, y * heightStep, z * depthStep);
+                        float3 size = new float3(widthStep, heightStep, depthStep);
+                        float3 position = new float3(x * widthStep, y * heightStep, z * depthStep);
                         if (playerCell == (x + z * resolution.x + (resolution.x * resolution.z * y)))
                         {
                             Gizmos.color = new Color(0, 1, 0, 0.5f);
@@ -89,6 +89,13 @@ public class CellGroups : MonoBehaviour
                         Gizmos.DrawCube(position + size / 2, size);
                     }
                 }
+            }
+
+            int cellCount = 0;
+            foreach (List<Boid> boidsList in allBoidCells)
+            {
+                print("BoidCountinCell "+cellCount+ ": " +boidsList.Count);
+                cellCount++;
             }
         }
     }

@@ -85,8 +85,8 @@ public class BoidManager : MonoBehaviour
                     directionArray = directionArray,
                     accelerationArray = accelerationArray,
                     velocityArray = velocityArray,
-                    viewRadius = viewRadius,
-                    avoidRadius = avoidRadius,
+                    viewRadiusSqr = viewRadius * viewRadius,
+                    avoidRadiusSqr = avoidRadius * avoidRadius,
                     alignWeight = alignWeight,
                     cohesionWeight = cohesionWeight,
                     seperateWeight = seperateWeight,
@@ -95,8 +95,8 @@ public class BoidManager : MonoBehaviour
                     targetWeight = targetWeight
                 };
 
-                JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 64);
-                jobHandle.Complete();
+                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 64);
+                jobHandle1.Complete();
 
                 for (int i = 0; i < Count; i++)
                 {
@@ -111,11 +111,96 @@ public class BoidManager : MonoBehaviour
                 targetPositionArray.Dispose();
                 hasTargetArray.Dispose();
             }
+
+            // calculate all new cell positions
+            int sumOfAllBoids = 0;
+            foreach (List<Boid> boidsList in cellGroups.allBoidCells)
+            {
+                sumOfAllBoids += boidsList.Count;
+            }
+            print("Summe aller Boids: " +sumOfAllBoids);
+            positionArray = new NativeArray<float3>(sumOfAllBoids, Allocator.TempJob);
+            NativeArray<int> newCellIndex = new NativeArray<int>(sumOfAllBoids, Allocator.TempJob);
+
+            int absoluteIndex = 0;
+            foreach (List<Boid> boidsList in cellGroups.allBoidCells)
+            {
+                for (int i = 0; i < boidsList.Count; i++)
+                {
+                    positionArray[absoluteIndex + i] = boidsList[i].position;
+                }
+                absoluteIndex += boidsList.Count;
+            }
+
+            print("PositionArray aller Boids: " +positionArray.Length);
+            
+            CalculateCellPosition calculateCellPosition = new CalculateCellPosition
+            {
+                positionArray = positionArray,
+                newCellIndex = newCellIndex,
+                widthStep = cellGroups.widthStep,
+                heightStep = cellGroups.heightStep,
+                depthStep = cellGroups.depthStep,
+                resolution = cellGroups.resolution,
+            };
+
+            JobHandle jobHandle2 = calculateCellPosition.Schedule(sumOfAllBoids, 64);
+            jobHandle2.Complete();
+
+
+            absoluteIndex = 0;
+            foreach (List<Boid> boidsList in cellGroups.allBoidCells)
+            {
+                for (int i = 0; i < boidsList.Count; i++)
+                {
+                    Boid boid = boidsList[absoluteIndex + i];
+                    int oldIndex = boid.cellIndex;
+                    int newIndex = newCellIndex[absoluteIndex + i];
+
+                    if (newIndex != oldIndex)
+                    {
+                        boid.cellIndex = newIndex;
+                        cellGroups.allBoidCells[oldIndex].Remove(boid);
+                        cellGroups.allBoidCells[newIndex].Add(boid);
+                    }
+                }
+                absoluteIndex += boidsList.Count;
+            }
+
+            positionArray.Dispose();
+
         }
 
         ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
     }
 }
+
+
+
+[BurstCompile]
+public struct CalculateCellPosition : IJobParallelFor
+{
+
+    [ReadOnly] public NativeArray<float3> positionArray;
+
+    public NativeArray<int> newCellIndex;
+    [ReadOnly] public float widthStep;
+    [ReadOnly] public float heightStep;
+    [ReadOnly] public float depthStep;
+    [ReadOnly] public float3 resolution;
+
+    public void Execute(int index)
+    {
+        float newIndex = ((int)(positionArray[index].x / widthStep) + (int)(positionArray[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray[index].y / heightStep)));
+        newIndex = Mathf.Clamp(index, 0, positionArray.Length - 1);
+
+        newCellIndex[index] = (int)newIndex;
+    }
+}
+
+
+
+
 
 [BurstCompile]
 public struct CellBoidParallelJob : IJobParallelFor
@@ -127,25 +212,26 @@ public struct CellBoidParallelJob : IJobParallelFor
     public NativeArray<float3> accelerationArray;
     [ReadOnly] public NativeArray<float3> velocityArray;
 
-    [ReadOnly] public float viewRadius;
-    [ReadOnly] public float avoidRadius;
+    [ReadOnly] public float viewRadiusSqr;
+    [ReadOnly] public float avoidRadiusSqr;
     [ReadOnly] public float alignWeight;
     [ReadOnly] public float cohesionWeight;
     [ReadOnly] public float seperateWeight;
     [ReadOnly] public float maxSpeed;
     [ReadOnly] public float maxSteerForce;
     [ReadOnly] public float targetWeight;
+    float3 flockHeading;
+    float3 flockCentre;
+    float3 separationHeading;
+    float3 acceleration;
 
     public void Execute(int index)
     {
-
-        float viewRadiusSqr = viewRadius * viewRadius;
-        float avoidRadiusSqr = avoidRadius * avoidRadius;
         int numFlockmates = 0;
-        float3 flockHeading = new float3();
-        float3 flockCentre = new float3();
-        float3 separationHeading = new float3();
-        float3 acceleration = new float3();
+        flockHeading = new float3();
+        flockCentre = new float3();
+        separationHeading = new float3();
+        acceleration = new float3();
 
         for (int i = 0; i < positionArray.Length; i++)
         {
@@ -168,10 +254,11 @@ public struct CellBoidParallelJob : IJobParallelFor
             }
         }
 
+        float3 velocity = velocityArray[index];
         if (hasTargetArray[index])
         {
             float3 offsetToTarget = targetPositionArray[index] - positionArray[index];
-            acceleration = Vector3.ClampMagnitude(math.normalizesafe(offsetToTarget) * maxSpeed - velocityArray[index], maxSteerForce) * targetWeight;
+            acceleration = Vector3.ClampMagnitude(math.normalizesafe(offsetToTarget) * maxSpeed - velocity, maxSteerForce) * targetWeight;
         }
 
         if (numFlockmates != 0)
@@ -179,14 +266,11 @@ public struct CellBoidParallelJob : IJobParallelFor
             flockCentre /= numFlockmates;
             float3 offsetToFlockmatesCentre = (flockCentre - positionArray[index]);
 
-            float3 alignmentForce = Vector3.ClampMagnitude(math.normalizesafe(flockHeading) * maxSpeed - velocityArray[index], maxSteerForce) * alignWeight;
-            float3 cohesionForce = Vector3.ClampMagnitude(math.normalizesafe(offsetToFlockmatesCentre) * maxSpeed - velocityArray[index], maxSteerForce) * cohesionWeight;
-            float3 seperationForce = Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocityArray[index], maxSteerForce) * seperateWeight;
-
-            acceleration += alignmentForce;
-            acceleration += cohesionForce;
-            acceleration += seperationForce;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(flockHeading) * maxSpeed - velocity, maxSteerForce) * alignWeight;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(offsetToFlockmatesCentre) * maxSpeed - velocity, maxSteerForce) * cohesionWeight;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocity, maxSteerForce) * seperateWeight;
         }
+
         accelerationArray[index] = acceleration;
     }
 }
