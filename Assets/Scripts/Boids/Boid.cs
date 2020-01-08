@@ -190,60 +190,22 @@ public class Boid : MonoBehaviour
             }
         }
 
+
         // if i have no leader already, use the nearest, if distance < 5
-        if(myLeader == null && distanceToLeader < 5f)
+        if (myLeader == null && distanceToLeader <= 5f)
+            JoinNewSwarm(otherLeader);
+
+        // if i have a leader but he is to far away, reset follow leader
+        if (myLeader != null && distanceToLeader > 5f)
+            LeaveActualSwarm();
+
+        // if i have a leader
+        if (myLeader != null)
         {
-                myLeader = otherLeader;
-                setColor(otherLeader.leaderColor1, otherLeader.leaderColor2);
+            Vector3 positionToLeader = otherLeader.getPosition() - position;
+            acceleration += positionToLeader * settings.leadingForce;
         }
 
-
-        // myLeader is already the nearest
-        if (myLeader != null && myLeader.Equals(otherLeader))
-        {
-            if (distanceToLeader < 5f)
-            {
-                // my leader is near to me
-                Vector3 positionToLeader = otherLeader.getPosition() - position;
-                acceleration += positionToLeader * settings.leadingForce;
-            }
-            else
-            {
-                // myLeader is to far away
-                setColor(originalColor1, originalColor2);
-                myLeader.RemoveBoidFromSwarm(this);
-                myLeader = null;
-            }
-        }
-        else if(myLeader != null)
-        {
-            // an other leader is nearer to me than myLeader
-            //  check size of both leaders swarm
-            float myLeaderSwarmSize = myLeader.GetSwarmSize();
-            float otherLeaderSwarmSize = otherLeader.GetSwarmSize();
-
-            if(myLeaderSwarmSize > 0) {
-
-                float value = otherLeaderSwarmSize / myLeaderSwarmSize;
-
-                if(myLeaderSwarmSize < otherLeaderSwarmSize)
-                    value = myLeaderSwarmSize / otherLeaderSwarmSize;
-
-                Debug.Log("Wechselwahrscheinlichkeit: " +value);
-                Debug.Log("Random-Value: " +UnityEngine.Random.value);
-
-                // boid switches leader
-                if (UnityEngine.Random.value > value) {
-                    myLeader.RemoveBoidFromSwarm(this);
-                    myLeader = otherLeader;
-                    myLeader.AddBoidToSwarm(this);
-                    setColor(originalColor1, originalColor2);
-
-                    Debug.Log("Der Boid hat seinen Leader gewechselt");
-                }
-
-            }
-        }
 
 
         // find food 
@@ -305,6 +267,21 @@ public class Boid : MonoBehaviour
         }
 
         setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+    }
+
+
+    public void JoinNewSwarm(Leader leader)
+    {
+        myLeader = leader;
+        leader.AddBoidToSwarm(this);
+        setColor(leader.leaderColor1, leader.leaderColor2);
+    }
+
+    public void LeaveActualSwarm()
+    {
+        setColor(originalColor1, originalColor2);
+        myLeader.RemoveBoidFromSwarm(this);
+        myLeader = null;
     }
 
 
@@ -404,6 +381,14 @@ public class Boid : MonoBehaviour
         }
         else { }
         return false;
+    }
+
+
+    // use this to check if oppenent want to hunt a boid
+    //  check boid is allready in a swarm
+    public bool HasLeader()
+    {
+        return myLeader != null;
     }
 
 

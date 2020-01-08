@@ -14,6 +14,9 @@ public class Leader : MonoBehaviour
     public Color leaderColor2;
     private Material material;
 
+    // defined as secounds
+    private float waitForNextRipCount;
+
     private void Awake()
     {
 
@@ -21,6 +24,9 @@ public class Leader : MonoBehaviour
             leaderList = new List<Leader>();
 
         leaderList.Add(this);
+
+        // defined as secounds
+        waitForNextRipCount = 0;
 
         //leaderColor = Random.ColorHSV();
         cellGroups = FindObjectOfType<CellGroups>();
@@ -62,6 +68,75 @@ public class Leader : MonoBehaviour
     public Vector3 getPosition()
     {
         return transform.position;
+    }
+
+
+    public void Update()
+    {
+
+        if(waitForNextRipCount > 0)
+        {
+            waitForNextRipCount -= Time.deltaTime;
+            return;
+        }
+
+
+        Leader otherLeader = null;
+        // find other leader
+        float distanceToOtherLeader = float.MaxValue;
+        if (leaderList != null)
+        {
+            foreach (Leader l in Leader.leaderList)
+            {
+                if (l.Equals(this))
+                    continue;
+
+                float tempDistance = Vector3.Distance(transform.position, l.getPosition());
+                if (tempDistance < distanceToOtherLeader)
+                {
+                    otherLeader = l;
+                    distanceToOtherLeader = tempDistance;
+                }
+            }
+        }
+
+
+        if(distanceToOtherLeader <= 5f && otherLeader != null)
+        {
+            Debug.Log("Found other leader");
+            int otherSwarmCount = otherLeader.GetSwarmSize();
+            int mySwarmCount = GetSwarmSize();
+
+            // if my swarm is extremly bigger than the other swarm
+            //  i get half the boids of the other
+            int ripCount = 0;
+
+            if (otherSwarmCount < mySwarmCount)
+                ripCount = otherSwarmCount / 4;
+
+            if (otherSwarmCount * 2 < mySwarmCount)
+                ripCount = otherSwarmCount / 3;
+
+            if (otherSwarmCount * 3 < mySwarmCount)
+                ripCount = otherSwarmCount / 2;
+
+            if(ripCount != 0)
+            {
+                Debug.Log("Swarm riped " + ripCount + " boids from " + otherSwarmCount );
+                List<Boid> boidsToRip = otherLeader.GetSwarmList().GetRange(0, otherSwarmCount < ripCount ? otherSwarmCount : ripCount);
+
+                // lets rip
+                foreach (Boid boid in boidsToRip)
+                {
+                    boid.LeaveActualSwarm();
+                    boid.JoinNewSwarm(this);
+                }
+            }
+
+            waitForNextRipCount = 10f;
+
+        }
+
     }
 
 

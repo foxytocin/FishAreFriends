@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Mathematics;
+using System.Collections.Generic;
 
 public class OpponentPlayer : MonoBehaviour
 {
@@ -23,14 +24,17 @@ public class OpponentPlayer : MonoBehaviour
     public float collisionAvoidDst = 5f;
     public LayerMask obstacleMask;
 
-    // Key events
-    bool upKeyPressed = false;
-    bool downKeyPressed = false;
-    bool leftKeyPressed = false;
-    bool rightKeyPressed = false;
 
-    // Debug
-    bool showDebug = true;
+    private OpponentBehavior opponentBehavior;
+    private Boid boidToHunt = null;
+
+    // swarm search, food search enum
+    public enum OpponentBehavior
+    {
+        SearchForBoids,
+        SearchForFood,
+        AttackOtherLeader
+    }
 
 
     void Awake()
@@ -39,6 +43,7 @@ public class OpponentPlayer : MonoBehaviour
         cellGroups = FindObjectOfType<CellGroups>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material;
+        opponentBehavior = OpponentBehavior.SearchForBoids;
     }
 
     public void Start()
@@ -67,80 +72,59 @@ public class OpponentPlayer : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
-        // speed handling
+
+        float speed = 0;
+        if (!isHeadingForCollision)
+        {
+            if (boidToHunt == null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
+            {
+                List<Boid> boidsNearby = cellGroups.allBoidCells[cellGroups.GetIndex(transform.position)];
+
+                for(int i = 0; i < boidsNearby.Count; i++)
+                {
+                    if (!boidsNearby[i].HasLeader())
+                    {
+                        boidToHunt = boidsNearby[i];
+                        speed = maxSpeed;
+                        Debug.Log("Hunt boid");
+                    }
+                }
+            }
+
+            if (boidToHunt != null)
+            {
+                acceleration += boidToHunt.transform.position - position;
+                if (boidToHunt.HasLeader())
+                {
+                    boidToHunt = null;
+                    Debug.Log("Boid reached or joined to other swarm.");
+                    speed = maxSpeed / 4;
+                }
+                    
+            }
+
+        }
+
+
+
         velocity += acceleration * Time.deltaTime;
-        float speed = velocity.magnitude;
+
+        // if speed not set befor
+        if(speed == 0)
+             speed = velocity.magnitude;
+
         Vector3 dir = velocity / speed;
 
 
-        /*
-        if (!isHeadingForCollision)
-        {
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                speed -= 0.5f;
-                //Debug.Log("KeyDown Q: " + speed);
-            }
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                speed += 0.5f;
-                //Debug.Log("KeyDown E: " + speed);
-            }
-        }
-
-        */
 
         speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
         velocity = dir * speed;
 
-        if(speed < 1)
-        {
-            speed = 3f;
-        }
 
-        /*
-        // handle key events
-        if (!isHeadingForCollision)
-        {
-            // key ups
-            if (Input.GetKeyDown(KeyCode.A))
-                leftKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.D))
-                rightKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.W))
-                upKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.S))
-                downKeyPressed = true;
-        }
 
-        // key downs
-        if (Input.GetKeyUp(KeyCode.A))
-            leftKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.D))
-            rightKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.W))
-            upKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.S))
-            downKeyPressed = false;
+        
 
-    */
-
-        /*
-        if (!isHeadingForCollision)
-        {
-
-            
-            if (leftKeyPressed)
-                velocity -= transform.right * Time.deltaTime * speed;
-            if (rightKeyPressed)
-                velocity += transform.right * Time.deltaTime * speed;
-            if (upKeyPressed)
-                velocity += transform.up * Time.deltaTime * speed;
-            if (downKeyPressed)
-                velocity -= transform.up * Time.deltaTime * speed;
-
-        }
-        */
+        
 
 
         cachedTransform.position += velocity * Time.deltaTime;
@@ -173,11 +157,6 @@ public class OpponentPlayer : MonoBehaviour
 
     bool IsHeadingForCollision()
     {
-        if (showDebug)
-        {
-            Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
-            Debug.DrawRay(position, forward, Color.green);
-        }
 
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
@@ -188,6 +167,7 @@ public class OpponentPlayer : MonoBehaviour
         return false;
     }
 
+    
     Vector3 ObstacleRays()
     {
         float3[] rayDirections = BoidHelper.directions;
@@ -199,11 +179,7 @@ public class OpponentPlayer : MonoBehaviour
             Vector3 dir = cachedTransform.TransformDirection(rayDirections[i]);
             Ray ray = new Ray(position, dir);
 
-            if (showDebug)
-            {
-                Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
-                Debug.DrawRay(position, forward, Color.green);
-            }
+
 
             if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
             {
@@ -213,6 +189,7 @@ public class OpponentPlayer : MonoBehaviour
 
         return forward;
     }
+    
 
     Vector3 SteerTowards(Vector3 vector)
     {
