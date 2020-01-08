@@ -219,23 +219,30 @@ public class Boid : MonoBehaviour
         {
             // an other leader is nearer to me than myLeader
             //  check size of both leaders swarm
-            int myLeaderSwarmSize = myLeader.GetSwarmSize();
-            int otherLeaderSwarmSize = otherLeader.GetSwarmSize();
+            float myLeaderSwarmSize = myLeader.GetSwarmSize();
+            float otherLeaderSwarmSize = otherLeader.GetSwarmSize();
 
-            // TODO calculate other (devide by zero)
-            float value = otherLeaderSwarmSize / myLeaderSwarmSize;
+            if(myLeaderSwarmSize > 0) {
 
-            if(myLeaderSwarmSize < otherLeaderSwarmSize)
-                value = myLeaderSwarmSize / otherLeaderSwarmSize;
+                float value = otherLeaderSwarmSize / myLeaderSwarmSize;
 
-            if (UnityEngine.Random.value > value) {
-                myLeader.RemoveBoidFromSwarm(this);
-                myLeader = otherLeader;
-                myLeader.AddBoidToSwarm(this);
+                if(myLeaderSwarmSize < otherLeaderSwarmSize)
+                    value = myLeaderSwarmSize / otherLeaderSwarmSize;
+
+                Debug.Log("Wechselwahrscheinlichkeit: " +value);
+                Debug.Log("Random-Value: " +UnityEngine.Random.value);
+
+                // boid switches leader
+                if (UnityEngine.Random.value > value) {
+                    myLeader.RemoveBoidFromSwarm(this);
+                    myLeader = otherLeader;
+                    myLeader.AddBoidToSwarm(this);
+                    setColor(originalColor1, originalColor2);
+
+                    Debug.Log("Der Boid hat seinen Leader gewechselt");
+                }
+
             }
-
-
-
         }
 
 

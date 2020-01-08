@@ -25,6 +25,8 @@ public class BoidManager : MonoBehaviour
     float maxSpeed;
     float maxSteerForce;
     float targetWeight;
+    NativeArray<float3> positionArray2;
+    NativeArray<int> newCellIndex;
 
     void Awake()
     {
@@ -46,9 +48,10 @@ public class BoidManager : MonoBehaviour
 
     void Update()
     {
-        int foodNeedsSum = 0;
+       
         if (cellGroups.allBoidCells != null)
         {
+            int foodNeedsSum = 0;
             foreach (List<Boid> boidsList in cellGroups.allBoidCells)
             {
                 //List<Boid> boidsList = cellGroups.allBoidCells[j];
@@ -85,8 +88,8 @@ public class BoidManager : MonoBehaviour
                     directionArray = directionArray,
                     accelerationArray = accelerationArray,
                     velocityArray = velocityArray,
-                    viewRadius = viewRadius,
-                    avoidRadius = avoidRadius,
+                    viewRadiusSqr = viewRadius * viewRadius,
+                    avoidRadiusSqr = avoidRadius * avoidRadius,
                     alignWeight = alignWeight,
                     cohesionWeight = cohesionWeight,
                     seperateWeight = seperateWeight,
@@ -95,27 +98,112 @@ public class BoidManager : MonoBehaviour
                     targetWeight = targetWeight
                 };
 
-                JobHandle jobHandle = cellBoidParallelJob.Schedule(Count, 64);
-                jobHandle.Complete();
-
-                for (int i = 0; i < Count; i++)
-                {
-                    foodNeedsSum += boidsList[i].foodNeeds;
-                    boidsList[i].UpdateBoid(accelerationArray[i]);
-                }
+                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 64);
+                jobHandle1.Complete();
 
                 positionArray.Dispose();
                 directionArray.Dispose();
-                accelerationArray.Dispose();
+                
                 velocityArray.Dispose();
                 targetPositionArray.Dispose();
                 hasTargetArray.Dispose();
-            }
-        }
 
-        ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
+                for (int i = 0; i < Count; i++)
+                {
+                    Boid boid = boidsList[i];
+
+                    if(boid.alife)
+                    {
+                        foodNeedsSum += boid.foodNeeds;
+                        boid.UpdateBoid(accelerationArray[i]);
+                    } else {
+                        boid.setColor(Color.black, Color.black);
+                        boid.setWobbleSpeed(0);
+                        boid.transform.eulerAngles = new Vector3(180, 0, 0);
+                    }
+                }
+
+                accelerationArray.Dispose();            
+            }
+            ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
+
+
+            // calculate all new cell positions
+            // error if raster larger then 1 - 1 - 1
+            List<List<Boid>> tmpList = new List<List<Boid>>(cellGroups.allBoidCells);
+
+            foreach (List<Boid> boidsList in tmpList)
+            {
+                int Count = boidsList.Count;
+                positionArray2 = new NativeArray<float3>(Count, Allocator.TempJob);
+                newCellIndex = new NativeArray<int>(Count, Allocator.TempJob);
+
+                for (int i = 0; i < Count; i++)
+                {
+                    positionArray2[i] = boidsList[i].position;
+                }
+            
+                CalculateCellPosition calculateCellPosition = new CalculateCellPosition
+                {
+                    positionArray2 = positionArray2,
+                    newCellIndex = newCellIndex,
+                    widthStep = cellGroups.widthStep,
+                    heightStep = cellGroups.heightStep,
+                    depthStep = cellGroups.depthStep,
+                    resolution = cellGroups.resolution,
+                };
+
+                JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 64);
+                jobHandle2.Complete();
+
+                positionArray2.Dispose();
+
+                for (int i = 0; i < Count; i++)
+                {
+                    Boid boid = boidsList[i];
+                    int oldIndex = boid.cellIndex;
+                    int newIndex = newCellIndex[i];
+
+                    if (newIndex != oldIndex)
+                    {
+                        boid.cellIndex = newIndex;
+                        cellGroups.allBoidCells[oldIndex].Remove(boid);
+                        cellGroups.allBoidCells[newIndex].Add(boid);
+                    }
+                }
+
+                newCellIndex.Dispose();
+            }
+        
+        }
     }
 }
+
+
+
+[BurstCompile]
+public struct CalculateCellPosition : IJobParallelFor
+{
+
+    [ReadOnly] public NativeArray<float3> positionArray2;
+    public NativeArray<int> newCellIndex;
+    [ReadOnly] public float widthStep;
+    [ReadOnly] public float heightStep;
+    [ReadOnly] public float depthStep;
+    [ReadOnly] public float3 resolution;
+
+    public void Execute(int index)
+    {
+        float newIndex = ((int)(positionArray2[index].x / widthStep) + (int)(positionArray2[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray2[index].y / heightStep)));
+        newIndex = Mathf.Clamp(newIndex, 0, positionArray2.Length - 1);
+
+        newCellIndex[index] = (int)newIndex;
+    }
+}
+
+
+
+
 
 [BurstCompile]
 public struct CellBoidParallelJob : IJobParallelFor
@@ -127,25 +215,26 @@ public struct CellBoidParallelJob : IJobParallelFor
     public NativeArray<float3> accelerationArray;
     [ReadOnly] public NativeArray<float3> velocityArray;
 
-    [ReadOnly] public float viewRadius;
-    [ReadOnly] public float avoidRadius;
+    [ReadOnly] public float viewRadiusSqr;
+    [ReadOnly] public float avoidRadiusSqr;
     [ReadOnly] public float alignWeight;
     [ReadOnly] public float cohesionWeight;
     [ReadOnly] public float seperateWeight;
     [ReadOnly] public float maxSpeed;
     [ReadOnly] public float maxSteerForce;
     [ReadOnly] public float targetWeight;
+    float3 flockHeading;
+    float3 flockCentre;
+    float3 separationHeading;
+    float3 acceleration;
 
     public void Execute(int index)
     {
-
-        float viewRadiusSqr = viewRadius * viewRadius;
-        float avoidRadiusSqr = avoidRadius * avoidRadius;
         int numFlockmates = 0;
-        float3 flockHeading = new float3();
-        float3 flockCentre = new float3();
-        float3 separationHeading = new float3();
-        float3 acceleration = new float3();
+        flockHeading = new float3();
+        flockCentre = new float3();
+        separationHeading = new float3();
+        acceleration = new float3();
 
         for (int i = 0; i < positionArray.Length; i++)
         {
@@ -168,10 +257,11 @@ public struct CellBoidParallelJob : IJobParallelFor
             }
         }
 
+        float3 velocity = velocityArray[index];
         if (hasTargetArray[index])
         {
             float3 offsetToTarget = targetPositionArray[index] - positionArray[index];
-            acceleration = Vector3.ClampMagnitude(math.normalizesafe(offsetToTarget) * maxSpeed - velocityArray[index], maxSteerForce) * targetWeight;
+            acceleration = Vector3.ClampMagnitude(math.normalizesafe(offsetToTarget) * maxSpeed - velocity, maxSteerForce) * targetWeight;
         }
 
         if (numFlockmates != 0)
@@ -179,14 +269,11 @@ public struct CellBoidParallelJob : IJobParallelFor
             flockCentre /= numFlockmates;
             float3 offsetToFlockmatesCentre = (flockCentre - positionArray[index]);
 
-            float3 alignmentForce = Vector3.ClampMagnitude(math.normalizesafe(flockHeading) * maxSpeed - velocityArray[index], maxSteerForce) * alignWeight;
-            float3 cohesionForce = Vector3.ClampMagnitude(math.normalizesafe(offsetToFlockmatesCentre) * maxSpeed - velocityArray[index], maxSteerForce) * cohesionWeight;
-            float3 seperationForce = Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocityArray[index], maxSteerForce) * seperateWeight;
-
-            acceleration += alignmentForce;
-            acceleration += cohesionForce;
-            acceleration += seperationForce;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(flockHeading) * maxSpeed - velocity, maxSteerForce) * alignWeight;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(offsetToFlockmatesCentre) * maxSpeed - velocity, maxSteerForce) * cohesionWeight;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocity, maxSteerForce) * seperateWeight;
         }
+
         accelerationArray[index] = acceleration;
     }
 }
