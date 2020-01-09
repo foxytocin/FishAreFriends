@@ -4,6 +4,7 @@ using UnityEngine;
 public class Leader : MonoBehaviour
 {
 
+ForceField forceField;
     CellGroups cellGroups;
     MapGenerator mapGenerator;
     private List<Boid> swarmList;
@@ -19,6 +20,8 @@ public class Leader : MonoBehaviour
 
     private void Awake()
     {
+        forceField = GetComponentInChildren<ForceField>();
+        forceField.SetColor(leaderColor1);
 
         if (leaderList == null)
             leaderList = new List<Leader>();
@@ -32,6 +35,7 @@ public class Leader : MonoBehaviour
         cellGroups = FindObjectOfType<CellGroups>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         transform.position = mapGenerator.mapSize / 2;
+        
         material = gameObject.GetComponentInChildren<MeshRenderer>().material;
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
@@ -107,6 +111,8 @@ public class Leader : MonoBehaviour
             int otherSwarmCount = otherLeader.GetSwarmSize();
             int mySwarmCount = GetSwarmSize();
 
+            forceField.StartPulse();
+
             // if my swarm is extremly bigger than the other swarm
             //  i get half the boids of the other
             int ripCount = 0;
@@ -135,6 +141,9 @@ public class Leader : MonoBehaviour
 
             waitForNextRipCount = 10f;
 
+        } else {
+            
+            forceField.StopPulse();
         }
 
     }
