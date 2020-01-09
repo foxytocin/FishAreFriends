@@ -27,7 +27,8 @@ public class Boid : MonoBehaviour
     public Vector3 velocity;
 
     // To update:
-    Vector3 acceleration = Vector3.zero;
+    Vector3 accelerationNormalMoving = Vector3.zero;
+    Vector3 accelerationBehaviorChanges = Vector3.zero;
 
     [HideInInspector]
     public Vector3 avgFlockHeading;
@@ -61,6 +62,18 @@ public class Boid : MonoBehaviour
     private int delay = 30;
     private bool firstTime = true;
 
+    public int timeBetweedFoodUpdate = 2;
+
+    public Status status;
+    public enum Status {
+        swimmsToFood,
+        normalSwimming,
+        died
+    }
+
+    Coroutine updateBoidNormalMovement = null;
+    Coroutine calculateFoodBehavior = null;
+
     // Debug
     bool showDebug = false;
 
@@ -85,6 +98,8 @@ public class Boid : MonoBehaviour
         cachedTransform = transform;
         position = cachedTransform.position;
         delay = UnityEngine.Random.Range(5, 31);
+        hungerRate = hungerRate * timeBetweedFoodUpdate;
+        status = Status.normalSwimming;
     }
 
 
@@ -101,7 +116,7 @@ public class Boid : MonoBehaviour
 
         setColor(originalColor1, originalColor2);
 
-        StartCoroutine(UpdateBoidNumerator());
+        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
 
@@ -116,19 +131,67 @@ public class Boid : MonoBehaviour
     }
 
 
-    private IEnumerator IncreaseFood()
+    private IEnumerator CalculateFoodBehavior()
     {
         while (true)
         {
-            yield return new WaitForSeconds(delay);
+            if(status == Status.normalSwimming)
+                yield return new WaitForSeconds(delay);
+
+            if(status == Status.swimmsToFood)
+                yield return new WaitForSeconds(0.25f);
+
             foodNeeds += hungerRate;
 
             if (firstTime)
             {
                 firstTime = false;
-                delay = 1;
+                delay = timeBetweedFoodUpdate;
             }
 
+            // find food 
+            setFoodNeeds();
+            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
+            {
+                setColor(Color.red, Color.red);
+
+                List<Food> foodList = foodManager.GetFoodList();
+                if (foodList.Count > 0)
+                {
+                    // find nearest food
+                    float nearestFood = float.PositiveInfinity;
+                    int nearestFoodIndex = 0;
+                    for (int i = 0; i < foodList.Count; i++)
+                    {
+                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                        if (dist < nearestFood)
+                        {
+                            nearestFood = dist;
+                            nearestFoodIndex = i;
+                        }
+                    }
+
+                    if (nearestFood < 15f)
+                    {
+                        // swim towards food
+                        status = Status.swimmsToFood;
+
+                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
+                        accelerationBehaviorChanges += positionToFood * settings.chaisingForFoodForce;
+
+                        // eat when nearby
+                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
+                        {
+                            setColor(originalColor1, originalColor2);
+
+                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
+                            setFoodNeeds();
+
+                            status = Status.normalSwimming;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -143,14 +206,13 @@ public class Boid : MonoBehaviour
     }
 
 
-    Vector3 accelerationChange = Vector3.zero;
-
     public void UpdateBoid(Vector3 acceleration_)
     {
-        acceleration = accelerationChange + acceleration_;
+        accelerationNormalMoving = accelerationBehaviorChanges + acceleration_;
 
-        velocity += acceleration * Time.deltaTime;
+        velocity += accelerationNormalMoving * Time.deltaTime;
         float speed = velocity.magnitude;
+
         dir = velocity / speed;
         speed = Mathf.Clamp(speed, settings.minSpeed, settings.maxSpeed);
         velocity = dir * speed;
@@ -170,18 +232,18 @@ public class Boid : MonoBehaviour
     }
 
 
-    public IEnumerator UpdateBoidNumerator()
+    public IEnumerator UpdateBoidNormalMovement()
     {
 
         while(true) {
 
-            accelerationChange = Vector3.zero;
+            accelerationBehaviorChanges = Vector3.zero;
 
             if (IsHeadingForCollision())
             {
                 Vector3 collisionAvoidDir = ObstacleRays();
                 Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
-                accelerationChange += collisionAvoidForce;
+                accelerationBehaviorChanges += collisionAvoidForce;
             }
 
 
@@ -190,7 +252,7 @@ public class Boid : MonoBehaviour
             if (distanceToPredator < 5f)
             {
                 Vector3 positionToPredator = predator.getPosition() - position;
-                accelerationChange += positionToPredator * -(settings.predatorAvoidanceForce);
+                accelerationBehaviorChanges += positionToPredator * -(settings.predatorAvoidanceForce);
 
                 predator.IAmYourBoid(gameObject);
 
@@ -234,54 +296,13 @@ public class Boid : MonoBehaviour
             if (myLeader != null)
             {
                 Vector3 positionToLeader = otherLeader.getPosition() - position;
-                accelerationChange += positionToLeader * settings.leadingForce;
-            }
-
-
-
-            // find food 
-            setFoodNeeds();
-            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
-            {
-                setColor(Color.red, Color.red);
-
-                List<Food> foodList = foodManager.GetFoodList();
-                if (foodList.Count > 0)
-                {
-                    // find nearest food
-                    float nearestFood = float.PositiveInfinity;
-                    int nearestFoodIndex = 0;
-                    for (int i = 0; i < foodList.Count; i++)
-                    {
-                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
-                        if (dist < nearestFood)
-                        {
-                            nearestFood = dist;
-                            nearestFoodIndex = i;
-                        }
-                    }
-
-                    if (nearestFood < 15f)
-                    {
-                        // swim towards food
-                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
-                        accelerationChange += positionToFood * settings.chaisingForFoodForce;
-
-                        // eat when nearby
-                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
-                        {
-                            setColor(originalColor1, originalColor2);
-
-                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
-                            setFoodNeeds();
-                        }
-                    }
-                }
+                accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
             }
 
             yield return new WaitForSeconds(0.5f);
         }
     }
+
 
 
     public void JoinNewSwarm(Leader leader)
@@ -335,18 +356,16 @@ public class Boid : MonoBehaviour
     {
         if (alife)
         {
-            StopCoroutine(IncreaseFood());
+            StopCoroutine(calculateFoodBehavior);
+            StopCoroutine(updateBoidNormalMovement);
+
             alife = false;
             ecoSystemManager.addDiedFish();
-            StartDeadAnimation();
+
+            StartCoroutine(Animate());
         }
     }
 
-
-    public void StartDeadAnimation()
-    {
-        StartCoroutine(Animate());
-    }
 
     private IEnumerator Animate()
     {
@@ -372,12 +391,15 @@ public class Boid : MonoBehaviour
 
         // reset state
         ecoSystemManager.addFishToFishCount();
-        //gameObject.SetActive(true);
+
+
         alife = true;
+        status = Status.normalSwimming;
         setColor(originalColor1, originalColor2);
         setWobbleSpeed(originalWobbleSpeed);
 
-        StartCoroutine(IncreaseFood());
+        calculateFoodBehavior = StartCoroutine(CalculateFoodBehavior());
+        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
     bool IsHeadingForCollision()

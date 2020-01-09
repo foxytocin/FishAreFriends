@@ -66,6 +66,7 @@ MonoBehaviour:
   foodLeft: 0
   hungerRate: 2
   alife: 1
+  timeBetweedFoodUpdate: 3
 --- !u!205 &6029163333581138842
 LODGroup:
   m_ObjectHideFlags: 0
