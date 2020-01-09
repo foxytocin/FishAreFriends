@@ -27,7 +27,8 @@ public class Boid : MonoBehaviour
     public Vector3 velocity;
 
     // To update:
-    Vector3 acceleration;
+    Vector3 acceleration = Vector3.zero;
+
     [HideInInspector]
     public Vector3 avgFlockHeading;
     [HideInInspector]
@@ -62,6 +63,7 @@ public class Boid : MonoBehaviour
 
     // Debug
     bool showDebug = false;
+
 
     void Awake()
     {
@@ -99,8 +101,7 @@ public class Boid : MonoBehaviour
 
         setColor(originalColor1, originalColor2);
 
-        cellIndex = cellGroups.GetIndex(transform.position);
-        cellGroups.RegisterAtCell(this);
+        StartCoroutine(UpdateBoidNumerator());
     }
 
 
@@ -142,112 +143,11 @@ public class Boid : MonoBehaviour
     }
 
 
+    Vector3 accelerationChange = Vector3.zero;
+
     public void UpdateBoid(Vector3 acceleration_)
     {
-        Vector3 acceleration = acceleration_;
-
-        if (IsHeadingForCollision())
-        {
-            Vector3 collisionAvoidDir = ObstacleRays();
-            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
-            acceleration += collisionAvoidForce;
-        }
-
-
-        // avoid predator
-        float distanceToPredator = Vector3.Distance(position, predator.getPosition());
-        if (distanceToPredator < 5f)
-        {
-            Vector3 positionToPredator = predator.getPosition() - position;
-            acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
-
-            predator.IAmYourBoid(gameObject);
-
-            if (distanceToPredator <= 1.5f)
-            {
-                if (predator.BoidDied(this, foodLeft))
-                {
-                    Instantiate(prefabBlood, position, Quaternion.identity);
-                    ecoSystemManager.addKilledFish();
-                    LetMeDie();
-                }
-            }
-        }
-
-
-        // find leader
-        float distanceToLeader = float.MaxValue;
-        if (Leader.leaderList != null)
-        {
-            foreach (Leader l in Leader.leaderList)
-            {
-                float tempDistance = Vector3.Distance(position, l.getPosition());
-                if (tempDistance < distanceToLeader)
-                {
-                    otherLeader = l;
-                    distanceToLeader = tempDistance;
-                }
-            }
-        }
-
-
-        // if i have no leader already, use the nearest, if distance < 5
-        if (myLeader == null && distanceToLeader <= 5f)
-            JoinNewSwarm(otherLeader);
-
-        // if i have a leader but he is to far away, reset follow leader
-        if (myLeader != null && distanceToLeader > 5f)
-            LeaveActualSwarm();
-
-        // if i have a leader
-        if (myLeader != null)
-        {
-            Vector3 positionToLeader = otherLeader.getPosition() - position;
-            acceleration += positionToLeader * settings.leadingForce;
-        }
-
-
-
-        // find food 
-        setFoodNeeds();
-        if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
-        {
-            setColor(Color.red, Color.red);
-
-            List<Food> foodList = foodManager.GetFoodList();
-            if (foodList.Count > 0)
-            {
-                // find nearest food
-                float nearestFood = float.PositiveInfinity;
-                int nearestFoodIndex = 0;
-                for (int i = 0; i < foodList.Count; i++)
-                {
-                    float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
-                    if (dist < nearestFood)
-                    {
-                        nearestFood = dist;
-                        nearestFoodIndex = i;
-                    }
-                }
-
-                if (nearestFood < 15f)
-                {
-                    // swim towards food
-                    var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
-                    acceleration += positionToFood * settings.chaisingForFoodForce;
-
-                    // eat when nearby
-                    if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
-                    {
-                        setColor(originalColor1, originalColor2);
-
-                        foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
-                        setFoodNeeds();
-                    }
-                }
-            }
-        }
-
+        acceleration = accelerationChange + acceleration_;
 
         velocity += acceleration * Time.deltaTime;
         float speed = velocity.magnitude;
@@ -267,6 +167,120 @@ public class Boid : MonoBehaviour
         }
 
         setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+    }
+
+
+    public IEnumerator UpdateBoidNumerator()
+    {
+
+        while(true) {
+
+            accelerationChange = Vector3.zero;
+
+            if (IsHeadingForCollision())
+            {
+                Vector3 collisionAvoidDir = ObstacleRays();
+                Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
+                accelerationChange += collisionAvoidForce;
+            }
+
+
+            // avoid predator
+            float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+            if (distanceToPredator < 5f)
+            {
+                Vector3 positionToPredator = predator.getPosition() - position;
+                accelerationChange += positionToPredator * -(settings.predatorAvoidanceForce);
+
+                predator.IAmYourBoid(gameObject);
+
+                if (distanceToPredator <= 1.5f)
+                {
+                    if (predator.BoidDied(this, foodLeft))
+                    {
+                        Instantiate(prefabBlood, position, Quaternion.identity);
+                        ecoSystemManager.addKilledFish();
+                        LetMeDie();
+                    }
+                }
+            }
+
+
+            // find leader
+            float distanceToLeader = float.MaxValue;
+            if (Leader.leaderList != null)
+            {
+                foreach (Leader l in Leader.leaderList)
+                {
+                    float tempDistance = Vector3.Distance(position, l.getPosition());
+                    if (tempDistance < distanceToLeader)
+                    {
+                        otherLeader = l;
+                        distanceToLeader = tempDistance;
+                    }
+                }
+            }
+
+
+            // if i have no leader already, use the nearest, if distance < 5
+            if (myLeader == null && distanceToLeader <= 5f)
+                JoinNewSwarm(otherLeader);
+
+            // if i have a leader but he is to far away, reset follow leader
+            if (myLeader != null && distanceToLeader > 5f)
+                LeaveActualSwarm();
+
+            // if i have a leader
+            if (myLeader != null)
+            {
+                Vector3 positionToLeader = otherLeader.getPosition() - position;
+                accelerationChange += positionToLeader * settings.leadingForce;
+            }
+
+
+
+            // find food 
+            setFoodNeeds();
+            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
+            {
+                setColor(Color.red, Color.red);
+
+                List<Food> foodList = foodManager.GetFoodList();
+                if (foodList.Count > 0)
+                {
+                    // find nearest food
+                    float nearestFood = float.PositiveInfinity;
+                    int nearestFoodIndex = 0;
+                    for (int i = 0; i < foodList.Count; i++)
+                    {
+                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                        if (dist < nearestFood)
+                        {
+                            nearestFood = dist;
+                            nearestFoodIndex = i;
+                        }
+                    }
+
+                    if (nearestFood < 15f)
+                    {
+                        // swim towards food
+                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
+                        accelerationChange += positionToFood * settings.chaisingForFoodForce;
+
+                        // eat when nearby
+                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
+                        {
+                            setColor(originalColor1, originalColor2);
+
+                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
+                            setFoodNeeds();
+                        }
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
 
