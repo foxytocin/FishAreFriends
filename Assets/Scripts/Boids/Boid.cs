@@ -75,6 +75,7 @@ public class Boid : MonoBehaviour
 
     Coroutine updateBoidNormalMovement = null;
     Coroutine calculateFoodBehavior = null;
+    List<Food> foodList;
 
     // Debug
     bool showDebug = false;
@@ -107,6 +108,8 @@ public class Boid : MonoBehaviour
 
     public void Initialize(BoidSettings settings, Transform target)
     {
+        foodList = foodManager.GetFoodList();
+
         this.target = target;
         this.settings = settings;
 
@@ -133,17 +136,23 @@ public class Boid : MonoBehaviour
     }
 
 
+    Food foodTarget = null;
+    Vector3 foodPosition;
+
     private IEnumerator CalculateFoodBehavior()
     {
         while (true)
         {
-            if(status == Status.normalSwimming)
+            if(status == Status.normalSwimming) {
                 yield return new WaitForSeconds(delay);
-
-            if(status == Status.swimmsToFood)
-                yield return new WaitForSeconds(0.25f);
-
+            }
+             
+            if(status == Status.swimmsToFood) {
+                yield return new WaitForSeconds(0.5f);
+            }
+            
             foodNeeds += hungerRate;
+
 
             if (firstTime)
             {
@@ -151,50 +160,74 @@ public class Boid : MonoBehaviour
                 delay = timeBetweedFoodUpdate;
             }
 
-            // find food 
+
             setFoodNeeds();
-            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
-            {
-                setColor(Color.red, Color.red);
+            // boid already has a food-target: swimm towards the target
+            if(foodTarget != null && foodTarget.checkAmount() > 0) {
 
-                List<Food> foodList = foodManager.GetFoodList();
-                if (foodList.Count > 0)
+                //Debug.Log("Schwimmt zur bekannten Futterquelle");
+                accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce;
+
+            } else {
+
+                // find food 
+                foodTarget = null;
+                status = Status.normalSwimming;
+                
+
+                if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
                 {
-                    // find nearest food
-                    float nearestFood = float.PositiveInfinity;
-                    int nearestFoodIndex = 0;
-                    for (int i = 0; i < foodList.Count; i++)
+                    //Debug.Log("Keine Futterquelle vorhanden: suche");
+                    setColor(Color.red, Color.red);
+
+                    if (foodList.Count > 0)
                     {
-                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
-                        if (dist < nearestFood)
+                        // find nearest food
+                        float nearestFood = float.PositiveInfinity;
+                        int nearestFoodIndex = 0;
+                        for (int i = 0; i < foodList.Count; i++)
                         {
-                            nearestFood = dist;
-                            nearestFoodIndex = i;
+                            float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                            if (dist < nearestFood)
+                            {
+                                nearestFood = dist;
+                                nearestFoodIndex = i;
+                            }
                         }
-                    }
 
-                    if (nearestFood < 15f)
-                    {
-                        // swim towards food
-                        status = Status.swimmsToFood;
-
-                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
-                        accelerationFoodBehavior = positionToFood * settings.chaisingForFoodForce;
-
-                        // eat when nearby
-                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
+                        // found food: setting food-parameters
+                        if (nearestFood < 15f)
                         {
-                            setColor(originalColor1, originalColor2);
+                            //Debug.Log("Futterquelle gefunden");
+                            // swim towards food
+                            status = Status.swimmsToFood;
 
-                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
-                            setFoodNeeds();
-                            
-                            accelerationFoodBehavior = Vector3.zero;
-                            status = Status.normalSwimming;
+                            foodTarget = foodList[nearestFoodIndex];
+                            foodPosition = foodTarget.GetPosition();
+                            accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce; 
                         }
                     }
                 }
             }
+
+            // tests if reached the food-source: eat when nearby
+            if(status == Status.swimmsToFood) {
+
+                if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                {
+                    setColor(originalColor1, originalColor2);
+
+                    foodNeeds -= foodTarget.getFood(foodNeeds);
+                    setFoodNeeds();
+
+                    accelerationFoodBehavior = Vector3.zero;
+                    foodTarget = null;
+                    status = Status.normalSwimming;
+
+                    //Debug.Log("Hat gefressen");
+                }
+            }
+            
         }
     }
 
