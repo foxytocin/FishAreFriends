@@ -28,6 +28,10 @@ public class BoidManager : MonoBehaviour
     NativeArray<float3> positionArray2;
     NativeArray<int> newCellIndex;
 
+    public float timeBetweenCellUpdates = 5f;
+    private float timeTilCellUpdate;
+    private bool boidInitializationCompleted = false;
+
     void Awake()
     {
         viewRadius = settings.perceptionRadius;
@@ -38,6 +42,8 @@ public class BoidManager : MonoBehaviour
         maxSpeed = settings.maxSpeed;
         maxSteerForce = settings.maxSteerForce;
         targetWeight = settings.targetWeight;
+        timeTilCellUpdate = timeBetweenCellUpdates;
+
     }
     void Start()
     {
@@ -46,9 +52,17 @@ public class BoidManager : MonoBehaviour
         spawner = FindObjectOfType<Spawner>();
     }
 
+    public void BoidInitializationCompleted() {
+        timeTilCellUpdate = timeBetweenCellUpdates;
+        boidInitializationCompleted = true;
+
+        Debug.Log("Initialization of " +spawner.spawnCount+ " Boids completed");
+    }
+
     void Update()
     {
-       
+       timeTilCellUpdate -= Time.deltaTime;
+
         if (cellGroups.allBoidCells != null)
         {
             int foodNeedsSum = 0;
@@ -128,51 +142,56 @@ public class BoidManager : MonoBehaviour
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
 
 
-            // calculate all new cell positions
-            // error if raster larger then 1 - 1 - 1
-            List<List<Boid>> tmpList = new List<List<Boid>>(cellGroups.allBoidCells);
-
-            foreach (List<Boid> boidsList in tmpList)
+            if(boidInitializationCompleted && timeTilCellUpdate < 0f )
             {
-                int Count = boidsList.Count;
-                positionArray2 = new NativeArray<float3>(Count, Allocator.TempJob);
-                newCellIndex = new NativeArray<int>(Count, Allocator.TempJob);
+                timeTilCellUpdate = timeBetweenCellUpdates;
 
-                for (int i = 0; i < Count; i++)
+                Debug.Log("Updating Cell-Informations");
+                // calculate all new cell positions
+                // error if raster larger then 1 - 1 - 1
+      
+                foreach (List<Boid> boidsList in cellGroups.allBoidCells)
                 {
-                    positionArray2[i] = boidsList[i].position;
-                }
-            
-                CalculateCellPosition calculateCellPosition = new CalculateCellPosition
-                {
-                    positionArray2 = positionArray2,
-                    newCellIndex = newCellIndex,
-                    widthStep = cellGroups.widthStep,
-                    heightStep = cellGroups.heightStep,
-                    depthStep = cellGroups.depthStep,
-                    resolution = cellGroups.resolution,
-                };
+                    int Count = boidsList.Count;
+                    positionArray2 = new NativeArray<float3>(Count, Allocator.TempJob);
+                    newCellIndex = new NativeArray<int>(Count, Allocator.TempJob);
 
-                JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 64);
-                jobHandle2.Complete();
-
-                positionArray2.Dispose();
-
-                for (int i = 0; i < Count; i++)
-                {
-                    Boid boid = boidsList[i];
-                    int oldIndex = boid.cellIndex;
-                    int newIndex = newCellIndex[i];
-
-                    if (newIndex != oldIndex)
+                    for (int i = 0; i < Count; i++)
                     {
-                        boid.cellIndex = newIndex;
-                        cellGroups.allBoidCells[oldIndex].Remove(boid);
-                        cellGroups.allBoidCells[newIndex].Add(boid);
+                        positionArray2[i] = boidsList[i].position;
                     }
-                }
+                
+                    CalculateCellPosition calculateCellPosition = new CalculateCellPosition
+                    {
+                        positionArray2 = positionArray2,
+                        newCellIndex = newCellIndex,
+                        widthStep = cellGroups.widthStep,
+                        heightStep = cellGroups.heightStep,
+                        depthStep = cellGroups.depthStep,
+                        resolution = cellGroups.resolution,
+                    };
 
-                newCellIndex.Dispose();
+                    JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 64);
+                    jobHandle2.Complete();
+
+                    positionArray2.Dispose();
+
+                    for (int i = 0; i < Count; i++)
+                    {
+                        Boid boid = boidsList[i];
+                        int oldIndex = boid.cellIndex;
+                        int newIndex = newCellIndex[i];
+
+                        if (newIndex != oldIndex)
+                        {
+                            boid.cellIndex = newIndex;
+                            cellGroups.allBoidCells[oldIndex].Remove(boid);
+                            cellGroups.allBoidCells[newIndex].Add(boid);
+                        }
+                    }
+
+                    newCellIndex.Dispose();
+                }
             }
         
         }

@@ -86,7 +86,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         boidToHunt = boidsNearby[i];
                         speed = maxSpeed;
-                        Debug.Log("Hunt boid");
+                        //Debug.Log("Hunt boid");
                     }
                 }
             }

@@ -70090,6 +70090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: fd4bc51c395304add92e7ac263cc6d3f, type: 2}
+  timeBetweenCellUpdates: 2
 --- !u!4 &1236065718
 Transform:
   m_ObjectHideFlags: 0
