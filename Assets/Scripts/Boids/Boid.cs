@@ -5,7 +5,6 @@ using Unity.Mathematics;
 
 public class Boid : MonoBehaviour
 {
-
     Predator predator;
     Leader otherLeader;
     CellGroups cellGroups;
@@ -139,10 +138,19 @@ public class Boid : MonoBehaviour
     Food foodTarget = null;
     Vector3 foodPosition;
 
+
+    
+
     private IEnumerator CalculateFoodBehavior()
     {
+
+        
+
         while (true)
         {
+
+            
+
             if(status == Status.normalSwimming) {
                 yield return new WaitForSeconds(delay);
             }
@@ -150,7 +158,10 @@ public class Boid : MonoBehaviour
             if(status == Status.swimmsToFood) {
                 yield return new WaitForSeconds(0.5f);
             }
-            
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
             foodNeeds += hungerRate;
 
 
@@ -228,6 +239,9 @@ public class Boid : MonoBehaviour
                 }
             }
             
+            sw.Stop();
+            Debug.Log("FoodNeeds Secons to Execude: " +sw.ElapsedMilliseconds);
+
         }
     }
 

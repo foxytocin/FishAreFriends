@@ -64,7 +64,7 @@ MonoBehaviour:
   basicFoodNeed: 1000
   foodNeeds: 0
   foodLeft: 0
-  hungerRate: 2
+  hungerRate: 5
   alife: 1
   timeBetweedFoodUpdate: 3
   status: 0
