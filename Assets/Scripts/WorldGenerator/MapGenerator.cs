@@ -230,13 +230,13 @@ public class MapGenerator : MonoBehaviour
         wall4.transform.parent = enviromentHolder;
         wall4.tag = "Enviroment";
 
-        // Bottom - Ground is the Wall
-        // Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
-        // GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
-        // wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
-        // wall5.GetComponent<MeshRenderer>().enabled = false;
-        // wall5.transform.parent = enviromentHolder;
-        // wall5.tag = "Enviroment";
+        //Bottom - Ground is the Wall
+        Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
+        GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
+        wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
+        wall5.GetComponent<MeshRenderer>().enabled = false;
+        wall5.transform.parent = enviromentHolder;
+        wall5.tag = "Enviroment";
 
         // Top
         Vector3 position6 = new Vector3(mapSize.x / 2, mapSize.y - 0.5f, mapSize.z / 2);

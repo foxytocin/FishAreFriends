@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 80422}
   - component: {fileID: 80421}
   - component: {fileID: 80420}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Fish_OpponentPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
