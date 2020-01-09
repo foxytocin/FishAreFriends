@@ -109,4 +109,5 @@ MonoBehaviour:
   foodLeft: 0
   hungerRate: 2
   alife: 1
-  timeBetweedFoodUpdate: 2
+  timeBetweedFoodUpdate: 3
+  status: 0
