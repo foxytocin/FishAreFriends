@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Spawner : MonoBehaviour
 {
     CellGroups cellGroups;
     EcoSystemManager ecoSystemManager;
+    BoidManager boidManager;
     public BoidSettings settings;
     public enum GizmoType { Never, SelectedOnly, Always }
     public bool spawnBoids = true;
@@ -21,23 +23,40 @@ public class Spawner : MonoBehaviour
     {
         cellGroups = FindObjectOfType<CellGroups>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        boidManager = FindObjectOfType<BoidManager>();
         fishHolder = new GameObject("Fishes").transform;
     }
 
     void Start()
     {
-        if (spawnBoids)
+        StartCoroutine(InitializeBoidSlowly());
+    }
+
+
+    private IEnumerator InitializeBoidSlowly() {
+        
+        int count = 0;
+        while (count < spawnCount)        
         {
-            for (int i = 0; i < spawnCount; i++)
-            {
+
                 Vector3 pos = Random.insideUnitSphere * spawnRadius;
                 Boid boid = Instantiate(prefab, pos, Quaternion.identity);
                 boid.transform.parent = fishHolder;
+                int cellIndex = cellGroups.GetIndex(transform.position);
+                boid.cellIndex = cellIndex;
+                cellGroups.RegisterAtCell(boid);
+
                 boid.PassColor(color1, color2);
                 boid.Initialize(settings, null);
                 boid.RespawnBoid();
-            }
+
+                //Debug.Log("Initializing Boid #:" +count);
+                yield return new WaitForSeconds(0.025f);
+
+                count++;
         }
+
+        //boidManager.BoidInitializationCompleted();
     }
 
 
