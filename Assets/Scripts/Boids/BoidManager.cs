@@ -130,7 +130,10 @@ public class BoidManager : MonoBehaviour
                     {
                         foodNeedsSum += boid.foodNeeds;
                         boid.UpdateBoid(accelerationArray[i]);
-                    } else {
+
+                    } else if (boid.status != Boid.Status.died) {
+
+                        boid.status = Boid.Status.died;
                         boid.setColor(Color.black, Color.black);
                         boid.setWobbleSpeed(0);
                         boid.transform.eulerAngles = new Vector3(180, 0, 0);

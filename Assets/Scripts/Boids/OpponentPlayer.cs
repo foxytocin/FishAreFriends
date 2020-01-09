@@ -58,7 +58,6 @@ public class OpponentPlayer : MonoBehaviour
 
     void Update()
     {
-
         cellGroups.SetPlayerCell(transform.position);
 
         Vector3 acceleration = Vector3.zero;
@@ -106,7 +105,6 @@ public class OpponentPlayer : MonoBehaviour
         }
 
 
-
         velocity += acceleration * Time.deltaTime;
 
         // if speed not set befor
@@ -119,13 +117,6 @@ public class OpponentPlayer : MonoBehaviour
 
         speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
         velocity = dir * speed;
-
-
-
-        
-
-        
-
 
         cachedTransform.position += velocity * Time.deltaTime;
         cachedTransform.forward = dir;

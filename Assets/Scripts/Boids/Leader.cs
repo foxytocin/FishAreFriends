@@ -4,7 +4,7 @@ using UnityEngine;
 public class Leader : MonoBehaviour
 {
 
-ForceField forceField;
+    ForceField forceField;
     CellGroups cellGroups;
     MapGenerator mapGenerator;
     private List<Boid> swarmList;

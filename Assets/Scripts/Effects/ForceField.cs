@@ -11,6 +11,8 @@ private AudioSource audioPulse;
 private float alpha = 0f;
 private float power = 1.5f;
 
+private Coroutine pulseCoroutine = null;
+
     void Awake()
     {
         material = GetComponent<MeshRenderer>().material;
@@ -50,7 +52,7 @@ private float power = 1.5f;
             yield return new WaitForEndOfFrame();
         }
 
-        StopCoroutine(Pulse());
+        StopCoroutine(pulseCoroutine);
         alpha = 0;
         material.SetFloat("_Alpha", alpha);
         audioPulse.Stop();
@@ -69,7 +71,7 @@ private float power = 1.5f;
         }
 
         alpha = 2f;
-        StartCoroutine(Pulse());
+        pulseCoroutine = StartCoroutine(Pulse());
         material.SetFloat("_Alpha", alpha);
         yield return null;
     }
