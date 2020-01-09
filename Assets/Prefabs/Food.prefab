@@ -104,7 +104,6 @@ GameObject:
   - component: {fileID: 8152186459143208385}
   - component: {fileID: 8684020955152880443}
   - component: {fileID: 2250937385318096243}
-  - component: {fileID: 6473245212459311219}
   - component: {fileID: 7655489908406175020}
   m_Layer: 14
   m_Name: Food
@@ -187,19 +186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df586a3399f74428887344275d6f7be0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &6473245212459311219
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2491570935633817438}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!82 &7655489908406175020
 AudioSource:
   m_ObjectHideFlags: 0
