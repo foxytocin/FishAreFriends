@@ -51,12 +51,12 @@ public class Spawner : MonoBehaviour
                 boid.RespawnBoid();
 
                 //Debug.Log("Initializing Boid #:" +count);
-                yield return new WaitForSeconds(0.025f);
+                yield return new WaitForSeconds(0.01f); //0.25
 
                 count++;
         }
 
-        //boidManager.BoidInitializationCompleted();
+        boidManager.BoidInitializationCompleted();
     }
 
 

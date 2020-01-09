@@ -68,8 +68,6 @@ public class BoidManager : MonoBehaviour
             int foodNeedsSum = 0;
             foreach (List<Boid> boidsList in cellGroups.allBoidCells)
             {
-                //List<Boid> boidsList = cellGroups.allBoidCells[j];
-
                 int Count = boidsList.Count;
                 positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
                 directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
@@ -112,7 +110,7 @@ public class BoidManager : MonoBehaviour
                     targetWeight = targetWeight
                 };
 
-                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 64);
+                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 128);
                 jobHandle1.Complete();
 
                 positionArray.Dispose();
@@ -145,13 +143,15 @@ public class BoidManager : MonoBehaviour
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
 
 
-            if(boidInitializationCompleted && timeTilCellUpdate < 0f )
+            if(boidInitializationCompleted && timeTilCellUpdate < 0f)
             {
                 timeTilCellUpdate = timeBetweenCellUpdates;
 
-                Debug.Log("Updating Cell-Informations");
-                // calculate all new cell positions
-                // error if raster larger then 1 - 1 - 1
+                List<List<Boid>> newList = new List<List<Boid>>();
+                for (int i = 0; i < cellGroups.allBoidCells.Count; i++)
+                {
+                    newList.Add(new List<Boid>());
+                }
       
                 foreach (List<Boid> boidsList in cellGroups.allBoidCells)
                 {
@@ -172,59 +172,49 @@ public class BoidManager : MonoBehaviour
                         heightStep = cellGroups.heightStep,
                         depthStep = cellGroups.depthStep,
                         resolution = cellGroups.resolution,
+                        maxCellIndex = cellGroups.allBoidCells.Count
                     };
 
-                    JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 64);
+                    JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 128);
                     jobHandle2.Complete();
 
                     positionArray2.Dispose();
 
                     for (int i = 0; i < Count; i++)
                     {
-                        Boid boid = boidsList[i];
-                        int oldIndex = boid.cellIndex;
-                        int newIndex = newCellIndex[i];
-
-                        if (newIndex != oldIndex)
-                        {
-                            boid.cellIndex = newIndex;
-                            cellGroups.allBoidCells[oldIndex].Remove(boid);
-                            cellGroups.allBoidCells[newIndex].Add(boid);
-                        }
+                        newList[newCellIndex[i]].Add(boidsList[i]);
                     }
 
                     newCellIndex.Dispose();
                 }
+
+                cellGroups.allBoidCells = newList;
             }
-        
         }
     }
 }
-
 
 
 [BurstCompile]
 public struct CalculateCellPosition : IJobParallelFor
 {
 
-    [ReadOnly] public NativeArray<float3> positionArray2;
+    public NativeArray<float3> positionArray2;
     public NativeArray<int> newCellIndex;
     [ReadOnly] public float widthStep;
     [ReadOnly] public float heightStep;
     [ReadOnly] public float depthStep;
     [ReadOnly] public float3 resolution;
+    [ReadOnly] public int maxCellIndex;
 
     public void Execute(int index)
     {
-        float newIndex = ((int)(positionArray2[index].x / widthStep) + (int)(positionArray2[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray2[index].y / heightStep)));
-        newIndex = Mathf.Clamp(newIndex, 0, positionArray2.Length - 1);
+        int newIndex = (int)((int)(positionArray2[index].x / widthStep) + (int)(positionArray2[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray2[index].y / heightStep)));
+        newIndex = Mathf.Clamp(newIndex, 0, maxCellIndex - 1);
 
-        newCellIndex[index] = (int)newIndex;
+        newCellIndex[index] = newIndex;
     }
 }
-
-
-
 
 
 [BurstCompile]
