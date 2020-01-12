@@ -28,6 +28,10 @@ public class BoidManager : MonoBehaviour
     NativeArray<float3> positionArray2;
     NativeArray<int> newCellIndex;
 
+    public float timeBetweenCellUpdates = 5f;
+    private float timeTilCellUpdate;
+    private bool boidInitializationCompleted = false;
+
     void Awake()
     {
         viewRadius = settings.perceptionRadius;
@@ -38,6 +42,8 @@ public class BoidManager : MonoBehaviour
         maxSpeed = settings.maxSpeed;
         maxSteerForce = settings.maxSteerForce;
         targetWeight = settings.targetWeight;
+        timeTilCellUpdate = timeBetweenCellUpdates;
+
     }
     void Start()
     {
@@ -46,16 +52,22 @@ public class BoidManager : MonoBehaviour
         spawner = FindObjectOfType<Spawner>();
     }
 
+    public void BoidInitializationCompleted() {
+        timeTilCellUpdate = timeBetweenCellUpdates;
+        boidInitializationCompleted = true;
+
+        Debug.Log("Initialization of " +spawner.spawnCount+ " Boids completed");
+    }
+
     void Update()
     {
-       
+       timeTilCellUpdate -= Time.deltaTime;
+
         if (cellGroups.allBoidCells != null)
         {
             int foodNeedsSum = 0;
             foreach (List<Boid> boidsList in cellGroups.allBoidCells)
             {
-                //List<Boid> boidsList = cellGroups.allBoidCells[j];
-
                 int Count = boidsList.Count;
                 positionArray = new NativeArray<float3>(Count, Allocator.TempJob);
                 directionArray = new NativeArray<float3>(Count, Allocator.TempJob);
@@ -98,7 +110,7 @@ public class BoidManager : MonoBehaviour
                     targetWeight = targetWeight
                 };
 
-                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 64);
+                JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 128);
                 jobHandle1.Complete();
 
                 positionArray.Dispose();
@@ -116,7 +128,10 @@ public class BoidManager : MonoBehaviour
                     {
                         foodNeedsSum += boid.foodNeeds;
                         boid.UpdateBoid(accelerationArray[i]);
-                    } else {
+
+                    } else if (boid.status != Boid.Status.died) {
+
+                        boid.status = Boid.Status.died;
                         boid.setColor(Color.black, Color.black);
                         boid.setWobbleSpeed(0);
                         boid.transform.eulerAngles = new Vector3(180, 0, 0);
@@ -128,81 +143,79 @@ public class BoidManager : MonoBehaviour
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
 
 
-            // calculate all new cell positions
-            // error if raster larger then 1 - 1 - 1
-            List<List<Boid>> tmpList = new List<List<Boid>>(cellGroups.allBoidCells);
-
-            foreach (List<Boid> boidsList in tmpList)
+            if(boidInitializationCompleted && timeTilCellUpdate < 0f)
             {
-                int Count = boidsList.Count;
-                positionArray2 = new NativeArray<float3>(Count, Allocator.TempJob);
-                newCellIndex = new NativeArray<int>(Count, Allocator.TempJob);
+                timeTilCellUpdate = timeBetweenCellUpdates;
 
-                for (int i = 0; i < Count; i++)
+                List<List<Boid>> newList = new List<List<Boid>>();
+                for (int i = 0; i < cellGroups.allBoidCells.Count; i++)
                 {
-                    positionArray2[i] = boidsList[i].position;
+                    newList.Add(new List<Boid>());
                 }
-            
-                CalculateCellPosition calculateCellPosition = new CalculateCellPosition
+      
+                foreach (List<Boid> boidsList in cellGroups.allBoidCells)
                 {
-                    positionArray2 = positionArray2,
-                    newCellIndex = newCellIndex,
-                    widthStep = cellGroups.widthStep,
-                    heightStep = cellGroups.heightStep,
-                    depthStep = cellGroups.depthStep,
-                    resolution = cellGroups.resolution,
-                };
+                    int Count = boidsList.Count;
+                    positionArray2 = new NativeArray<float3>(Count, Allocator.TempJob);
+                    newCellIndex = new NativeArray<int>(Count, Allocator.TempJob);
 
-                JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 64);
-                jobHandle2.Complete();
-
-                positionArray2.Dispose();
-
-                for (int i = 0; i < Count; i++)
-                {
-                    Boid boid = boidsList[i];
-                    int oldIndex = boid.cellIndex;
-                    int newIndex = newCellIndex[i];
-
-                    if (newIndex != oldIndex)
+                    for (int i = 0; i < Count; i++)
                     {
-                        boid.cellIndex = newIndex;
-                        cellGroups.allBoidCells[oldIndex].Remove(boid);
-                        cellGroups.allBoidCells[newIndex].Add(boid);
+                        positionArray2[i] = boidsList[i].position;
                     }
+                
+                    CalculateCellPosition calculateCellPosition = new CalculateCellPosition
+                    {
+                        positionArray2 = positionArray2,
+                        newCellIndex = newCellIndex,
+                        widthStep = cellGroups.widthStep,
+                        heightStep = cellGroups.heightStep,
+                        depthStep = cellGroups.depthStep,
+                        resolution = cellGroups.resolution,
+                        maxCellIndex = cellGroups.allBoidCells.Count
+                    };
+
+                    JobHandle jobHandle2 = calculateCellPosition.Schedule(Count, 128);
+                    jobHandle2.Complete();
+
+                    positionArray2.Dispose();
+
+                    for (int i = 0; i < Count; i++)
+                    {
+                        boidsList[i].cellIndex = newCellIndex[i];
+                        newList[newCellIndex[i]].Add(boidsList[i]);
+                    }
+
+                    newCellIndex.Dispose();
                 }
 
-                newCellIndex.Dispose();
+                cellGroups.allBoidCells = newList;
             }
-        
         }
     }
 }
-
 
 
 [BurstCompile]
 public struct CalculateCellPosition : IJobParallelFor
 {
 
-    [ReadOnly] public NativeArray<float3> positionArray2;
+    public NativeArray<float3> positionArray2;
     public NativeArray<int> newCellIndex;
     [ReadOnly] public float widthStep;
     [ReadOnly] public float heightStep;
     [ReadOnly] public float depthStep;
     [ReadOnly] public float3 resolution;
+    [ReadOnly] public int maxCellIndex;
 
     public void Execute(int index)
     {
-        float newIndex = ((int)(positionArray2[index].x / widthStep) + (int)(positionArray2[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray2[index].y / heightStep)));
-        newIndex = Mathf.Clamp(newIndex, 0, positionArray2.Length - 1);
+        int newIndex = (int)((int)(positionArray2[index].x / widthStep) + (int)(positionArray2[index].z / depthStep) * resolution.x + (resolution.x * resolution.z * (int)(positionArray2[index].y / heightStep)));
+        newIndex = Mathf.Clamp(newIndex, 0, maxCellIndex - 1);
 
-        newCellIndex[index] = (int)newIndex;
+        newCellIndex[index] = newIndex;
     }
 }
-
-
-
 
 
 [BurstCompile]

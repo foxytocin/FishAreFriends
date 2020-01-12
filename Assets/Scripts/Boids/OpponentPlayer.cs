@@ -65,7 +65,6 @@ public class OpponentPlayer : MonoBehaviour
 
     void Update()
     {
-
         // just for debuging
         if (Input.GetKeyDown(KeyCode.U))
             opponentBehavior = OpponentBehavior.SearchForBoids;
@@ -99,10 +98,7 @@ public class OpponentPlayer : MonoBehaviour
             timeToStayNextToAttackedLeader = 0;
             timeToRehunt = 0;
         }
-
-
-
-        cellGroups.SetPlayerCell(transform.position);
+      
 
         Vector3 acceleration = Vector3.zero;
         bool isHeadingForCollision = IsHeadingForCollision();
@@ -135,7 +131,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         boidToHunt = boidsNearby[i];
                         speed = maxSpeed;
-                        Debug.Log("Hunt boid");
+                        //Debug.Log("Hunt boid");
                     }
                 }
             }
@@ -252,7 +248,6 @@ public class OpponentPlayer : MonoBehaviour
         }
 
 
-
         velocity += acceleration * Time.deltaTime;
 
         // if speed not set befor
@@ -265,14 +260,6 @@ public class OpponentPlayer : MonoBehaviour
 
         speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
         velocity = dir * speed;
-
-
-
-
-
-
-
-
         cachedTransform.position += velocity * Time.deltaTime;
         cachedTransform.forward = dir;
 
