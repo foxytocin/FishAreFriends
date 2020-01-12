@@ -5,9 +5,7 @@ using System.Collections;
 
 public class CameraPosition : MonoBehaviour
 {
-
     MapGenerator mapGenerator;
-
     public Transform Top_View;
     public Transform Side_View;
     public Transform target;
@@ -31,8 +29,7 @@ public class CameraPosition : MonoBehaviour
 
     float totalDistanceToTarget = 1;
     float startPosition = 0;
-
-
+    Coroutine setClippingPlane = null;
 
     void Awake()
     {
@@ -42,13 +39,11 @@ public class CameraPosition : MonoBehaviour
     }
 
 
-    // Start is called before the first frame update
     void Start()
     {
         targetPosition = Side_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
-        //Top_View.position = centerOfTank + new Vector3(0, mapGenerator.mapSize.y * 2, 0);
         lookAtCenterOfTank = centerOfTank;
         originalFogDensity = RenderSettings.fogDensity;
         originalFieldOfView = myCamera.fieldOfView;
@@ -56,13 +51,20 @@ public class CameraPosition : MonoBehaviour
     }
 
 
-    // Update is called once per frame
+    bool switchingPerspevtiv = false;
+
     void FixedUpdate()
     {
+
         bool down = Input.GetKeyDown(KeyCode.Space);
-        if (down & side)
+
+        if (!switchingPerspevtiv && down & side)
         {
+            if(setClippingPlane != null)
+                StopCoroutine(setClippingPlane);
+
             side = false;
+            switchingPerspevtiv = true;
             myCamera.farClipPlane = 1000;
             SwitchFieldOfViewToTop(true);
             startPosition = transform.position.y;
@@ -72,9 +74,10 @@ public class CameraPosition : MonoBehaviour
             SwitchFodDensityToTop(true);
 
         }
-        else if (down & !side)
+        else if (!switchingPerspevtiv && down & !side)
         {
             side = true;
+            switchingPerspevtiv = true;
             SwitchFieldOfViewToTop(false);
             startPosition = transform.position.y;
             lookAtLeader = target.position;
@@ -82,28 +85,13 @@ public class CameraPosition : MonoBehaviour
             totalDistanceToTarget = Mathf.Abs(transform.position.y - lookAtLeader.y);
             DisablePostEffects(false);
             SwitchFodDensityToTop(false);
-            StartCoroutine(SetClippingPlane());
+            setClippingPlane = StartCoroutine(SetClippingPlane());
 
         }
 
         if (targetPosition.position != transform.position)
         {
             transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.2f * Time.deltaTime * 5);
-            // float percentOfWay = Mathf.Abs(transform.position.y - startPosition) / totalDistanceToTarget;
-            // percentOfWay = Mathf.Clamp(percentOfWay, 0.01f, 1f);
-
-            // if (side)
-            // {
-            //     //myCamera.fieldOfView = map(percentOfWay, 0, 0.9f, 10f, 60f);
-            //     myCamera.fieldOfView = Mathf.Lerp(myCamera.fieldOfView, map(percentOfWay, 0.01f, 1f, 10f, 60f), 0.2f * Time.deltaTime * 2);
-            // }
-            // else
-            // {
-            //     //myCamera.fieldOfView = map(percentOfWay, 0, 0.9f, 60f, 10f);
-            //     myCamera.fieldOfView = map(percentOfWay, 0.01f, 1f, 60f, 10f);
-
-            // }
-
         }
 
         if (side)
@@ -129,7 +117,6 @@ public class CameraPosition : MonoBehaviour
                 transform.TransformDirection(Vector3.down);
             }
         }
-
     }
 
 
@@ -137,28 +124,11 @@ public class CameraPosition : MonoBehaviour
     {
         if (value)
         {
-            //This enables the orthographic mode
-            //myCamera.orthographic = true;
-
-            //myCamera.fieldOfView = 10f;
             targetFieldOfView = 10f;
-            //StartCoroutine(AnimateFieldOfView());
-            //Set the size of the viewing volume you'd like the orthographic Camera to pick up (5)
-            //myCamera.orthographicSize = 30f;
-
-            //Set the orthographic Camera Viewport size and position
-            //camera.rect = new Rect(centerOfTank.x, centerOfTank.y, mapGenerator.mapSize.x, mapGenerator.mapSize.y);
         }
         else
         {
-            //This enables the orthographic mode
-            //myCamera.orthographic = false;
             targetFieldOfView = 60f;
-            //StartCoroutine(AnimateFieldOfView());
-            //myCamera.fieldOfView = 60f;
-
-            //Set the orthographic Camera Viewport size and position
-            //camera.rect = new Rect(m_ViewPositionX, m_ViewPositionY, m_ViewWidth, m_ViewHeight); 
         }
     }
 
@@ -189,17 +159,21 @@ public class CameraPosition : MonoBehaviour
             yield return new WaitForSeconds(1);
             while (RenderSettings.fogDensity < targetFogDensity)
             {
-                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                RenderSettings.fogDensity += 0.0007f;
                 yield return new WaitForEndOfFrame();
             }
+
+            switchingPerspevtiv = false;
         }
         else
         {
             while (RenderSettings.fogDensity > targetFogDensity)
             {
-                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                RenderSettings.fogDensity -= 0.004f;
                 yield return new WaitForEndOfFrame();
             }
+
+            switchingPerspevtiv = false;
 
             if (RenderSettings.fogDensity < 0)
                 RenderSettings.fogDensity = 0;
@@ -209,7 +183,7 @@ public class CameraPosition : MonoBehaviour
 
     private IEnumerator SetClippingPlane()
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
         myCamera.farClipPlane = 300;
     }
 
@@ -242,7 +216,7 @@ public class CameraPosition : MonoBehaviour
         }
         else
         {
-            depthOfField.active = true;
+            //depthOfField.active = true;
         }
     }
 

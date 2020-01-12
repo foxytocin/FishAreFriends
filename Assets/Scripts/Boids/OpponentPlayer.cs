@@ -79,7 +79,7 @@ public class OpponentPlayer : MonoBehaviour
         if(myLeaderScript.GetSwarmSize() < 300)
         {
             opponentBehavior = OpponentBehavior.SearchForBoids;
-            Debug.Log("Switched opponentBehavior to searchForBoids");
+            //Debug.Log("Switched opponentBehavior to searchForBoids");
         }
         else
         {
