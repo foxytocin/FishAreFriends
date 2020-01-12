@@ -42,9 +42,6 @@ public class Spawner : MonoBehaviour
                 Vector3 pos = Random.insideUnitSphere * spawnRadius;
                 Boid boid = Instantiate(prefab, pos, Quaternion.identity);
                 boid.transform.parent = fishHolder;
-                int cellIndex = cellGroups.GetIndex(transform.position);
-                boid.cellIndex = cellIndex;
-                cellGroups.RegisterAtCell(boid);
 
                 boid.PassColor(color1, color2);
                 boid.Initialize(settings, null);

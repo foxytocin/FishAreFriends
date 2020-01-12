@@ -182,6 +182,7 @@ public class BoidManager : MonoBehaviour
 
                     for (int i = 0; i < Count; i++)
                     {
+                        boidsList[i].cellIndex = newCellIndex[i];
                         newList[newCellIndex[i]].Add(boidsList[i]);
                     }
 

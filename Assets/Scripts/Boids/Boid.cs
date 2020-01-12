@@ -120,6 +120,9 @@ public class Boid : MonoBehaviour
 
         setColor(originalColor1, originalColor2);
 
+        cellGroups.RegisterAtCell(this);
+        cellGroups.CheckCell(this);
+
         updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
@@ -173,7 +176,6 @@ public class Boid : MonoBehaviour
                 foodTarget = null;
                 status = Status.normalSwimming;
                 
-
                 if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
                 {
                     //Debug.Log("Keine Futterquelle vorhanden: suche");
@@ -225,6 +227,9 @@ public class Boid : MonoBehaviour
 
                     //Debug.Log("Hat gefressen");
                 }
+            } else {
+
+                accelerationFoodBehavior = Vector3.zero;
             }
         }
     }
@@ -429,8 +434,12 @@ public class Boid : MonoBehaviour
 
         alife = true;
         status = Status.normalSwimming;
+        foodTarget = null;
+
         setColor(originalColor1, originalColor2);
         setWobbleSpeed(originalWobbleSpeed);
+
+        cellGroups.CheckCell(this);
 
         calculateFoodBehavior = StartCoroutine(CalculateFoodBehavior());
         updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
