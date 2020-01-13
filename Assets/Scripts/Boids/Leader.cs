@@ -162,8 +162,7 @@ public class Leader : MonoBehaviour
                 // lets rip
                 foreach (Boid boid in boidsToRip)
                 {
-                    boid.LeaveActualSwarm();
-                    boid.JoinNewSwarm(this);
+                    boid.ToggleActualSwarm(this);
                 }
             }
 

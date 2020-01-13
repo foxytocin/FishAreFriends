@@ -223,7 +223,7 @@ public class OpponentPlayer : MonoBehaviour
                         Debug.Log("I can search for a new leader to attack.");
                         // delete leaderToAttack, if i am fa
                         leaderToAttack = null;
-                        speed = maxSpeed / 3;
+                        speed = maxSpeed / 3f;
                         timeToRehunt = 15f;
                     }
                 }
