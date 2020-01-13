@@ -8,11 +8,15 @@ public class Tutorial : MonoBehaviour
     GuiOverlay guiOverlay;
     TopStatsScroller topStatsScroller;
     Leader leaderPlayer;
+    
+    GameObject aiPlayer;
 
     void Awake() {
         guiOverlay = FindObjectOfType<GuiOverlay>();
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         leaderPlayer = GameObject.Find("Leader").GetComponent<Leader>();
+        aiPlayer = GameObject.Find("Fish_OpponentPlayer");
+        aiPlayer.SetActive(false);
     }
 
     void Start() {
@@ -22,9 +26,6 @@ public class Tutorial : MonoBehaviour
 
 
     private IEnumerator BasicTutorial() {
-
-        // splash
-        guiOverlay.DisplayMainMessage("FISH ARE FRIENDS", 2);
 
         // start
         yield return new WaitForSeconds(4);
@@ -40,18 +41,22 @@ public class Tutorial : MonoBehaviour
             count = leaderPlayer.GetSwarmSize();
             yield return new WaitForEndOfFrame();
         }
-        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " +count+ " neue Freunde gefunden", 4);
+        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " +count+ " neue Freunde gefunden", 3);
 
 
         yield return new WaitForSeconds(10);
-        topStatsScroller.FadeInTopStats();
-        guiOverlay.DisplayMainMessage("Sieh mal an den oberen Rand", 2);
+        guiOverlay.DisplayMainMessage("Sieh mal nach Oben", 2);
         
+        yield return new WaitForSeconds(2);
+        topStatsScroller.FadeInTopStats();
+
 
         yield return new WaitForSeconds(6);
-        guiOverlay.DisplayMainMessage("Dort siest Du die groesse Deines Schwarms und wieviel Nahrung diesem noch bleibt", 6);
+        guiOverlay.DisplayMainMessage("Dort kannst Du sehen, wie gross Dein Schwarm ist und wieviel Nahrung euch bleibt", 7);
         topStatsScroller.FadeInTopStats();
 
+
+        aiPlayer.SetActive(true);
 
         // beware the shark
         yield return new WaitForSeconds(80);
