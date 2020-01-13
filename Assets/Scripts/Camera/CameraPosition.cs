@@ -6,6 +6,7 @@ using System.Collections;
 public class CameraPosition : MonoBehaviour
 {
     MapGenerator mapGenerator;
+    TopStatsScroller topStatsScroller;
     public Transform Top_View;
     public Transform Side_View;
     public Transform target;
@@ -36,6 +37,7 @@ public class CameraPosition : MonoBehaviour
         mapGenerator = FindObjectOfType<MapGenerator>();
         myCamera = GetComponent<Camera>();
         volume = postProcessing.GetComponent<Volume>();
+        topStatsScroller = FindObjectOfType<TopStatsScroller>();
     }
 
 
@@ -44,7 +46,7 @@ public class CameraPosition : MonoBehaviour
         targetPosition = Side_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
-        lookAtCenterOfTank = centerOfTank;
+        lookAtCenterOfTank = centerOfTank + new Vector3(0, 0, 20);
         originalFogDensity = RenderSettings.fogDensity;
         originalFieldOfView = myCamera.fieldOfView;
         startPosition = transform.position.y;
@@ -72,6 +74,7 @@ public class CameraPosition : MonoBehaviour
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
             DisablePostEffects(true);
             SwitchFodDensityToTop(true);
+            topStatsScroller.FadeOutTopStats();
 
         }
         else if (!switchingPerspevtiv && down & !side)
@@ -86,6 +89,7 @@ public class CameraPosition : MonoBehaviour
             DisablePostEffects(false);
             SwitchFodDensityToTop(false);
             setClippingPlane = StartCoroutine(SetClippingPlane());
+            topStatsScroller.FadeInTopStats();
 
         }
 
@@ -159,7 +163,7 @@ public class CameraPosition : MonoBehaviour
             yield return new WaitForSeconds(1);
             while (RenderSettings.fogDensity < targetFogDensity)
             {
-                RenderSettings.fogDensity += 0.0007f;
+                RenderSettings.fogDensity += (0.015f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
 
@@ -169,7 +173,7 @@ public class CameraPosition : MonoBehaviour
         {
             while (RenderSettings.fogDensity > targetFogDensity)
             {
-                RenderSettings.fogDensity -= 0.004f;
+                RenderSettings.fogDensity -= (0.3f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
 

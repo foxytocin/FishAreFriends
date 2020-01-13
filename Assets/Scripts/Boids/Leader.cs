@@ -7,6 +7,7 @@ public class Leader : MonoBehaviour
     ForceField forceField;
     CellGroups cellGroups;
     MapGenerator mapGenerator;
+    GuiOverlay guiOverlay;
     private List<Boid> swarmList;
 
     public static List<Leader> leaderList;
@@ -17,11 +18,17 @@ public class Leader : MonoBehaviour
 
     // defined as secounds
     private float waitForNextRipCount;
+    private bool humanPlayer = false;
 
     private void Awake()
-    {
+    {   
+        swarmList = new List<Boid>();
+        material = gameObject.GetComponentInChildren<MeshRenderer>().material;
         forceField = GetComponentInChildren<ForceField>();
-        forceField.SetColor(leaderColor1);
+        cellGroups = FindObjectOfType<CellGroups>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
+        transform.position = mapGenerator.mapSize / 2;
 
         if (leaderList == null)
             leaderList = new List<Leader>();
@@ -31,16 +38,18 @@ public class Leader : MonoBehaviour
         // defined as secounds
         waitForNextRipCount = 0;
 
-        //leaderColor = Random.ColorHSV();
-        cellGroups = FindObjectOfType<CellGroups>();
-        mapGenerator = FindObjectOfType<MapGenerator>();
-        transform.position = mapGenerator.mapSize / 2;
         
-        material = gameObject.GetComponentInChildren<MeshRenderer>().material;
+    }
+
+    private void Start() {
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
-        swarmList = new List<Boid>();
+        forceField.SetColor(leaderColor1);
+
+        if(gameObject.name == "Leader")
+            humanPlayer = true;
     }
+
 
     public int getCellInfo()
     {
@@ -51,12 +60,18 @@ public class Leader : MonoBehaviour
     public void AddBoidToSwarm(Boid boid)
     {
         swarmList.Add(boid);
+
+        if(humanPlayer)
+            guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
 
     public void RemoveBoidFromSwarm(Boid boid)
     {
         swarmList.Remove(boid);
+
+        if(humanPlayer)
+            guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
     public int GetSwarmSize()
@@ -75,7 +90,20 @@ public class Leader : MonoBehaviour
     }
 
 
-    public void Update()
+    public int GetSwarmEnergie() {
+
+        int energie = 0;
+        foreach(Boid boid in swarmList) {
+            energie += boid.foodLeft;
+        }
+
+        int swarmSize = GetSwarmSize();
+
+        return (swarmSize > 0) ? (energie / swarmSize) : 0;
+    }
+
+
+    public void LateUpdate()
     {
 
         if(waitForNextRipCount > 0)
@@ -146,6 +174,7 @@ public class Leader : MonoBehaviour
             forceField.StopPulse();
         }
 
+        guiOverlay.SetPlayerEnergie(GetSwarmEnergie());
     }
 
 

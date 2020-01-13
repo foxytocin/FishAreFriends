@@ -9,7 +9,7 @@ public float fadeSpeed = 0.5f;
 private Material material;
 private AudioSource audioPulse;
 private float alpha = 0f;
-private float power = 1.5f;
+private float power = 1f;
 
 private Coroutine pulseCoroutine = null;
 
@@ -37,7 +37,7 @@ private Coroutine pulseCoroutine = null;
     private IEnumerator Pulse()
     {
         while(true) {
-            power = 1.5f + Mathf.PingPong(Time.time * pulseSpeed, 4.5f);
+            power = 1f + Mathf.PingPong(Time.time * pulseSpeed, 4f);
             material.SetFloat("_Power", power);
             yield return new WaitForEndOfFrame();
         }
@@ -52,7 +52,9 @@ private Coroutine pulseCoroutine = null;
             yield return new WaitForEndOfFrame();
         }
 
-        StopCoroutine(pulseCoroutine);
+        if(pulseCoroutine != null)
+            StopCoroutine(pulseCoroutine);
+        
         alpha = 0;
         material.SetFloat("_Alpha", alpha);
         audioPulse.Stop();
@@ -61,6 +63,7 @@ private Coroutine pulseCoroutine = null;
 
     private IEnumerator FadeToOneAndPulse()
     {
+        power = 1f;
         audioPulse.volume = 1f;
         audioPulse.Play();
 
