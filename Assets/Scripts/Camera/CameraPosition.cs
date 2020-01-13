@@ -163,7 +163,7 @@ public class CameraPosition : MonoBehaviour
             yield return new WaitForSeconds(1);
             while (RenderSettings.fogDensity < targetFogDensity)
             {
-                RenderSettings.fogDensity += 0.00035f;
+                RenderSettings.fogDensity += (0.015f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
 
@@ -173,7 +173,7 @@ public class CameraPosition : MonoBehaviour
         {
             while (RenderSettings.fogDensity > targetFogDensity)
             {
-                RenderSettings.fogDensity -= 0.004f;
+                RenderSettings.fogDensity -= (0.3f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
 
