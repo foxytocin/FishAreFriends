@@ -225,6 +225,6 @@ public class Predator : MonoBehaviour
         maxSpeed = (isHunting) ? huntingMaxSpeed : normalMaxSpeed;
 
         string text = (isHunting) ? "Der Hai ist auf der Jagt" : "Der Hai ist satt";
-        guiOverlay.DisplayMainMessage(text);
+        guiOverlay.DisplayMainMessage(text, 3);
     }
 }
