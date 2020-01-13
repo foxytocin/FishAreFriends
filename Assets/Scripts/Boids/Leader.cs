@@ -18,6 +18,7 @@ public class Leader : MonoBehaviour
 
     // defined as secounds
     private float waitForNextRipCount;
+    private bool humanPlayer = false;
 
     private void Awake()
     {   
@@ -44,6 +45,9 @@ public class Leader : MonoBehaviour
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
         forceField.SetColor(leaderColor1);
+
+        if(gameObject.name == "Leader")
+            humanPlayer = true;
     }
 
 
@@ -56,14 +60,18 @@ public class Leader : MonoBehaviour
     public void AddBoidToSwarm(Boid boid)
     {
         swarmList.Add(boid);
-        guiOverlay.SetPlayerSwarmSize(swarmList.Count);
+
+        if(humanPlayer)
+            guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
 
     public void RemoveBoidFromSwarm(Boid boid)
     {
         swarmList.Remove(boid);
-        guiOverlay.SetPlayerSwarmSize(swarmList.Count);
+
+        if(humanPlayer)
+            guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
     public int GetSwarmSize()

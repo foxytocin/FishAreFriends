@@ -10,16 +10,14 @@ public class GuiOverlay : MonoBehaviour
     public TextMeshProUGUI playerSwarmSize;
     public TextMeshProUGUI mainMessages;
     private Color mainMessagesColor;
-
+    private float alpha = 1f;
+    private float timeToFade = 2;
 
     void Awake()
     {
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         mainMessagesColor = mainMessages.color;
-    }
-
-    void Start() {
-        DisplayMainMessage("Los geht's");
+        mainMessagesColor.a = 1f;
     }
 
 
@@ -37,29 +35,31 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    public void DisplayMainMessage(string message) {
+    public void DisplayMainMessage(string message, int timeToFade_) {
 
+        timeToFade = timeToFade_;
         mainMessages.text = message;
 
         StartCoroutine(DisplayAndFadeMainMessage());
     }
 
-    float alpha = 0f;
+
     private IEnumerator DisplayAndFadeMainMessage() {
         
         while (alpha < 1)
         {
-            alpha += 0.1f;
+            alpha += (1f * Time.deltaTime);
             mainMessagesColor.a = alpha;
             mainMessages.color = mainMessagesColor;
             yield return new WaitForEndOfFrame();
         }
 
-        yield return new WaitForSeconds(2);
+        alpha = 1f;
+        yield return new WaitForSeconds(timeToFade);
 
         while (alpha > 0)
         {
-            alpha -= 0.1f;
+            alpha -= (1f * Time.deltaTime);
             mainMessagesColor.a = alpha;
             mainMessages.color = mainMessagesColor;
             yield return new WaitForEndOfFrame();
