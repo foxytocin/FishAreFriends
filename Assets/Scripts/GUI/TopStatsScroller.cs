@@ -9,7 +9,6 @@ public class TopStatsScroller : MonoBehaviour
     float position;
 
     public float speed = 0.5f;
-    private bool firstTime = true;
     private RectTransform[] rectTransform;
     Coroutine fadeInTopStatsCore = null;
     Coroutine fadeOutTopStatsCore = null;
@@ -19,10 +18,6 @@ public class TopStatsScroller : MonoBehaviour
         rectTransform[0].anchoredPosition = new Vector2(0, offScreenOffset);
     }
 
-    void Start()
-    {
-        FadeInTopStats();
-    }
 
     public void FadeInTopStats() {
 
@@ -32,11 +27,6 @@ public class TopStatsScroller : MonoBehaviour
     }
     
     private IEnumerator FadeInTopStatsCore() {
-
-        if(firstTime) {
-            firstTime = false;
-            yield return new WaitForSeconds(3);
-        }
 
         if(fadeOutTopStatsCore != null)
             StopCoroutine(fadeOutTopStatsCore);

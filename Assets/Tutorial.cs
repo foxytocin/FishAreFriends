@@ -6,10 +6,12 @@ public class Tutorial : MonoBehaviour
 {
 
     GuiOverlay guiOverlay;
+    TopStatsScroller topStatsScroller;
     Leader leaderPlayer;
 
     void Awake() {
         guiOverlay = FindObjectOfType<GuiOverlay>();
+        topStatsScroller = FindObjectOfType<TopStatsScroller>();
         leaderPlayer = GameObject.Find("Leader").GetComponent<Leader>();
     }
 
@@ -30,7 +32,7 @@ public class Tutorial : MonoBehaviour
 
         // find friends
         yield return new WaitForSeconds(8);
-        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Naehe schwimmst", 8);
+        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Naehe schwimmst", 7);
 
         // wait until 10 friend are found
         int count = 0;
@@ -38,7 +40,18 @@ public class Tutorial : MonoBehaviour
             count = leaderPlayer.GetSwarmSize();
             yield return new WaitForEndOfFrame();
         }
-        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " +count+ " neue Freunde eingesammelt", 6);
+        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " +count+ " neue Freunde gefunden", 4);
+
+
+        yield return new WaitForSeconds(10);
+        topStatsScroller.FadeInTopStats();
+        guiOverlay.DisplayMainMessage("Sieh mal an den oberen Rand", 2);
+        
+
+        yield return new WaitForSeconds(6);
+        guiOverlay.DisplayMainMessage("Dort siest Du die groesse Deines Schwarms und wieviel Nahrung diesem noch bleibt", 6);
+        topStatsScroller.FadeInTopStats();
+
 
         // beware the shark
         yield return new WaitForSeconds(80);
