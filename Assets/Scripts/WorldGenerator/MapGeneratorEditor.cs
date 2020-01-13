@@ -1,7 +1,7 @@
 using UnityEngine;
-using System.Collections;
 using UnityEditor;
 
+/*
 [CustomEditor(typeof(MapGenerator))]
 public class MapGeneratorEditor : Editor
 {
@@ -29,3 +29,4 @@ public class MapGeneratorEditor : Editor
         }
     }
 }
+*/

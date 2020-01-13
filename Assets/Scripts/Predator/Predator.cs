@@ -6,7 +6,7 @@ public class Predator : MonoBehaviour
 {
 
     EcoSystemManager ecoSystemManager;
-    GUIMessages guiMessages;
+    GuiOverlay guiOverlay;
 
     // State
     [HideInInspector]
@@ -47,7 +47,7 @@ public class Predator : MonoBehaviour
         maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        guiMessages = FindObjectOfType<GUIMessages>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         cachedTransform = transform;
         material = new Material[3];
         Transform child = gameObject.transform.GetChild(0);
@@ -225,6 +225,6 @@ public class Predator : MonoBehaviour
         maxSpeed = (isHunting) ? huntingMaxSpeed : normalMaxSpeed;
 
         string text = (isHunting) ? "Der Hai ist auf der Jagt" : "Der Hai ist satt";
-        guiMessages.SetText(text);
+        guiOverlay.DisplayMainMessage(text);
     }
 }

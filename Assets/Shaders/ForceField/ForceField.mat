@@ -24,9 +24,15 @@ Material:
         m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_5CFD3A42_Texture_1:
+        m_Texture: {fileID: 2800000, guid: f3a80df8e76c64600955e05bc28c32e0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Alpha: 1
-    - _Power: 1.61
-    - _StyleSpeed: 0.02
+    - Vector1_58E79B1F: 15
+    - Vector1_708C5214: 1
+    - _Alpha: 2
+    - _Power: 4.37
+    - _StyleSpeed: 0.005
     m_Colors:
     - _Emission: {r: 2, g: 0.2431373, b: 0, a: 0}

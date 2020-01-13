@@ -168,11 +168,11 @@ public class MapGenerator : MonoBehaviour
                     go1.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    if (UnityEditor.EditorApplication.isPlaying)
-                    {
+                    //if (UnityEditor.EditorApplication.isPlaying)
+                    //{
                         if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
-                    }
+                    //}
 
                 }
 
@@ -188,10 +188,10 @@ public class MapGenerator : MonoBehaviour
                     go2.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    if (UnityEditor.EditorApplication.isPlaying)
-                    {
+                    //if (UnityEditor.EditorApplication.isPlaying)
+                    //{
                         ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
-                    }
+                    //}
 
                 }
             }
@@ -231,12 +231,12 @@ public class MapGenerator : MonoBehaviour
         wall4.tag = "Enviroment";
 
         //Bottom - Ground is the Wall
-        Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
-        GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
-        wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
-        wall5.GetComponent<MeshRenderer>().enabled = false;
-        wall5.transform.parent = enviromentHolder;
-        wall5.tag = "Enviroment";
+        // Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
+        // GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
+        // wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
+        // wall5.GetComponent<MeshRenderer>().enabled = false;
+        // wall5.transform.parent = enviromentHolder;
+        // wall5.tag = "Enviroment";
 
         // Top
         Vector3 position6 = new Vector3(mapSize.x / 2, mapSize.y - 0.5f, mapSize.z / 2);
