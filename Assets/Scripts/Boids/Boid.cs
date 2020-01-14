@@ -6,7 +6,6 @@ using Unity.Mathematics;
 public class Boid : MonoBehaviour
 {
     Predator predator;
-    Leader otherLeader;
     CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
@@ -51,7 +50,7 @@ public class Boid : MonoBehaviour
     public Transform target;
 
     // Swarm handling varialbes
-    Leader myLeader = null;
+    private Leader myLeader = null;
     public int cellIndex = 0;
 
     // Food
@@ -212,11 +211,14 @@ public class Boid : MonoBehaviour
             }
 
             // tests if reached the food-source: eat when nearby
-            if(status == Status.swimmsToFood) {
+            if (status == Status.swimmsToFood) {
 
                 if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
                 {
-                    setColor(originalColor1, originalColor2);
+                    if (myLeader == null)
+                        setColor(originalColor1, originalColor2);
+                    else
+                        setColor(myLeader.leaderColor1, myLeader.leaderColor2);
 
                     foodNeeds -= foodTarget.getFood(foodNeeds);
                     setFoodNeeds();
@@ -306,6 +308,7 @@ public class Boid : MonoBehaviour
                 }
             }
 
+            Leader otherLeader = null;
 
             // find leader
             float distanceToLeader = float.MaxValue;
@@ -334,7 +337,7 @@ public class Boid : MonoBehaviour
             // if i have a leader
             if (myLeader != null)
             {
-                Vector3 positionToLeader = otherLeader.getPosition() - position;
+                Vector3 positionToLeader = myLeader.getPosition() - position;
                 accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
             }
 
@@ -344,18 +347,27 @@ public class Boid : MonoBehaviour
 
 
 
-    public void JoinNewSwarm(Leader leader)
+    private void JoinNewSwarm(Leader leader)
     {
         myLeader = leader;
         leader.AddBoidToSwarm(this);
         setColor(leader.leaderColor1, leader.leaderColor2);
     }
 
-    public void LeaveActualSwarm()
+    private void LeaveActualSwarm()
     {
         setColor(originalColor1, originalColor2);
         myLeader.RemoveBoidFromSwarm(this);
         myLeader = null;
+    }
+
+    public void ToggleActualSwarm(Leader newLeader)
+    {
+        newLeader.AddBoidToSwarm(this);
+        myLeader.RemoveBoidFromSwarm(this);
+
+        myLeader = newLeader;
+        setColor(newLeader.leaderColor1, newLeader.leaderColor2);
     }
 
 
