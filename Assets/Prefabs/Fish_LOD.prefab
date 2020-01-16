@@ -58,16 +58,18 @@ MonoBehaviour:
   centreOfFlockmates: {x: 0, y: 0, z: 0}
   numPerceivedFlockmates: 0
   dir: {x: 0, y: 0, z: 0}
-  optimiert: 1
   target: {fileID: 0}
   cellIndex: 0
-  basicFoodNeed: 1000
+  thresholdHungry: 500
+  thresholdStarving: 200
   foodNeeds: 0
   foodLeft: 0
   hungerRate: 2
   alife: 1
   timeBetweedFoodUpdate: 3
-  status: 0
+  status: 1
+  hungry: 0
+  starving: 0
 --- !u!205 &6029163333581138842
 LODGroup:
   m_ObjectHideFlags: 0
