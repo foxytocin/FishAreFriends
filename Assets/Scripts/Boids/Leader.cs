@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Leader : MonoBehaviour
@@ -9,9 +10,7 @@ public class Leader : MonoBehaviour
     MapGenerator mapGenerator;
     GuiOverlay guiOverlay;
     private List<Boid> swarmList;
-
     public static List<Leader> leaderList;
-
     public Color leaderColor1;
     public Color leaderColor2;
     private Material material;
@@ -19,9 +18,13 @@ public class Leader : MonoBehaviour
     // defined as secounds
     private float waitForNextRipCount;
     private bool humanPlayer = false;
+    private int availableEnergie = 0;
+    private int hungerOfSwarm = 0;
+    private List<Food> foodList;
+    private bool coroutineFeedSwarmRunning = false;
 
     private void Awake()
-    {   
+    {
         swarmList = new List<Boid>();
         material = gameObject.GetComponentInChildren<MeshRenderer>().material;
         forceField = GetComponentInChildren<ForceField>();
@@ -38,15 +41,17 @@ public class Leader : MonoBehaviour
         // defined as secounds
         waitForNextRipCount = 0;
 
-        
+        foodList = FoodManager.foodList;
     }
 
-    private void Start() {
+
+    private void Start()
+    {
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
         forceField.SetColor(leaderColor1);
 
-        if(gameObject.name == "Leader")
+        if (gameObject.name == "Leader")
             humanPlayer = true;
     }
 
@@ -61,7 +66,7 @@ public class Leader : MonoBehaviour
     {
         swarmList.Add(boid);
 
-        if(humanPlayer)
+        if (humanPlayer)
             guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
@@ -70,7 +75,7 @@ public class Leader : MonoBehaviour
     {
         swarmList.Remove(boid);
 
-        if(humanPlayer)
+        if (humanPlayer)
             guiOverlay.SetPlayerSwarmSize(swarmList.Count);
     }
 
@@ -90,23 +95,44 @@ public class Leader : MonoBehaviour
     }
 
 
-    public int GetSwarmEnergie() {
-
+    public void CalculateSwarmFoodNeeds()
+    {
         int energie = 0;
-        foreach(Boid boid in swarmList) {
+        int boidsHungry = 0;
+        int boidsStarving = 0;
+        hungerOfSwarm = 0;
+
+        foreach (Boid boid in swarmList)
+        {
             energie += boid.foodLeft;
+            hungerOfSwarm += boid.foodNeeds;
+
+            boidsHungry += (boid.hungry) ? 1 : 0;
+            boidsStarving += (boid.starving) ? 1 : 0;
         }
 
         int swarmSize = GetSwarmSize();
 
-        return (swarmSize > 0) ? (energie / swarmSize) : 0;
+        if (humanPlayer)
+        {
+            guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
+
+            int avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
+            guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
+        }
     }
 
 
     public void LateUpdate()
     {
+        if (humanPlayer)
+        {
+            CalculateSwarmFoodNeeds();
+            CheckFoodSource();
+        }
 
-        if(waitForNextRipCount > 0)
+
+        if (waitForNextRipCount > 0)
         {
             waitForNextRipCount -= Time.deltaTime;
             return;
@@ -133,7 +159,7 @@ public class Leader : MonoBehaviour
         }
 
 
-        if(distanceToOtherLeader <= 5f && otherLeader != null)
+        if (distanceToOtherLeader <= 5f && otherLeader != null)
         {
             Debug.Log("Found other leader");
             int otherSwarmCount = otherLeader.GetSwarmSize();
@@ -154,9 +180,9 @@ public class Leader : MonoBehaviour
             if (otherSwarmCount * 3 < mySwarmCount)
                 ripCount = otherSwarmCount / 2;
 
-            if(ripCount != 0)
+            if (ripCount != 0)
             {
-                Debug.Log("Swarm riped " + ripCount + " boids from " + otherSwarmCount );
+                Debug.Log("Swarm riped " + ripCount + " boids from " + otherSwarmCount);
                 List<Boid> boidsToRip = otherLeader.GetSwarmList().GetRange(0, otherSwarmCount < ripCount ? otherSwarmCount : ripCount);
 
                 // lets rip
@@ -168,13 +194,117 @@ public class Leader : MonoBehaviour
 
             waitForNextRipCount = 10f;
 
-        } else {
-            
+        }
+        else
+        {
+
             forceField.StopPulse();
         }
 
-        guiOverlay.SetPlayerEnergie(GetSwarmEnergie());
     }
 
+
+    private void CheckFoodSource()
+    {
+        if (foodList.Count > 0)
+        {
+            float nearestFood = float.PositiveInfinity;
+            int nearestFoodIndex = 0;
+            for (int i = 0; i < foodList.Count; i++)
+            {
+                float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                if (dist < nearestFood)
+                {
+                    nearestFood = dist;
+                    nearestFoodIndex = i;
+                }
+            }
+
+            Food foodTarget = foodList[nearestFoodIndex];
+            Vector3 foodPosition = foodTarget.GetPosition();
+
+            if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 1f)
+            {
+                int neededFood = hungerOfSwarm - availableEnergie;
+                neededFood = (neededFood > 0) ? neededFood : 0;
+                int gotFromSource = foodTarget.getFood(neededFood);
+                availableEnergie += gotFromSource;
+                Debug.Log("Hunger of Swarm: " + hungerOfSwarm + " / Got from FoodSource: " + gotFromSource);
+            }
+        }
+
+        // feed the swarm if not alreay feeding
+        if (!coroutineFeedSwarmRunning && availableEnergie > 0)
+            StartCoroutine(FeedSwarm());
+    }
+
+
+    private IEnumerator FeedSwarm()
+    {
+        coroutineFeedSwarmRunning = true;
+
+        while (availableEnergie > 0)
+        {
+            // first: feed starving boids
+            foreach (Boid boid in swarmList)
+            {
+                if (boid.starving)
+                {
+                    int foodNeeds = boid.foodNeeds;
+                    if (availableEnergie > foodNeeds)
+                    {
+                        availableEnergie -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= availableEnergie;
+                        availableEnergie = 0;
+                    }
+                }
+            }
+
+            // second: feed hungry boids
+            foreach (Boid boid in swarmList)
+            {
+                if (boid.hungry)
+                {
+                    int foodNeeds = boid.foodNeeds;
+                    if (availableEnergie > foodNeeds)
+                    {
+                        availableEnergie -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= availableEnergie;
+                        availableEnergie = 0;
+                    }
+                }
+            }
+
+            // third: feed all the other boids
+            foreach (Boid boid in swarmList)
+            {
+                int foodNeeds = boid.foodNeeds;
+                if (foodNeeds > 0)
+                {
+                    if (availableEnergie > foodNeeds)
+                    {
+                        availableEnergie -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= availableEnergie;
+                        availableEnergie = 0;
+                    }
+                }
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        coroutineFeedSwarmRunning = false;
+    }
 
 }

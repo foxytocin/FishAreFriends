@@ -4,11 +4,12 @@ using System.Collections;
 
 public class GuiOverlay : MonoBehaviour
 {
-    
+
     private TextMeshProUGUI textMeshPro;
     public TextMeshProUGUI playerEnergie;
     public TextMeshProUGUI playerSwarmSize;
     public TextMeshProUGUI mainMessages;
+    public TextMeshProUGUI debugInfos;
     private Color mainMessagesColor;
     private float alpha = 1f;
     private float timeToFade = 2;
@@ -28,14 +29,19 @@ public class GuiOverlay : MonoBehaviour
 
     public void SetPlayerSwarmSize(int size)
     {
-        if(size == 0)
+        if (size == 0)
             playerSwarmSize.text = "lonely";
-            
+
         playerSwarmSize.text = size.ToString();
     }
 
+    public void SetDebugInfo(string text)
+    {
+        debugInfos.text = text;
+    }
 
-    public void DisplayMainMessage(string message, int timeToFade_) {
+    public void DisplayMainMessage(string message, int timeToFade_)
+    {
 
         timeToFade = timeToFade_;
         mainMessages.text = message;
@@ -44,8 +50,9 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    private IEnumerator DisplayAndFadeMainMessage() {
-        
+    private IEnumerator DisplayAndFadeMainMessage()
+    {
+
         while (alpha < 1)
         {
             alpha += (1f * Time.deltaTime);
