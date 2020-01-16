@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Unity.Collections;
 using System.Collections.Generic;
 
 public class FoodManager : MonoBehaviour
@@ -10,7 +9,7 @@ public class FoodManager : MonoBehaviour
     private Vector3 spawnOffset;
     private Vector3 mapSize;
     Transform foodHolder;
-    public List<Food> foodList;
+    public static List<Food> foodList;
 
     void Awake()
     {
@@ -30,23 +29,11 @@ public class FoodManager : MonoBehaviour
 
         Food food = Instantiate(foodPrefab, spawnPoint, Quaternion.identity);
         foodList.Add(food);
-        Debug.Log("FoodList: " + foodList.Count);
         food.transform.parent = foodHolder;
-    }
-
-    public List<Food> GetFoodList()
-    {
-        return foodList;
     }
 
     public void RemoveFromList(Food food)
     {
         foodList.Remove(food);
-        Debug.Log("FoodList: " + foodList.Count);
     }
-
-
-
-
-
 }

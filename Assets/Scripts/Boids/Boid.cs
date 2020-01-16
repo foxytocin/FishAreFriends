@@ -11,7 +11,6 @@ public class Boid : MonoBehaviour
     public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
     MapGenerator mapGenerator;
-    FoodManager foodManager;
 
     private Color originalColor1;
     private Color originalColor2;
@@ -41,7 +40,6 @@ public class Boid : MonoBehaviour
 
     public Vector3 dir;
 
-    public bool optimiert;
 
     // Cached
     Material[] material;
@@ -54,7 +52,9 @@ public class Boid : MonoBehaviour
     public int cellIndex = 0;
 
     // Food
-    public int basicFoodNeed = 1000;
+    public static int basicFoodNeed = 1000;
+    public int thresholdHungry = 400;
+    public int thresholdStarving = 200;
     public int foodNeeds = 0;
     public int foodLeft;
     public int hungerRate = 1;
@@ -65,11 +65,15 @@ public class Boid : MonoBehaviour
     public int timeBetweedFoodUpdate = 3;
 
     public Status status;
-    public enum Status {
+    public enum Status
+    {
         swimmsToFood,
         normalSwimming,
         died
     }
+
+    public bool hungry = false;
+    public bool starving = false;
 
     Coroutine updateBoidNormalMovement = null;
     Coroutine calculateFoodBehavior = null;
@@ -82,7 +86,6 @@ public class Boid : MonoBehaviour
     void Awake()
     {
         alife = true;
-        foodManager = FindObjectOfType<FoodManager>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
@@ -103,10 +106,9 @@ public class Boid : MonoBehaviour
         status = Status.normalSwimming;
     }
 
-
     public void Initialize(BoidSettings settings, Transform target)
     {
-        foodList = foodManager.GetFoodList();
+        foodList = FoodManager.foodList;
 
         this.target = target;
         this.settings = settings;
@@ -144,11 +146,13 @@ public class Boid : MonoBehaviour
     {
         while (true)
         {
-            if(status == Status.normalSwimming) {
+            if (status != Status.swimmsToFood)
+            {
                 yield return new WaitForSeconds(delay);
             }
-             
-            if(status == Status.swimmsToFood) {
+
+            if (status == Status.swimmsToFood)
+            {
                 yield return new WaitForSeconds(0.5f);
             }
 
@@ -164,18 +168,18 @@ public class Boid : MonoBehaviour
 
             setFoodNeeds();
             // boid already has a food-target: swimm towards the target
-            if(foodTarget != null && foodTarget.checkAmount() > 0) {
-
+            if (foodTarget != null && foodTarget.checkAmount() > 0)
+            {
                 //Debug.Log("Schwimmt zur bekannten Futterquelle");
                 accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce;
-
-            } else {
-
+            }
+            else
+            {
                 // find food 
                 foodTarget = null;
                 status = Status.normalSwimming;
-                
-                if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
+
+                if ((hungry && myLeader == null) || starving)
                 {
                     //Debug.Log("Keine Futterquelle vorhanden: suche");
                     setColor(Color.red, Color.red);
@@ -204,22 +208,18 @@ public class Boid : MonoBehaviour
 
                             foodTarget = foodList[nearestFoodIndex];
                             foodPosition = foodTarget.GetPosition();
-                            accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce; 
+                            accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce;
                         }
                     }
                 }
             }
 
             // tests if reached the food-source: eat when nearby
-            if (status == Status.swimmsToFood) {
+            if (status == Status.swimmsToFood)
+            {
 
                 if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
                 {
-                    if (myLeader == null)
-                        setColor(originalColor1, originalColor2);
-                    else
-                        setColor(myLeader.leaderColor1, myLeader.leaderColor2);
-
                     foodNeeds -= foodTarget.getFood(foodNeeds);
                     setFoodNeeds();
 
@@ -229,7 +229,9 @@ public class Boid : MonoBehaviour
 
                     //Debug.Log("Hat gefressen");
                 }
-            } else {
+            }
+            else
+            {
 
                 accelerationFoodBehavior = Vector3.zero;
             }
@@ -276,7 +278,8 @@ public class Boid : MonoBehaviour
     public IEnumerator UpdateBoidNormalMovement()
     {
 
-        while(true) {
+        while (true)
+        {
 
             accelerationBehaviorChanges = Vector3.zero;
 
@@ -399,6 +402,20 @@ public class Boid : MonoBehaviour
         {
             foodNeeds = Mathf.Clamp(foodNeeds, 0, basicFoodNeed);
             foodLeft = basicFoodNeed - foodNeeds;
+
+            starving = (foodLeft < thresholdStarving) ? true : false;
+            hungry = (foodLeft < thresholdHungry) ? true : false;
+
+            if (!starving)
+            {
+                if (myLeader == null)
+                    setColor(originalColor1, originalColor2);
+                else
+                    setColor(myLeader.leaderColor1, myLeader.leaderColor2);
+
+                status = Status.normalSwimming;
+                foodTarget = null;
+            }
         }
     }
 
