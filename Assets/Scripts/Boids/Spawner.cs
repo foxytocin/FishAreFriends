@@ -19,6 +19,8 @@ public class Spawner : MonoBehaviour
     public GizmoType showSpawnRegion;
     Transform fishHolder;
 
+    private Color[] opponentPlayerColor1 = { Color.cyan, Color.yellow, Color.magenta };
+    private Color[] opponentPlayerColor2 = { Color.blue, Color.yellow, Color.yellow };
 
     void Awake()
     {
@@ -35,10 +37,17 @@ public class Spawner : MonoBehaviour
 
     public void SpawnOpponentPlayers()
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
-            Vector3 pos = new Vector3(Random.Range(-5,5), 4, Random.Range(-5,5));
-            Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
+            MapGenerator mapGenerator = FindObjectOfType<MapGenerator>();
+            Vector3 pos = new Vector3(
+                Random.Range(3f, mapGenerator.mapSize.x - 3f), 
+                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f), 
+                Random.Range(3f, mapGenerator.mapSize.z - 3f)
+            );
+            GameObject tempGameObject = Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
+            tempGameObject.GetComponent<Leader>().leaderColor1 = opponentPlayerColor1[i];
+            tempGameObject.GetComponent<Leader>().leaderColor2 = opponentPlayerColor2[i];
         }
     }
 

@@ -33,7 +33,7 @@ public class Leader : MonoBehaviour
         cellGroups = FindObjectOfType<CellGroups>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
-        transform.position = mapGenerator.mapSize / 2;
+        //transform.position = mapGenerator.mapSize / 2;
 
         if (leaderList == null)
             leaderList = new List<Leader>();
