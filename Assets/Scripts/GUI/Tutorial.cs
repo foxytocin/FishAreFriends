@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Tutorial : MonoBehaviour
@@ -22,7 +21,6 @@ public class Tutorial : MonoBehaviour
     {
         StartCoroutine(BasicTutorial());
     }
-
 
 
     private IEnumerator BasicTutorial()
@@ -58,21 +56,13 @@ public class Tutorial : MonoBehaviour
         // spawn opponentPlayers
         yield return new WaitForSeconds(15);
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
-        guiOverlay.DisplayMainMessage("Es sind weitere Fischschwärme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
+        guiOverlay.DisplayMainMessage("Es sind weitere Fischschwaerme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
 
 
         // beware the shark
         yield return new WaitForSeconds(60);
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnPredators();
         guiOverlay.DisplayMainMessage("Sei vorsichtig! Hier soll es Haie geben", 3, GuiOverlay.MessageType.warning);
-
-
-
-
-
     }
-
-
-
 
 }

@@ -6,6 +6,7 @@ using System.Collections;
 public class CameraPosition : MonoBehaviour
 {
     MusicMenu musicMenu;
+    AmbientMusic ambientMusic;
     MapGenerator mapGenerator;
     TopStatsScroller topStatsScroller;
     public Transform Top_View;
@@ -40,6 +41,7 @@ public class CameraPosition : MonoBehaviour
         volume = postProcessing.GetComponent<Volume>();
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         musicMenu = FindObjectOfType<MusicMenu>();
+        ambientMusic = FindObjectOfType<AmbientMusic>();
     }
 
 
@@ -78,6 +80,7 @@ public class CameraPosition : MonoBehaviour
             SwitchFodDensityToTop(true);
             topStatsScroller.FadeOutTopStats();
             musicMenu.StartMenuMusic();
+            ambientMusic.StopAmbientMusic();
 
         }
         else if (!switchingPerspevtiv && down & !side)
@@ -94,6 +97,7 @@ public class CameraPosition : MonoBehaviour
             setClippingPlane = StartCoroutine(SetClippingPlane());
             topStatsScroller.FadeInTopStats();
             musicMenu.StopMenuMusic();
+            ambientMusic.StartAmbientMusic();
 
         }
 

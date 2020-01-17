@@ -24,6 +24,7 @@ public class EnergyDisplay : MonoBehaviour
     private Coroutine warningPulse;
     private bool warningPulseBlinking = false;
     private int warningThreshold;
+    private bool firstStart = true;
 
 
     void Awake()
@@ -61,7 +62,11 @@ public class EnergyDisplay : MonoBehaviour
         {
             warningPulseBlinking = true;
             warningPulse = StartCoroutine(WarningPuls());
-            guiOverlay.DisplayMainMessage("Du musst dringend Nahrung finden!", 3, GuiOverlay.MessageType.warning);
+
+            if (!firstStart)
+                guiOverlay.DisplayMainMessage("Du musst dringend Nahrung finden!", 3, GuiOverlay.MessageType.warning);
+
+            firstStart = false;
         }
         else if (energyStatus >= warningThreshold && warningPulseBlinking)
         {
