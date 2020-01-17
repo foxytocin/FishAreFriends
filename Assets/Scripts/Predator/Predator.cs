@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 using Unity.Mathematics;
 
 public class Predator : MonoBehaviour
 {
 
+    public static List<Predator> availablePredators = new List<Predator>();
     EcoSystemManager ecoSystemManager;
     GuiOverlay guiOverlay;
 
@@ -44,6 +46,10 @@ public class Predator : MonoBehaviour
 
     void Awake()
     {
+        if (availablePredators == null)
+            availablePredators = new List<Predator>();
+        availablePredators.Add(this);
+
         maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
@@ -79,7 +85,7 @@ public class Predator : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            foodNeeds -= 2;
+            foodNeeds -= UnityEngine.Random.Range(2, 20);
         }
     }
 

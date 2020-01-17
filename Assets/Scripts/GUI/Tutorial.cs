@@ -54,9 +54,9 @@ public class Tutorial : MonoBehaviour
         topStatsScroller.FadeInTopStats();
 
 
-        // aiPlayer.SetActive(true);
         // spawn opponentPlayers
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
+        GameObject.Find("Spawner").GetComponent<Spawner>().SpawnPredators();
 
 
         // beware the shark

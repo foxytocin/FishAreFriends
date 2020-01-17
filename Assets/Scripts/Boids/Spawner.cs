@@ -11,6 +11,7 @@ public class Spawner : MonoBehaviour
     public bool spawnBoids = true;
     public Boid prefab;
     public GameObject opponentPlayerPrefab;
+    public GameObject predatorPrefab;
     public float spawnRadius = 10;
     public int spawnCount = 10;
     public Color color1;
@@ -48,6 +49,21 @@ public class Spawner : MonoBehaviour
             GameObject tempGameObject = Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
             tempGameObject.GetComponent<Leader>().leaderColor1 = opponentPlayerColor1[i];
             tempGameObject.GetComponent<Leader>().leaderColor2 = opponentPlayerColor2[i];
+        }
+    }
+
+    public void SpawnPredators()
+    {
+        for (int i = 0; i < 1; i++)
+        {
+            MapGenerator mapGenerator = FindObjectOfType<MapGenerator>();
+            Vector3 pos = new Vector3(
+                Random.Range(3f, mapGenerator.mapSize.x - 3f),
+                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f),
+                Random.Range(3f, mapGenerator.mapSize.z - 3f)
+            );
+            Instantiate(predatorPrefab, pos, Quaternion.identity);
+
         }
     }
 
