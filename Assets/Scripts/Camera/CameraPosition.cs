@@ -104,7 +104,7 @@ public class CameraPosition : MonoBehaviour
 
         if (side)
         {
-            lookAtLeader = target.position + new Vector3(0, 0.5f, 0);
+            lookAtLeader = target.position + new Vector3(0, 1.25f, 0);
 
             if (tmpLookAtTarget != lookAtLeader)
             {
