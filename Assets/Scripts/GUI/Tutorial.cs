@@ -8,60 +8,63 @@ public class Tutorial : MonoBehaviour
     GuiOverlay guiOverlay;
     TopStatsScroller topStatsScroller;
     Leader leaderPlayer;
-    
+
     GameObject aiPlayer;
 
-    void Awake() {
+    void Awake()
+    {
         guiOverlay = FindObjectOfType<GuiOverlay>();
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         leaderPlayer = GameObject.Find("Leader").GetComponent<Leader>();
     }
 
-    void Start() {
+    void Start()
+    {
         StartCoroutine(BasicTutorial());
     }
 
 
 
-    private IEnumerator BasicTutorial() {
+    private IEnumerator BasicTutorial()
+    {
 
         // start
         yield return new WaitForSeconds(4);
-        guiOverlay.DisplayMainMessage("Los geht's", 2);
+        guiOverlay.DisplayMainMessage("Los geht's", 2, GuiOverlay.MessageType.info);
 
         // find friends
         yield return new WaitForSeconds(8);
-        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Naehe schwimmst", 7);
+        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Naehe schwimmst", 7, GuiOverlay.MessageType.tutorial);
 
         // wait until 10 friend are found
         int count = 0;
-        while(count < 10) {
+        while (count < 10)
+        {
             count = leaderPlayer.GetSwarmSize();
             yield return new WaitForEndOfFrame();
         }
-        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " +count+ " neue Freunde gefunden", 3);
+        guiOverlay.DisplayMainMessage("Sehr gut! Du hast " + count + " neue Freunde gefunden", 3, GuiOverlay.MessageType.tutorial);
 
-
+        // display
         yield return new WaitForSeconds(10);
-        guiOverlay.DisplayMainMessage("Sieh mal nach Oben", 2);
-        
-        yield return new WaitForSeconds(2);
         topStatsScroller.FadeInTopStats();
+        guiOverlay.DisplayMainMessage("Oben rechts kannst Du sehen, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
 
-
-        yield return new WaitForSeconds(6);
-        guiOverlay.DisplayMainMessage("Dort kannst Du sehen, wie gross Dein Schwarm ist und wieviel Nahrung euch bleibt", 7);
-        topStatsScroller.FadeInTopStats();
+        // display
+        yield return new WaitForSeconds(10);
+        guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt dir, wie hungrig dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
 
 
         // spawn opponentPlayers
+        yield return new WaitForSeconds(10);
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
-        GameObject.Find("Spawner").GetComponent<Spawner>().SpawnPredators();
+        guiOverlay.DisplayMainMessage("Es sind weitere Fischschwärme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
 
 
         // beware the shark
-        yield return new WaitForSeconds(80);
-        guiOverlay.DisplayMainMessage("Sei vorsichtig! Hier soll irgendwo ein Hai sein", 8);
+        yield return new WaitForSeconds(60);
+        GameObject.Find("Spawner").GetComponent<Spawner>().SpawnPredators();
+        guiOverlay.DisplayMainMessage("Sei vorsichtig! Hier soll es Haie geben", 3, GuiOverlay.MessageType.warning);
 
 
 
