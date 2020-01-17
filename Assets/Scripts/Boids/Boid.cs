@@ -53,8 +53,8 @@ public class Boid : MonoBehaviour
 
     // Food
     public static int basicFoodNeed = 1000;
-    public int thresholdHungry = 400;
-    public int thresholdStarving = 200;
+    public static int thresholdHungry = 400;
+    public static int thresholdStarving = 200;
     public int foodNeeds = 0;
     public int foodLeft;
     public int hungerRate = 1;
@@ -292,7 +292,7 @@ public class Boid : MonoBehaviour
 
 
             // avoid predator
-            foreach(Predator predator in availablePredators)
+            foreach (Predator predator in availablePredators)
             {
                 float distanceToPredator = Vector3.Distance(position, predator.getPosition());
                 if (distanceToPredator < 5f)
@@ -313,7 +313,7 @@ public class Boid : MonoBehaviour
                     }
                 }
             }
-            
+
 
             Leader otherLeader = null;
 

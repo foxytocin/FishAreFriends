@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 public class EnergyDisplay : MonoBehaviour
 {
 
     private float fullPosX;
-    private float emptyPosX = 115f;
+    private float emptyPosX = 89f;
     private float fullPosY;
     private float emptyPosY = -26f;
     private float posX;
@@ -13,39 +15,68 @@ public class EnergyDisplay : MonoBehaviour
     private float targetY;
     public float energyStatus = 1000f;
     private float colorPercent = 100;
-    RectTransform[] rectTransform;
-    SpriteRenderer spritRenderer;
+    RectTransform[] rectTransformOverlay;
+    Color32 emptyFishOriginalColor;
+    public GameObject overlay;
+    public Image empty;
+    public float blinkInterval = 0.3f;
+    private Coroutine warningPulse;
+    private bool warningPulseBlinking = false;
+    private int warningThreshold;
 
 
     void Awake()
     {
-        rectTransform = GetComponents<RectTransform>();
-        spritRenderer = GetComponent<SpriteRenderer>();
-        fullPosX = rectTransform[0].anchoredPosition.x;
-        fullPosY = rectTransform[0].anchoredPosition.y;
+        rectTransformOverlay = overlay.GetComponents<RectTransform>();
+        fullPosX = rectTransformOverlay[0].anchoredPosition.x;
+        fullPosY = rectTransformOverlay[0].anchoredPosition.y;
         posX = fullPosX;
         posY = fullPosY;
         emptyPosY = -fullPosY;
+        emptyFishOriginalColor = empty.color;
+        warningThreshold = Boid.thresholdStarving;
     }
 
     void LateUpdate()
     {
-        targetX = map(energyStatus, 1000f, 0f, fullPosX, 90f);
+        targetX = map(energyStatus, 1000f, 0f, fullPosX, emptyPosX);
         targetY = map(energyStatus, 1000f, 0f, fullPosY, emptyPosY);
         colorPercent = map(energyStatus, 1000f, 0f, 100f, 0f);
 
         if (posX != targetX)
         {
-            posX = Mathf.Lerp(posX, targetX, 0.3f);
-            rectTransform[0].anchoredPosition = new Vector2(posX, posY);
-            //spritRenderer.color = Color.Lerp(new Color32(137, 59, 65, 255), new Color32(59, 137, 66, 255), colorPercent);
+            posX = Mathf.Lerp(posX, targetX, 0.2f);
+            rectTransformOverlay[0].anchoredPosition = new Vector2(posX, posY);
         }
 
         if (posY != targetY)
         {
-            posY = Mathf.Lerp(posY, targetY, 0.3f);
-            rectTransform[0].anchoredPosition = new Vector2(posX, posY);
-            //spritRenderer.color = Color.Lerp(new Color32(137, 59, 65, 255), new Color32(59, 137, 66, 255), colorPercent);
+            posY = Mathf.Lerp(posY, targetY, 0.2f);
+            rectTransformOverlay[0].anchoredPosition = new Vector2(posX, posY);
+        }
+
+        if (energyStatus < warningThreshold && !warningPulseBlinking)
+        {
+            warningPulseBlinking = true;
+            warningPulse = StartCoroutine(WarningPuls());
+        }
+        else if (energyStatus >= warningThreshold && warningPulseBlinking)
+        {
+            warningPulseBlinking = false;
+            StopCoroutine(warningPulse);
+            empty.color = emptyFishOriginalColor;
+        }
+    }
+
+    public IEnumerator WarningPuls()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(blinkInterval);
+            empty.color = new Color32(255, 0, 0, 150);
+
+            yield return new WaitForSeconds(blinkInterval);
+            empty.color = emptyFishOriginalColor;
         }
     }
 
