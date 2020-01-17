@@ -53,6 +53,8 @@ public class KeyController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
 
         cellGroups.SetPlayerCell(transform.position);
 
