@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Unity.Mathematics;
 using System.Collections.Generic;
+using System.Collections;
 
 public class OpponentPlayer : MonoBehaviour
 {
@@ -40,6 +41,18 @@ public class OpponentPlayer : MonoBehaviour
         AttackOtherLeader
     }
 
+    // food stuff
+    private List<Food> foodList;
+    private Food foodTarget = null;
+    private int avgEnergieSwarm = int.MaxValue;
+    private int hungerOfSwarm = 0;
+    private int cachedFoodInLeader = 0;
+    private bool coroutineFeedSwarmRunning = false;
+
+
+    // gui
+    GuiOverlay guiOverlay;
+
 
     void Awake()
     {
@@ -55,12 +68,17 @@ public class OpponentPlayer : MonoBehaviour
 
     public void Start()
     {
-
+        foodList = FoodManager.foodList;
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
         float startSpeed = maxSpeed / 2;
         velocity = transform.forward * startSpeed;
+
+
+
+        StartCoroutine(CalculateFoodBehavior());
     }
 
     void Update()
@@ -76,7 +94,7 @@ public class OpponentPlayer : MonoBehaviour
         // end
 
 
-        if(myLeaderScript.GetSwarmSize() < 300)
+        if(myLeaderScript.GetSwarmSize() < 150)
         {
             opponentBehavior = OpponentBehavior.SearchForBoids;
             //Debug.Log("Switched opponentBehavior to searchForBoids");
@@ -86,6 +104,17 @@ public class OpponentPlayer : MonoBehaviour
             opponentBehavior = OpponentBehavior.AttackOtherLeader;
             Debug.Log("Switched opponentBehavior to attackOtherLeader");
         }
+
+        if(avgEnergieSwarm < 500)
+        {
+            Debug.Log("Opponent Player swarm is hungry");
+            opponentBehavior = OpponentBehavior.SearchForFood;
+        }
+
+
+
+
+
 
 
         // reset variables
@@ -136,7 +165,7 @@ public class OpponentPlayer : MonoBehaviour
                 }
             }
 
-            if (boidToHunt != null)
+            if (boidToHunt != null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
             {
                 acceleration += boidToHunt.transform.position - position;
                 if (boidToHunt.HasLeader())
@@ -189,6 +218,12 @@ public class OpponentPlayer : MonoBehaviour
                         {
                             timeToStayNextToAttackedLeader = 7f;
                             Debug.Log("Strength is ok. Lets attack him.");
+
+                            if (leaderToAttack.LeaderIsHumanPlayer())
+                            {
+                                guiOverlay.DisplayMainMessage("Achtung. Ein anderer Schwarm greift dich an", 4);
+                            }
+                            
                         }
                         else
                         {
@@ -240,6 +275,52 @@ public class OpponentPlayer : MonoBehaviour
             ///
             if (opponentBehavior.Equals(OpponentBehavior.SearchForFood))
             {
+                if(foodTarget == null)
+                {
+                    // find nearest food
+                    float nearestFood = float.PositiveInfinity;
+                    int nearestFoodIndex = 0;
+                    for (int i = 0; i < foodList.Count; i++)
+                    {
+                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                        if (dist < nearestFood)
+                        {
+                            nearestFood = dist;
+                            nearestFoodIndex = i;
+                        }
+                    }
+                    Debug.Log("Nächste Futterquelle ist " + nearestFood + " entfernt");
+
+                    // found food: setting food-parameters
+                    if (nearestFood < 20f)
+                    {
+                        Debug.Log("Futterquelle ist nahe gefunden");
+
+                        foodTarget = foodList[nearestFoodIndex];
+
+
+                    }
+
+                }
+
+
+                if (foodTarget != null)
+                {
+                    acceleration += foodTarget.GetPosition() - position;
+
+                    if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                    {
+                        cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
+                        foodTarget = null;
+                        Debug.Log("I got newFood " + cachedFoodInLeader);
+
+                        // feed the swarm if not alreay feeding
+                        if (!coroutineFeedSwarmRunning && cachedFoodInLeader > 0)
+                            StartCoroutine(FeedSwarm());
+                    }
+                }
+
+
 
             }
 
@@ -278,6 +359,114 @@ public class OpponentPlayer : MonoBehaviour
         setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
 
+    private IEnumerator CalculateFoodBehavior()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(2f);
+
+            CalculateSwarmFoodNeeds();
+        }
+
+
+    }
+
+
+    public void CalculateSwarmFoodNeeds()
+    {
+        int energie = 0;
+        int boidsHungry = 0;
+        int boidsStarving = 0;
+        hungerOfSwarm = 0;
+
+        foreach (Boid boid in myLeaderScript.GetSwarmList())
+        {
+            energie += boid.foodLeft;
+            hungerOfSwarm += boid.foodNeeds;
+
+            boidsHungry += (boid.hungry) ? 1 : 0;
+            boidsStarving += (boid.starving) ? 1 : 0;
+        }
+
+        
+
+        int swarmSize = myLeaderScript.GetSwarmSize();
+        avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
+
+        
+
+    }
+
+    private IEnumerator FeedSwarm()
+    {
+        coroutineFeedSwarmRunning = true;
+        while (cachedFoodInLeader > 0)
+        {
+            // first: feed starving boids
+            foreach (Boid boid in myLeaderScript.GetSwarmList())
+            {
+                if (boid.starving)
+                {
+                    int foodNeeds = boid.foodNeeds;
+                    if (cachedFoodInLeader > foodNeeds)
+                    {
+                        cachedFoodInLeader -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= cachedFoodInLeader;
+                        cachedFoodInLeader = 0;
+                    }
+                }
+            }
+
+            // second: feed hungry boids
+            foreach (Boid boid in myLeaderScript.GetSwarmList())
+            {
+                if (boid.hungry)
+                {
+                    int foodNeeds = boid.foodNeeds;
+                    if (cachedFoodInLeader > foodNeeds)
+                    {
+                        cachedFoodInLeader -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= cachedFoodInLeader;
+                        cachedFoodInLeader = 0;
+                    }
+                }
+            }
+
+            // third: feed all the other boids
+            foreach (Boid boid in myLeaderScript.GetSwarmList())
+            {
+                int foodNeeds = boid.foodNeeds;
+                if (foodNeeds > 0)
+                {
+                    if (cachedFoodInLeader > foodNeeds)
+                    {
+                        cachedFoodInLeader -= foodNeeds;
+                        boid.foodNeeds = 0;
+                    }
+                    else
+                    {
+                        boid.foodNeeds -= cachedFoodInLeader;
+                        cachedFoodInLeader = 0;
+                    }
+                }
+            }
+
+            if (cachedFoodInLeader == 0)
+                foodTarget = null;
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        coroutineFeedSwarmRunning = false;
+    }
 
     public void setWobbleSpeed(float speed)
     {

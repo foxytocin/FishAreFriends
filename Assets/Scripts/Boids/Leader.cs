@@ -311,4 +311,10 @@ public class Leader : MonoBehaviour
         coroutineFeedSwarmRunning = false;
     }
 
+
+    public bool LeaderIsHumanPlayer()
+    {
+        return humanPlayer;
+    }
+
 }
