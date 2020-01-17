@@ -39,11 +39,11 @@ public class KeyController : MonoBehaviour
         cellGroups = FindObjectOfType<CellGroups>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
+        Cursor.visible = false;
     }
 
     public void Start()
     {
-
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
