@@ -6,6 +6,7 @@ public class Leader : MonoBehaviour
 {
 
     ForceField forceField;
+    EnergyDisplay energyDisplay;
     CellGroups cellGroups;
     MapGenerator mapGenerator;
     GuiOverlay guiOverlay;
@@ -26,6 +27,7 @@ public class Leader : MonoBehaviour
     private void Awake()
     {
         swarmList = new List<Boid>();
+        energyDisplay = FindObjectOfType<EnergyDisplay>();
         material = gameObject.GetComponentInChildren<MeshRenderer>().material;
         forceField = GetComponentInChildren<ForceField>();
         cellGroups = FindObjectOfType<CellGroups>();
@@ -119,6 +121,7 @@ public class Leader : MonoBehaviour
 
             int avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
             guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
+            energyDisplay.SetEnergyStatus(avgEnergieSwarm);
         }
     }
 
@@ -301,6 +304,7 @@ public class Leader : MonoBehaviour
                     }
                 }
             }
+
             yield return new WaitForSeconds(0.1f);
         }
 
