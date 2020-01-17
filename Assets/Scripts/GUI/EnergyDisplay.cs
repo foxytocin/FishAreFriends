@@ -5,6 +5,7 @@ using System.Collections;
 public class EnergyDisplay : MonoBehaviour
 {
 
+    GuiOverlay guiOverlay;
     private float fullPosX;
     private float emptyPosX = 89f;
     private float fullPosY;
@@ -27,6 +28,7 @@ public class EnergyDisplay : MonoBehaviour
 
     void Awake()
     {
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         rectTransformOverlay = overlay.GetComponents<RectTransform>();
         fullPosX = rectTransformOverlay[0].anchoredPosition.x;
         fullPosY = rectTransformOverlay[0].anchoredPosition.y;
@@ -59,6 +61,7 @@ public class EnergyDisplay : MonoBehaviour
         {
             warningPulseBlinking = true;
             warningPulse = StartCoroutine(WarningPuls());
+            guiOverlay.DisplayMainMessage("Du musst dringend Nahrung finden!", 3, GuiOverlay.MessageType.warning);
         }
         else if (energyStatus >= warningThreshold && warningPulseBlinking)
         {
