@@ -29,7 +29,7 @@ public class Tutorial : MonoBehaviour
     {
 
         // start
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(3);
         guiOverlay.DisplayMainMessage("Los geht's", 2, GuiOverlay.MessageType.info);
 
         // find friends
@@ -46,17 +46,17 @@ public class Tutorial : MonoBehaviour
         guiOverlay.DisplayMainMessage("Sehr gut! Du hast " + count + " neue Freunde gefunden", 3, GuiOverlay.MessageType.tutorial);
 
         // display
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(13);
         topStatsScroller.FadeInTopStats();
         guiOverlay.DisplayMainMessage("Oben rechts kannst Du sehen, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
 
         // display
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(15);
         guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt dir, wie hungrig dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
 
 
         // spawn opponentPlayers
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(15);
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
         guiOverlay.DisplayMainMessage("Es sind weitere Fischschwärme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
 
