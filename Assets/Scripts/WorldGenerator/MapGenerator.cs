@@ -168,12 +168,15 @@ public class MapGenerator : MonoBehaviour
                     go1.tag = "Enviroment";
 
                     // add gras as spawnpoint
+#if (UNITY_EDITOR)
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
+#endif
                         if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
+#if (UNITY_EDITOR)
                     }
-
+#endif
                 }
 
                 if (sample > thresholdSeaweed && Random.value < growDensitySeaweed)
@@ -188,11 +191,14 @@ public class MapGenerator : MonoBehaviour
                     go2.tag = "Enviroment";
 
                     // add gras as spawnpoint
+#if (UNITY_EDITOR)
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
+#endif
                         ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
+#if (UNITY_EDITOR)
                     }
-
+#endif
                 }
             }
         }
