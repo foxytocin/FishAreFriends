@@ -272,7 +272,7 @@ public class MapGenerator : MonoBehaviour
 
             GameObject go = Instantiate(instName, position, Quaternion.identity);
             go.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
-            go.transform.localEulerAngles = new Vector3(0, Random.Range(0, 90), 0);
+            go.transform.localEulerAngles = new Vector3(Random.Range(-8f, 8f), Random.Range(0f, 90f), Random.Range(-8f, 8f));
             go.transform.parent = enviromentHolder;
             go.tag = "Enviroment";
         }
