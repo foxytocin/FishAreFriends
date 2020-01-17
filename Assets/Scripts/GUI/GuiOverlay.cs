@@ -11,14 +11,24 @@ public class GuiOverlay : MonoBehaviour
     public TextMeshProUGUI mainMessages;
     public TextMeshProUGUI debugInfos;
     private Color mainMessagesColor;
+    private Color mainMessagesColorStandard;
     private float alpha = 1f;
     private float timeToFade = 2;
+
+
+    public enum MessageType
+    {
+        tutorial,
+        info,
+        warning
+    }
 
     void Awake()
     {
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
+        mainMessagesColorStandard = mainMessages.color;
     }
 
 
@@ -40,8 +50,22 @@ public class GuiOverlay : MonoBehaviour
         debugInfos.text = text;
     }
 
-    public void DisplayMainMessage(string message, int timeToFade_)
+    public void DisplayMainMessage(string message, int timeToFade_, MessageType type)
     {
+        switch (type)
+        {
+            case MessageType.info:
+                mainMessagesColor = mainMessagesColorStandard;
+                break;
+            case MessageType.tutorial:
+                mainMessagesColor = mainMessagesColorStandard;
+                break;
+            case MessageType.warning:
+                mainMessagesColor = new Color(255, 0, 0, 0);
+                break;
+            default:
+                break;
+        }
 
         timeToFade = timeToFade_;
         mainMessages.text = message;
@@ -52,7 +76,7 @@ public class GuiOverlay : MonoBehaviour
 
     private IEnumerator DisplayAndFadeMainMessage()
     {
-
+        alpha = 0;
         while (alpha < 1)
         {
             alpha += (1f * Time.deltaTime);

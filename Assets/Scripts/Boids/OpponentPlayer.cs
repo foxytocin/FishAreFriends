@@ -98,7 +98,7 @@ public class OpponentPlayer : MonoBehaviour
         // end
 
 
-        if(myLeaderScript.GetSwarmSize() < 150)
+        if (myLeaderScript.GetSwarmSize() < 150)
         {
             opponentBehavior = OpponentBehavior.SearchForBoids;
             //Debug.Log("Switched opponentBehavior to searchForBoids");
@@ -109,7 +109,7 @@ public class OpponentPlayer : MonoBehaviour
             Debug.Log("Switched opponentBehavior to attackOtherLeader");
         }
 
-        if(avgEnergieSwarm < 500)
+        if (avgEnergieSwarm < 500)
         {
             Debug.Log("Opponent Player swarm is hungry");
             opponentBehavior = OpponentBehavior.SearchForFood;
@@ -131,7 +131,7 @@ public class OpponentPlayer : MonoBehaviour
             timeToStayNextToAttackedLeader = 0;
             timeToRehunt = 0;
         }
-      
+
 
         Vector3 acceleration = Vector3.zero;
         bool isHeadingForCollision = IsHeadingForCollision();
@@ -225,9 +225,9 @@ public class OpponentPlayer : MonoBehaviour
 
                             if (leaderToAttack.LeaderIsHumanPlayer())
                             {
-                                guiOverlay.DisplayMainMessage("Achtung! Ein anderer Schwarm greift dich an", 4);
+                                guiOverlay.DisplayMainMessage("Achtung! Ein anderer Schwarm greift dich an", 4, GuiOverlay.MessageType.warning);
                             }
-                            
+
                         }
                         else
                         {
@@ -255,7 +255,7 @@ public class OpponentPlayer : MonoBehaviour
                     else if (distanceToOtherLeader < 10f && timeToStayNextToAttackedLeader <= 0)
                     {
                         // go away from other leader
-                        acceleration += position ;
+                        acceleration += position;
                     }
                     else if (distanceToOtherLeader > 10f && timeToStayNextToAttackedLeader <= 0)
                     {
@@ -279,7 +279,7 @@ public class OpponentPlayer : MonoBehaviour
             ///
             if (opponentBehavior.Equals(OpponentBehavior.SearchForFood))
             {
-                if(foodTarget == null)
+                if (foodTarget == null)
                 {
                     // find nearest food
                     float nearestFood = float.PositiveInfinity;
@@ -406,11 +406,11 @@ public class OpponentPlayer : MonoBehaviour
             boidsStarving += (boid.starving) ? 1 : 0;
         }
 
-        
+
 
         int swarmSize = myLeaderScript.GetSwarmSize();
         avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
-               
+
 
     }
 
