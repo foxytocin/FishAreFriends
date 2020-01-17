@@ -49,6 +49,9 @@ public class OpponentPlayer : MonoBehaviour
     private int cachedFoodInLeader = 0;
     private bool coroutineFeedSwarmRunning = false;
 
+    // predator stuff
+    private List<Predator> availablePredators;
+
 
     // gui
     GuiOverlay guiOverlay;
@@ -69,6 +72,7 @@ public class OpponentPlayer : MonoBehaviour
     public void Start()
     {
         foodList = FoodManager.foodList;
+        availablePredators = Predator.availablePredators;
         guiOverlay = FindObjectOfType<GuiOverlay>();
         position = cachedTransform.position;
         forward = cachedTransform.forward;
@@ -325,6 +329,20 @@ public class OpponentPlayer : MonoBehaviour
             }
 
 
+            ////////////////////////////
+            ////// avoid predator //////
+            ////////////////////////////
+            foreach (Predator predator in availablePredators)
+            {
+                float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+                if (distanceToPredator < 4.5f)
+                {
+                    Vector3 positionToPredator = predator.getPosition() - position;
+                    acceleration = positionToPredator * -1;
+                }
+            }
+
+
 
         }
 
@@ -392,8 +410,7 @@ public class OpponentPlayer : MonoBehaviour
 
         int swarmSize = myLeaderScript.GetSwarmSize();
         avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
-
-        
+               
 
     }
 
