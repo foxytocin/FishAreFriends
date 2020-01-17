@@ -168,11 +168,11 @@ public class MapGenerator : MonoBehaviour
                     go1.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    //if (UnityEditor.EditorApplication.isPlaying)
-                    //{
+                    if (UnityEditor.EditorApplication.isPlaying)
+                    {
                         if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
-                    //}
+                    }
 
                 }
 
@@ -188,10 +188,10 @@ public class MapGenerator : MonoBehaviour
                     go2.tag = "Enviroment";
 
                     // add gras as spawnpoint
-                    //if (UnityEditor.EditorApplication.isPlaying)
-                    //{
+                    if (UnityEditor.EditorApplication.isPlaying)
+                    {
                         ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
-                    //}
+                    }
 
                 }
             }
