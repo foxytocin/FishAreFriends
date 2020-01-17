@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 public class Boid : MonoBehaviour
 {
-    Predator predator;
+    List<Predator> availablePredators;
     CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
@@ -89,7 +89,6 @@ public class Boid : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
-        predator = FindObjectOfType<Predator>();
         // leader = FindObjectOfType<Leader>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
@@ -109,6 +108,7 @@ public class Boid : MonoBehaviour
     public void Initialize(BoidSettings settings, Transform target)
     {
         foodList = FoodManager.foodList;
+        availablePredators = Predator.availablePredators;
 
         this.target = target;
         this.settings = settings;
@@ -292,24 +292,28 @@ public class Boid : MonoBehaviour
 
 
             // avoid predator
-            float distanceToPredator = Vector3.Distance(position, predator.getPosition());
-            if (distanceToPredator < 5f)
+            foreach(Predator predator in availablePredators)
             {
-                Vector3 positionToPredator = predator.getPosition() - position;
-                accelerationBehaviorChanges += positionToPredator * -(settings.predatorAvoidanceForce);
-
-                predator.IAmYourBoid(gameObject);
-
-                if (distanceToPredator <= 1.5f)
+                float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+                if (distanceToPredator < 5f)
                 {
-                    if (predator.BoidDied(this, foodLeft))
+                    Vector3 positionToPredator = predator.getPosition() - position;
+                    accelerationBehaviorChanges += positionToPredator * -(settings.predatorAvoidanceForce);
+
+                    predator.IAmYourBoid(gameObject);
+
+                    if (distanceToPredator <= 1.5f)
                     {
-                        Instantiate(prefabBlood, position, Quaternion.identity);
-                        ecoSystemManager.addKilledFish();
-                        LetMeDie();
+                        if (predator.BoidDied(this, foodLeft))
+                        {
+                            Instantiate(prefabBlood, position, Quaternion.identity);
+                            ecoSystemManager.addKilledFish();
+                            LetMeDie();
+                        }
                     }
                 }
             }
+            
 
             Leader otherLeader = null;
 

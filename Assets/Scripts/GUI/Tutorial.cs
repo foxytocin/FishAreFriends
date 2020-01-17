@@ -15,8 +15,6 @@ public class Tutorial : MonoBehaviour
         guiOverlay = FindObjectOfType<GuiOverlay>();
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         leaderPlayer = GameObject.Find("Leader").GetComponent<Leader>();
-        aiPlayer = GameObject.Find("Fish_OpponentPlayer");
-        aiPlayer.SetActive(false);
     }
 
     void Start() {
@@ -56,7 +54,10 @@ public class Tutorial : MonoBehaviour
         topStatsScroller.FadeInTopStats();
 
 
-        aiPlayer.SetActive(true);
+        // spawn opponentPlayers
+        GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
+        GameObject.Find("Spawner").GetComponent<Spawner>().SpawnPredators();
+
 
         // beware the shark
         yield return new WaitForSeconds(80);
