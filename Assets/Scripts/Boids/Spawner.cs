@@ -10,6 +10,7 @@ public class Spawner : MonoBehaviour
     public enum GizmoType { Never, SelectedOnly, Always }
     public bool spawnBoids = true;
     public Boid prefab;
+    public GameObject opponentPlayerPrefab;
     public float spawnRadius = 10;
     public int spawnCount = 10;
     public Color color1;
@@ -30,6 +31,15 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         StartCoroutine(InitializeBoidSlowly());
+    }
+
+    public void SpawnOpponentPlayers()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Vector3 pos = new Vector3(Random.Range(-5,5), 4, Random.Range(-5,5));
+            Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
+        }
     }
 
 

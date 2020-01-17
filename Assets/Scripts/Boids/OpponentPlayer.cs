@@ -221,7 +221,7 @@ public class OpponentPlayer : MonoBehaviour
 
                             if (leaderToAttack.LeaderIsHumanPlayer())
                             {
-                                guiOverlay.DisplayMainMessage("Achtung. Ein anderer Schwarm greift dich an", 4);
+                                guiOverlay.DisplayMainMessage("Achtung! Ein anderer Schwarm greift dich an", 4);
                             }
                             
                         }
