@@ -20,8 +20,8 @@ public class Spawner : MonoBehaviour
     public GizmoType showSpawnRegion;
     Transform fishHolder;
 
-    private Color[] opponentPlayerColor1 = { Color.cyan, Color.yellow, Color.magenta };
-    private Color[] opponentPlayerColor2 = { Color.blue, Color.yellow, Color.yellow };
+    private Color[] opponentPlayerColor1 = { Color.cyan, Color.yellow, Color.blue };
+    private Color[] opponentPlayerColor2 = { Color.cyan, Color.yellow, Color.blue };
 
     void Awake()
     {
@@ -42,8 +42,8 @@ public class Spawner : MonoBehaviour
         {
             MapGenerator mapGenerator = FindObjectOfType<MapGenerator>();
             Vector3 pos = new Vector3(
-                Random.Range(3f, mapGenerator.mapSize.x - 3f), 
-                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f), 
+                Random.Range(3f, mapGenerator.mapSize.x - 3f),
+                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f),
                 Random.Range(3f, mapGenerator.mapSize.z - 3f)
             );
             GameObject tempGameObject = Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
@@ -68,27 +68,28 @@ public class Spawner : MonoBehaviour
     }
 
 
-    private IEnumerator InitializeBoidSlowly() {
-        
+    private IEnumerator InitializeBoidSlowly()
+    {
+
         int count = 0;
 
         yield return new WaitForSeconds(10);
 
-        while (count < spawnCount)        
+        while (count < spawnCount)
         {
 
-                Vector3 pos = Random.insideUnitSphere * spawnRadius;
-                Boid boid = Instantiate(prefab, pos, Quaternion.identity);
-                boid.transform.parent = fishHolder;
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
 
-                boid.PassColor(color1, color2);
-                boid.Initialize(settings, null);
-                boid.RespawnBoid();
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
 
-                //Debug.Log("Initializing Boid #:" +count);
-                yield return new WaitForSeconds(0.015f); //0.25
+            //Debug.Log("Initializing Boid #:" +count);
+            yield return new WaitForSeconds(0.015f); //0.25
 
-                count++;
+            count++;
         }
 
         boidManager.BoidInitializationCompleted();
