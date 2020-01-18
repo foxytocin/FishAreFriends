@@ -52,16 +52,15 @@ public class BoidManager : MonoBehaviour
         spawner = FindObjectOfType<Spawner>();
     }
 
-    public void BoidInitializationCompleted() {
+    public void BoidInitializationCompleted()
+    {
         timeTilCellUpdate = timeBetweenCellUpdates;
         boidInitializationCompleted = true;
-
-        Debug.Log("Initialization of " +spawner.spawnCount+ " Boids completed");
     }
 
     void Update()
     {
-       timeTilCellUpdate -= Time.deltaTime;
+        timeTilCellUpdate -= Time.deltaTime;
 
         if (cellGroups.allBoidCells != null)
         {
@@ -115,7 +114,7 @@ public class BoidManager : MonoBehaviour
 
                 positionArray.Dispose();
                 directionArray.Dispose();
-                
+
                 velocityArray.Dispose();
                 targetPositionArray.Dispose();
                 hasTargetArray.Dispose();
@@ -124,12 +123,14 @@ public class BoidManager : MonoBehaviour
                 {
                     Boid boid = boidsList[i];
 
-                    if(boid.alife)
+                    if (boid.alife)
                     {
                         foodNeedsSum += boid.foodNeeds;
                         boid.UpdateBoid(accelerationArray[i]);
 
-                    } else if (boid.status != Boid.Status.died) {
+                    }
+                    else if (boid.status != Boid.Status.died)
+                    {
 
                         boid.status = Boid.Status.died;
                         boid.setColor(Color.black, Color.black);
@@ -138,12 +139,12 @@ public class BoidManager : MonoBehaviour
                     }
                 }
 
-                accelerationArray.Dispose();            
+                accelerationArray.Dispose();
             }
             ecoSystemManager.setfoodDemandFishes(foodNeedsSum);
 
 
-            if(boidInitializationCompleted && timeTilCellUpdate < 0f)
+            if (boidInitializationCompleted && timeTilCellUpdate < 0f)
             {
                 timeTilCellUpdate = timeBetweenCellUpdates;
 
@@ -152,7 +153,7 @@ public class BoidManager : MonoBehaviour
                 {
                     newList.Add(new List<Boid>());
                 }
-      
+
                 foreach (List<Boid> boidsList in cellGroups.allBoidCells)
                 {
                     int Count = boidsList.Count;
@@ -163,7 +164,7 @@ public class BoidManager : MonoBehaviour
                     {
                         positionArray2[i] = boidsList[i].position;
                     }
-                
+
                     CalculateCellPosition calculateCellPosition = new CalculateCellPosition
                     {
                         positionArray2 = positionArray2,

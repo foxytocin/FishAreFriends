@@ -87,7 +87,7 @@ public class Spawner : MonoBehaviour
             boid.RespawnBoid();
 
             //Debug.Log("Initializing Boid #:" +count);
-            yield return new WaitForSeconds(0.015f); //0.25
+            yield return new WaitForSeconds(0.015f);
 
             count++;
         }
