@@ -30,7 +30,7 @@ public class Predator : MonoBehaviour
     public LayerMask obstacleMask;
 
     // hunting
-    GameObject boidToHunt = null;
+    Boid boidToHunt = null;
     public int fishNutritionalValue = 700;
 
     // food
@@ -89,7 +89,7 @@ public class Predator : MonoBehaviour
         }
     }
 
-    public void IAmYourBoid(GameObject boid)
+    public void IAmYourBoid(Boid boid)
     {
         if (boidToHunt == null)
             boidToHunt = boid;
@@ -97,7 +97,7 @@ public class Predator : MonoBehaviour
 
     public bool BoidDied(Boid boid, int vitality)
     {
-        if (!boidToHunt.Equals(boid.gameObject))
+        if (!boidToHunt.Equals(boid))
             return false;
 
         boidToHunt = null;
@@ -126,6 +126,37 @@ public class Predator : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
+        // check leaders and hunt their boids
+
+        if (Leader.leaderList != null)
+        {
+            Leader leaderToAttack = null;
+            float distanceToLeader = float.MaxValue;
+            foreach (Leader leader in Leader.leaderList)
+            {
+
+                float tempDistance = Vector3.Distance(position, leader.getPosition());
+                if (tempDistance < distanceToLeader)
+                {
+                    leaderToAttack = leader;
+                    distanceToLeader = tempDistance;
+                }
+            }
+
+            // if the nearest leaders has boids in swarm, attack him
+            if (leaderToAttack != null && distanceToLeader < 30f && leaderToAttack.GetSwarmSize() > 0)
+            {
+
+                boidToHunt = leaderToAttack.GetSwarmList()[0];
+                if (leaderToAttack.LeaderIsHumanPlayer())
+                {
+                    guiOverlay.DisplayMainMessage("Achtung! Der Hai hat deinen Schwarm im Visier.", 4, GuiOverlay.MessageType.warning);
+                }
+
+            }
+        }
+
+
         if (boidToHunt != null && (foodNeeds < 200 || isHunting))
         {
             if (!isHunting)
@@ -136,10 +167,10 @@ public class Predator : MonoBehaviour
 
             float distance = Vector3.Distance(position, boidToHunt.transform.position);
 
-            if (!boidToHunt.activeSelf)
+            if (!boidToHunt.gameObject.activeSelf)
                 boidToHunt = null;
 
-            if (distance > 10)
+            if (distance > 10f)
                 boidToHunt = null;
 
         }
