@@ -12,7 +12,7 @@ public struct SwarmInformation
 public class CalculateSwarmSizes : MonoBehaviour
 {
 
-    public List<SwarmInformation> calculatedSwarmSizeList;
+    public static List<SwarmInformation> calculatedSwarmSizeList;
 
     private void Awake()
     {
