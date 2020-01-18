@@ -300,7 +300,7 @@ public class Boid : MonoBehaviour
                     Vector3 positionToPredator = predator.getPosition() - position;
                     accelerationBehaviorChanges += positionToPredator * -(settings.predatorAvoidanceForce);
 
-                    predator.IAmYourBoid(gameObject);
+                    predator.IAmYourBoid(this);
 
                     if (distanceToPredator <= 1.5f)
                     {
