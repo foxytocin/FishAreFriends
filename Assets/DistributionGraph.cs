@@ -4,45 +4,51 @@ using System.Collections.Generic;
 
 public class DistributionGraph : MonoBehaviour
 {
-
     public DisplaySegment displaySegmentPrefab;
-    public int displayElementsAmount = 2;
     private List<DisplaySegment> displaySegmentsArray;
+    private int existingElements = 0;
 
-    public float player1 = 0;
-    public float player2 = 0;
-
-    private Color32[] colorArray;
 
     void Awake()
     {
         displaySegmentsArray = new List<DisplaySegment>();
-        colorArray = new Color32[] { new Color32(255, 0, 0, 255), new Color32(0, 255, 0, 255) };
     }
 
     // Start is called before the first frame update
-    void Start()
+    void GenerateElement(Color color)
     {
-        for (int i = 0; i < displayElementsAmount; i++)
-        {
-            DisplaySegment seg = Instantiate(displaySegmentPrefab);
-            seg.transform.SetParent(this.transform, false);
-            seg.SetInitialPosition(new Vector2(-1000, 0));
-            seg.SetColor(colorArray[i]);
+        DisplaySegment seg = Instantiate(displaySegmentPrefab);
 
-            displaySegmentsArray.Add(seg);
-        }
+        seg.transform.SetParent(this.transform, false);
+        seg.transform.SetSiblingIndex(1);
+        seg.SetInitialPosition(new Vector2(-1000, 0));
+        seg.SetColor((Color32)color);
 
-        Test();
+        displaySegmentsArray.Add(seg);
     }
 
-    float posSum = 100;
-    void Test()
+
+    void LateUpdate()
     {
-        for (int i = 0; i < displaySegmentsArray.Count; i++)
+        if (CalculateSwarmSizes.calculatedSwarmSizeList.Count > 0)
         {
-            displaySegmentsArray[i].SetPosition(posSum);
-            posSum += 100;
+            if (CalculateSwarmSizes.calculatedSwarmSizeList.Count > existingElements)
+            {
+                existingElements++;
+                int elementToCreate = CalculateSwarmSizes.calculatedSwarmSizeList.Count - existingElements;
+                GenerateElement(CalculateSwarmSizes.calculatedSwarmSizeList[elementToCreate].color);
+            }
+        }
+
+
+        if (displaySegmentsArray.Count > 0)
+        {
+            float posSum = -1000;
+            for (int i = displaySegmentsArray.Count - 1; i >= 0; i--)
+            {
+                posSum += CalculateSwarmSizes.calculatedSwarmSizeList[i].size;
+                displaySegmentsArray[displaySegmentsArray.Count - 1 - i].SetPosition(posSum);
+            }
         }
     }
 }

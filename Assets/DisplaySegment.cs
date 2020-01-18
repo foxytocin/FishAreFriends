@@ -16,6 +16,7 @@ public class DisplaySegment : MonoBehaviour
 
     public void SetColor(Color32 color_)
     {
+        color_.a = 255;
         segmentImage.color = color_;
     }
 

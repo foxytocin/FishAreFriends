@@ -47,7 +47,7 @@ public class CalculateSwarmSizes : MonoBehaviour
 
                 }
 
-                if(humanPlayer != null)
+                if (humanPlayer != null)
                 {
                     calculatedSwarmSizeList.Add(new SwarmInformation
                     {
@@ -57,6 +57,7 @@ public class CalculateSwarmSizes : MonoBehaviour
                 }
             }
 
+            Debug.Log("PlayerCountCALC: " + CalculateSwarmSizes.calculatedSwarmSizeList.Count);
             yield return new WaitForSeconds(3f);
         }
     }
