@@ -91,12 +91,12 @@ public class CellGroups : MonoBehaviour
                 }
             }
 
-            int cellCount = 0;
-            foreach (List<Boid> boidsList in allBoidCells)
-            {
-                print("BoidCountinCell "+cellCount+ ": " +boidsList.Count);
-                cellCount++;
-            }
+            // int cellCount = 0;
+            // foreach (List<Boid> boidsList in allBoidCells)
+            // {
+            //     print("BoidCountinCell "+cellCount+ ": " +boidsList.Count);
+            //     cellCount++;
+            // }
         }
     }
 }
