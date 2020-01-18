@@ -164,7 +164,7 @@ public class Leader : MonoBehaviour
 
         if (distanceToOtherLeader <= 5f && otherLeader != null)
         {
-            Debug.Log("Found other leader");
+            // Debug.Log("Found other leader");
             int otherSwarmCount = otherLeader.GetSwarmSize();
             int mySwarmCount = GetSwarmSize();
 

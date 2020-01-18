@@ -106,12 +106,12 @@ public class OpponentPlayer : MonoBehaviour
         else
         {
             opponentBehavior = OpponentBehavior.AttackOtherLeader;
-            Debug.Log("Switched opponentBehavior to attackOtherLeader");
+            // Debug.Log("Switched opponentBehavior to attackOtherLeader");
         }
 
         if (avgEnergieSwarm < 500)
         {
-            Debug.Log("Opponent Player swarm is hungry");
+            // Debug.Log("Opponent Player swarm is hungry");
             opponentBehavior = OpponentBehavior.SearchForFood;
         }
 
@@ -175,7 +175,7 @@ public class OpponentPlayer : MonoBehaviour
                 if (boidToHunt.HasLeader())
                 {
                     boidToHunt = null;
-                    Debug.Log("Boid reached or joined to other swarm.");
+                    // Debug.Log("Boid reached or joined to other swarm.");
                     speed = maxSpeed / 4;
                 }
 
@@ -198,7 +198,7 @@ public class OpponentPlayer : MonoBehaviour
                 // if i have no leader to hunt
                 if (leaderToAttack == null && timeToRehunt <= 0)
                 {
-                    Debug.Log("Search for other leader");
+                    // Debug.Log("Search for other leader");
                     // find other leader
                     float distanceToLeader = float.MaxValue;
                     if (Leader.leaderList != null)
@@ -213,7 +213,7 @@ public class OpponentPlayer : MonoBehaviour
                             {
                                 leaderToAttack = leader;
                                 distanceToLeader = tempDistance;
-                                Debug.Log("I found an other leader, but check his strength.");
+                                // Debug.Log("I found an other leader, but check his strength.");
                             }
                         }
 
@@ -221,7 +221,7 @@ public class OpponentPlayer : MonoBehaviour
                         if (distanceToLeader < 80f && leaderToAttack.GetSwarmSize() < myLeaderScript.GetSwarmSize())
                         {
                             timeToStayNextToAttackedLeader = 7f;
-                            Debug.Log("Strength is ok. Lets attack him.");
+                            // Debug.Log("Strength is ok. Lets attack him.");
 
                             if (leaderToAttack.LeaderIsHumanPlayer())
                             {
@@ -232,7 +232,7 @@ public class OpponentPlayer : MonoBehaviour
                         else
                         {
                             // if other swarm is too big, search for boids
-                            Debug.Log("The other swarm is to strong for me. I search for boids.");
+                            // Debug.Log("The other swarm is to strong for me. I search for boids.");
                             opponentBehavior = OpponentBehavior.SearchForBoids;
                             leaderToAttack = null;
                         }
@@ -249,7 +249,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         // stay next to leader a specific time
                         timeToStayNextToAttackedLeader -= Time.deltaTime;
-                        Debug.Log("I came to the other leader less than 5 EE.");
+                        // Debug.Log("I came to the other leader less than 5 EE.");
 
                     }
                     else if (distanceToOtherLeader < 10f && timeToStayNextToAttackedLeader <= 0)
@@ -259,7 +259,7 @@ public class OpponentPlayer : MonoBehaviour
                     }
                     else if (distanceToOtherLeader > 10f && timeToStayNextToAttackedLeader <= 0)
                     {
-                        Debug.Log("I can search for a new leader to attack.");
+                        // Debug.Log("I can search for a new leader to attack.");
                         // delete leaderToAttack, if i am fa
                         leaderToAttack = null;
                         speed = maxSpeed / 3f;
@@ -293,12 +293,12 @@ public class OpponentPlayer : MonoBehaviour
                             nearestFoodIndex = i;
                         }
                     }
-                    Debug.Log("Nächste Futterquelle ist " + nearestFood + " entfernt");
+                    // Debug.Log("Nächste Futterquelle ist " + nearestFood + " entfernt");
 
                     // found food: setting food-parameters
                     if (nearestFood < 20f)
                     {
-                        Debug.Log("Futterquelle ist nahe gefunden");
+                        // Debug.Log("Futterquelle ist nahe gefunden");
 
                         foodTarget = foodList[nearestFoodIndex];
 
@@ -316,7 +316,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
                         foodTarget = null;
-                        Debug.Log("I got newFood " + cachedFoodInLeader);
+                        // Debug.Log("I got newFood " + cachedFoodInLeader);
 
                         // feed the swarm if not alreay feeding
                         if (!coroutineFeedSwarmRunning && cachedFoodInLeader > 0)
