@@ -46,18 +46,24 @@ public class Tutorial : MonoBehaviour
         // display
         yield return new WaitForSeconds(13);
         topStatsScroller.FadeInTopStats();
-        guiOverlay.DisplayMainMessage("Oben rechts kannst Du sehen, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
+        guiOverlay.DisplayMainMessage("Die Zahl oben rechts gibt an, wie gross Dein Schwarm ist", 4, GuiOverlay.MessageType.tutorial);
 
         // display
         yield return new WaitForSeconds(15);
-        guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt dir, wie hungrig dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
+        guiOverlay.DisplayMainMessage("Wie groß Dein Anteil an allen Fischen ist, zeigt der Balken an", 5, GuiOverlay.MessageType.tutorial);
 
+        // display
+        yield return new WaitForSeconds(15);
+        guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt Dir, wie hungrig dein Schwarm ist", 4, GuiOverlay.MessageType.tutorial);
 
         // spawn opponentPlayers
         yield return new WaitForSeconds(15);
         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
         guiOverlay.DisplayMainMessage("Es sind weitere Fischschwaerme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
 
+        // display
+        yield return new WaitForSeconds(30);
+        guiOverlay.DisplayMainMessage("Im Balkendiagramm kannst Du nun deine Schwarmgrosse mit der der Anderen vergleichen", 7, GuiOverlay.MessageType.tutorial);
 
         // beware the shark
         yield return new WaitForSeconds(60);
