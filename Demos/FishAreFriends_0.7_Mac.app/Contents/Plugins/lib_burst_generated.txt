@@ -5,9 +5,9 @@
 --float-precision=Standard
 --format=MachO
 --output=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/FishAreFriends_0.7_Mac.app/Contents/Plugins/lib_burst_generated
---root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Collections.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Scenes.Hybrid.dll
+--root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Entities.Hybrid.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/UnityEngine.UI.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Entities.dll
@@ -162,9 +162,9 @@
 --float-precision=Standard
 --format=MachO
 --output=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/FishAreFriends_0.7_Mac.app/Contents/Plugins/lib_burst_generated
---root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Collections.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Scenes.Hybrid.dll
+--root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Entities.Hybrid.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/UnityEngine.UI.dll
 --root-assembly=/Users/andreas/LokaleDaten/FishAreFriends/Temp/StagingArea/Data/Managed/Unity.Entities.dll
