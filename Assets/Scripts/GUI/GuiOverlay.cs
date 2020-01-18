@@ -58,7 +58,7 @@ public class GuiOverlay : MonoBehaviour
             switch (type)
             {
                 case MessageType.info:
-                    mainMessagesColor = new Color(0, 0, 255, 0);
+                    mainMessagesColor = new Color(255, 255, 0, 0);
                     break;
                 case MessageType.tutorial:
                     mainMessagesColor = mainMessagesColorStandard;
