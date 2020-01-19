@@ -29,7 +29,6 @@ public class DisplaySegment : MonoBehaviour
     public void SetPosition(float posX)
     {
         targetPosX = posX;
-        //rectTransform[0].anchoredPosition = new Vector2(posX, 0);
     }
 
     float tmpPosX;
@@ -47,7 +46,7 @@ public class DisplaySegment : MonoBehaviour
         {
             if (rectTransform[0].anchoredPosition.x != targetPosX)
             {
-                tmpPosX = Mathf.Lerp(rectTransform[0].anchoredPosition.x, targetPosX, 0.1f);
+                tmpPosX = Mathf.Lerp(rectTransform[0].anchoredPosition.x, targetPosX, 0.3f * Time.deltaTime);
                 rectTransform[0].anchoredPosition = new Vector2(tmpPosX, 0);
             }
             yield return new WaitForEndOfFrame();
