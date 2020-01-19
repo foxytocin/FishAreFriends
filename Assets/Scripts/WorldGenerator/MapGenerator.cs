@@ -43,6 +43,13 @@ public class MapGenerator : MonoBehaviour
     public float growDensityGrass = 0.25f;
 
 
+    [Header("Bubbles")]
+    public GameObject prefabBubbles;
+
+    [Range(0, 0.5f)]
+    public float amountBubbles = 0.1f;
+
+
     [Header("Seaweed")]
     public GameObject prefabSeaweed;
     [Range(0.5f, 1)]
@@ -175,6 +182,16 @@ public class MapGenerator : MonoBehaviour
                         if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
 #if (UNITY_EDITOR)
+                    }
+
+                    // bubbles
+                    if (Random.value < amountBubbles)
+                    {
+                        GameObject bubble = Instantiate(prefabBubbles, new Vector3(0, 0, 0), Quaternion.identity);
+                        bubble.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
+                        bubble.transform.localEulerAngles += new Vector3(-90, 0, 0);
+                        bubble.transform.parent = enviromentHolder;
+                        bubble.tag = "Enviroment";
                     }
 #endif
                 }
