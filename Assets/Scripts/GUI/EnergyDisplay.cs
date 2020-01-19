@@ -15,7 +15,7 @@ public class EnergyDisplay : MonoBehaviour
     private float targetX;
     private float targetY;
     public float energyStatus = 1000f;
-    private float colorPercent = 100;
+    //private float colorPercent = 100;
     RectTransform[] rectTransformOverlay;
     Color32 emptyFishOriginalColor;
     public GameObject overlay;
@@ -36,7 +36,7 @@ public class EnergyDisplay : MonoBehaviour
         posY = fullPosY;
         emptyPosY = -fullPosY;
         emptyFishOriginalColor = empty.color;
-        warningThreshold = Boid.thresholdStarving;
+        warningThreshold = Boid.thresholdStarving * 1.2f; // 20 percent more
     }
 
     void LateUpdate()
@@ -47,13 +47,13 @@ public class EnergyDisplay : MonoBehaviour
 
         if (posX != targetX)
         {
-            posX = Mathf.Lerp(rectTransformOverlay[0].anchoredPosition.x, targetX, 0.2f);
+            posX = Mathf.Lerp(rectTransformOverlay[0].anchoredPosition.x, targetX, 0.1f);
             rectTransformOverlay[0].anchoredPosition = new Vector2(posX, posY);
         }
 
         if (posY != targetY)
         {
-            posY = Mathf.Lerp(rectTransformOverlay[0].anchoredPosition.y, targetY, 0.2f);
+            posY = Mathf.Lerp(rectTransformOverlay[0].anchoredPosition.y, targetY, 0.1f);
             rectTransformOverlay[0].anchoredPosition = new Vector2(posX, posY);
         }
 
@@ -79,10 +79,10 @@ public class EnergyDisplay : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(1.3f);
             empty.color = new Color32(255, 0, 0, 150);
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
             empty.color = emptyFishOriginalColor;
         }
     }
