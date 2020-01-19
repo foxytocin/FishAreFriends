@@ -14,6 +14,7 @@ public class GuiOverlay : MonoBehaviour
     private Color mainMessagesColorStandard;
     private float alpha = 1f;
     private float timeToFade = 2;
+    private bool broadcastingMessage = false;
 
 
     public enum MessageType
@@ -52,30 +53,35 @@ public class GuiOverlay : MonoBehaviour
 
     public void DisplayMainMessage(string message, int timeToFade_, MessageType type)
     {
-        switch (type)
+        if (!broadcastingMessage)
         {
-            case MessageType.info:
-                mainMessagesColor = mainMessagesColorStandard;
-                break;
-            case MessageType.tutorial:
-                mainMessagesColor = mainMessagesColorStandard;
-                break;
-            case MessageType.warning:
-                mainMessagesColor = new Color(255, 0, 0, 0);
-                break;
-            default:
-                break;
+            switch (type)
+            {
+                case MessageType.info:
+                    mainMessagesColor = new Color(255, 255, 0, 0);
+                    break;
+                case MessageType.tutorial:
+                    mainMessagesColor = mainMessagesColorStandard;
+                    break;
+                case MessageType.warning:
+                    mainMessagesColor = new Color(255, 0, 0, 0);
+                    break;
+                default:
+                    break;
+            }
+
+            timeToFade = timeToFade_;
+            mainMessages.text = message;
+
+            StartCoroutine(DisplayAndFadeMainMessage());
         }
-
-        timeToFade = timeToFade_;
-        mainMessages.text = message;
-
-        StartCoroutine(DisplayAndFadeMainMessage());
     }
 
 
     private IEnumerator DisplayAndFadeMainMessage()
     {
+        broadcastingMessage = true;
+
         alpha = 0;
         while (alpha < 1)
         {
@@ -98,5 +104,7 @@ public class GuiOverlay : MonoBehaviour
 
         alpha = 0;
         mainMessages.text = "";
+
+        broadcastingMessage = false;
     }
 }

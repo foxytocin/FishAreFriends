@@ -117,7 +117,7 @@ public class Leader : MonoBehaviour
 
         if (humanPlayer)
         {
-            guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
+            //guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
 
             int avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
             guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
@@ -196,11 +196,9 @@ public class Leader : MonoBehaviour
             }
 
             waitForNextRipCount = 10f;
-
         }
         else
         {
-
             forceField.StopPulse();
         }
 
@@ -232,7 +230,7 @@ public class Leader : MonoBehaviour
                 neededFood = (neededFood > 0) ? neededFood : 0;
                 int gotFromSource = foodTarget.getFood(neededFood);
                 availableEnergie += gotFromSource;
-                Debug.Log("Hunger of Swarm: " + hungerOfSwarm + " / Got from FoodSource: " + gotFromSource);
+                //Debug.Log("Hunger of Swarm: " + hungerOfSwarm + " / Got from FoodSource: " + gotFromSource);
             }
         }
 
