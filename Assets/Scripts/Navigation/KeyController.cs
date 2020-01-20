@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using Unity.Mathematics;
+using System.Collections;
 
 public class KeyController : MonoBehaviour
 {
 
     CellGroups cellGroups;
+    GuiOverlay guiOverlay;
 
     // State
     [HideInInspector]
@@ -24,19 +26,22 @@ public class KeyController : MonoBehaviour
     public LayerMask obstacleMask;
 
     // Key events
-    bool upKeyPressed = false;
-    bool downKeyPressed = false;
-    bool leftKeyPressed = false;
-    bool rightKeyPressed = false;
+    private bool upKeyPressed = false;
+    private bool downKeyPressed = false;
+    private bool leftKeyPressed = false;
+    private bool rightKeyPressed = false;
+    private bool invertedControlls = false;
+    private bool invertingSemaphor = false;
 
     // Debug
-    bool showDebug = true;
+    private bool showDebug = true;
 
 
     void Awake()
     {
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cellGroups = FindObjectOfType<CellGroups>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         Cursor.visible = false;
@@ -51,12 +56,38 @@ public class KeyController : MonoBehaviour
         velocity = transform.forward * startSpeed;
     }
 
+
+    private IEnumerator InvertControll()
+    {
+        invertingSemaphor = true;
+
+        if (invertedControlls)
+        {
+            invertedControlls = false;
+            guiOverlay.DisplayMainMessage("Invertierte Steuerung deaktiviert", 1, GuiOverlay.MessageType.info);
+        }
+        else
+        {
+            invertedControlls = true;
+            guiOverlay.DisplayMainMessage("Invertierte Steuerung aktiviert", 1, GuiOverlay.MessageType.info);
+        }
+
+        upKeyPressed = false;
+        downKeyPressed = false;
+        yield return new WaitForSeconds(0.5f);
+        invertingSemaphor = false;
+    }
+
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
 
         cellGroups.SetPlayerCell(transform.position);
+
+        if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))
+            StartCoroutine(InvertControll());
 
         Vector3 acceleration = Vector3.zero;
         bool isHeadingForCollision = IsHeadingForCollision();
@@ -100,10 +131,21 @@ public class KeyController : MonoBehaviour
                 leftKeyPressed = true;
             if (Input.GetKeyDown(KeyCode.D))
                 rightKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.W))
-                upKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.S))
-                downKeyPressed = true;
+
+            if (!invertedControlls)
+            {
+                if (Input.GetKeyDown(KeyCode.W))
+                    upKeyPressed = true;
+                if (Input.GetKeyDown(KeyCode.S))
+                    downKeyPressed = true;
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.S))
+                    upKeyPressed = true;
+                if (Input.GetKeyDown(KeyCode.W))
+                    downKeyPressed = true;
+            }
         }
 
         // key downs
@@ -111,11 +153,21 @@ public class KeyController : MonoBehaviour
             leftKeyPressed = false;
         if (Input.GetKeyUp(KeyCode.D))
             rightKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.W))
-            upKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.S))
-            downKeyPressed = false;
 
+        if (!invertedControlls)
+        {
+            if (Input.GetKeyUp(KeyCode.W))
+                upKeyPressed = false;
+            if (Input.GetKeyUp(KeyCode.S))
+                downKeyPressed = false;
+        }
+        else
+        {
+            if (Input.GetKeyUp(KeyCode.S))
+                upKeyPressed = false;
+            if (Input.GetKeyUp(KeyCode.W))
+                downKeyPressed = false;
+        }
 
         if (!isHeadingForCollision)
         {

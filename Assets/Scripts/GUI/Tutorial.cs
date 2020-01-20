@@ -46,11 +46,13 @@ public class Tutorial : MonoBehaviour
         // display
         yield return new WaitForSeconds(13);
         topStatsScroller.FadeInTopStats();
-        guiOverlay.DisplayMainMessage("Die Zahl oben rechts gibt an, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
+
+        yield return new WaitForSeconds(3);
+        guiOverlay.DisplayMainMessage("Die Zahl im Infobereich gibt an, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
 
         // display
         yield return new WaitForSeconds(15);
-        guiOverlay.DisplayMainMessage("Wie gross Dein Anteil an allen Fischen ist, zeigt der Balken an", 7, GuiOverlay.MessageType.tutorial);
+        guiOverlay.DisplayMainMessage("Das Balkendiagramm zeigt das Verhaeltnis zu allen Fischen im Aquarium", 7, GuiOverlay.MessageType.tutorial);
 
         // display
         yield return new WaitForSeconds(15);
@@ -63,7 +65,7 @@ public class Tutorial : MonoBehaviour
 
         // display
         yield return new WaitForSeconds(30);
-        guiOverlay.DisplayMainMessage("Im Balkendiagramm kannst Du nun deine Schwarmgroesse mit der der Anderen vergleichen", 8, GuiOverlay.MessageType.tutorial);
+        guiOverlay.DisplayMainMessage("Im Balkendiagramm kannst Du nun deine Schwarmgroesse, mit der der Anderen vergleichen", 8, GuiOverlay.MessageType.tutorial);
 
         // beware the shark
         yield return new WaitForSeconds(60);
