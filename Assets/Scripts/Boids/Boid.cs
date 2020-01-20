@@ -396,7 +396,13 @@ public class Boid : MonoBehaviour
     }
 
 
-    void setFoodNeeds()
+    public void setFoodNeeds(int newValue)
+    {
+        foodLeft = newValue;
+        foodNeeds = basicFoodNeed - foodLeft;
+    }
+
+    private void setFoodNeeds()
     {
         if (foodNeeds > basicFoodNeed)
         {

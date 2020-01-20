@@ -24,6 +24,9 @@ public class Leader : MonoBehaviour
     private List<Food> foodList;
     private bool coroutineFeedSwarmRunning = false;
 
+    // food
+    private bool boidAddedWhileCheckFoodNeeds = false;
+
     private void Awake()
     {
         swarmList = new List<Boid>();
@@ -70,6 +73,13 @@ public class Leader : MonoBehaviour
 
         if (humanPlayer)
             guiOverlay.SetPlayerSwarmSize(swarmList.Count);
+
+
+
+        if (!coroutineFeedSwarmRunning)
+            StartCoroutine(FeedSwarm());
+        else
+            boidAddedWhileCheckFoodNeeds = true;
     }
 
 
@@ -117,7 +127,7 @@ public class Leader : MonoBehaviour
 
         if (humanPlayer)
         {
-            //guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
+            guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
 
             int avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
             guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
@@ -244,68 +254,29 @@ public class Leader : MonoBehaviour
     {
         coroutineFeedSwarmRunning = true;
 
-        while (availableEnergie > 0)
+        do
         {
-            // first: feed starving boids
+            // get existing food in boids
+            int existingFoodInBoids = 0;
             foreach (Boid boid in swarmList)
-            {
-                if (boid.starving)
-                {
-                    int foodNeeds = boid.foodNeeds;
-                    if (availableEnergie > foodNeeds)
-                    {
-                        availableEnergie -= foodNeeds;
-                        boid.foodNeeds = 0;
-                    }
-                    else
-                    {
-                        boid.foodNeeds -= availableEnergie;
-                        availableEnergie = 0;
-                    }
-                }
-            }
+                existingFoodInBoids += boid.foodLeft;
 
-            // second: feed hungry boids
+            // add collected food
+            existingFoodInBoids += availableEnergie;
+            availableEnergie = 0;
+
+            // set food in boids
+            int foodViaBoid = existingFoodInBoids / swarmList.Count;
+            Debug.Log(foodViaBoid);
+            Debug.Log(swarmList.Count);
             foreach (Boid boid in swarmList)
-            {
-                if (boid.hungry)
-                {
-                    int foodNeeds = boid.foodNeeds;
-                    if (availableEnergie > foodNeeds)
-                    {
-                        availableEnergie -= foodNeeds;
-                        boid.foodNeeds = 0;
-                    }
-                    else
-                    {
-                        boid.foodNeeds -= availableEnergie;
-                        availableEnergie = 0;
-                    }
-                }
-            }
+                boid.setFoodNeeds(foodViaBoid);
+                
 
-            // third: feed all the other boids
-            foreach (Boid boid in swarmList)
-            {
-                int foodNeeds = boid.foodNeeds;
-                if (foodNeeds > 0)
-                {
-                    if (availableEnergie > foodNeeds)
-                    {
-                        availableEnergie -= foodNeeds;
-                        boid.foodNeeds = 0;
-                    }
-                    else
-                    {
-                        boid.foodNeeds -= availableEnergie;
-                        availableEnergie = 0;
-                    }
-                }
-            }
+            boidAddedWhileCheckFoodNeeds = false;
+            yield return new WaitForSeconds(0.2f);
 
-            yield return new WaitForSeconds(0.1f);
-        }
-
+        } while (boidAddedWhileCheckFoodNeeds);
         coroutineFeedSwarmRunning = false;
     }
 
