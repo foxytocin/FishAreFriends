@@ -7,7 +7,7 @@ public class EnergyDisplay : MonoBehaviour
 
     GuiOverlay guiOverlay;
     private float fullPosX;
-    private float emptyPosX = 89f;
+    private float emptyPosX = 70f;
     private float posX;
     private float targetX;
     public float energyStatus = 1000f;

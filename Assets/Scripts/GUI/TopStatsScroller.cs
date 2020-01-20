@@ -4,7 +4,7 @@ using UnityEngine;
 public class TopStatsScroller : MonoBehaviour
 {
 
-    float offScreenOffset = 50f;
+    float offScreenOffset = 45f;
     float target;
     float position;
 
