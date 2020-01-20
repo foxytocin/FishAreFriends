@@ -183,6 +183,7 @@ public class MapGenerator : MonoBehaviour
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
 #if (UNITY_EDITOR)
                     }
+#endif
 
                     // bubbles
                     if (Random.value < amountBubbles)
@@ -193,7 +194,7 @@ public class MapGenerator : MonoBehaviour
                         bubble.transform.parent = enviromentHolder;
                         bubble.tag = "Enviroment";
                     }
-#endif
+
                 }
 
                 if (sample > thresholdSeaweed && Random.value < growDensitySeaweed)
