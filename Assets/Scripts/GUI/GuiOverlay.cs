@@ -33,10 +33,10 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    public void SetPlayerEnergie(int energie)
-    {
-        playerEnergie.text = energie.ToString();
-    }
+    // public void SetPlayerEnergie(int energie)
+    // {
+    //     playerEnergie.text = energie.ToString();
+    // }
 
     public void SetPlayerSwarmSize(int size)
     {
@@ -46,10 +46,10 @@ public class GuiOverlay : MonoBehaviour
         playerSwarmSize.text = size.ToString();
     }
 
-    public void SetDebugInfo(string text)
-    {
-        debugInfos.text = text;
-    }
+    // public void SetDebugInfo(string text)
+    // {
+    //     debugInfos.text = text;
+    // }
 
     public void DisplayMainMessage(string message, int timeToFade_, MessageType type)
     {

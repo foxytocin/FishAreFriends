@@ -64,7 +64,7 @@ MonoBehaviour:
   foodLeft: 0
   hungerRate: 2
   alife: 1
-  timeBetweedFoodUpdate: 3
+  timeBetweedFoodUpdate: 2
   status: 1
   hungry: 0
   starving: 0
