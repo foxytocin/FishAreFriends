@@ -18,7 +18,6 @@ public class MapGenerator : MonoBehaviour
 
     [Header("Bricks")]
     public GameObject prefabCube;
-    public GameObject prefabCylinder;
     public int amountSzeneElements = 30;
     public int sizeVariationBrick = 3;
 
@@ -102,6 +101,7 @@ public class MapGenerator : MonoBehaviour
     private Vector3[] verticesGround;
     private Mesh meshWater;
     private Vector3[] verticesWater;
+    public float[,] noiseMap;
 
 
 
@@ -128,7 +128,7 @@ public class MapGenerator : MonoBehaviour
         if (randomSeed)
             seed = Random.Range(0, 100000);
 
-        float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
+        noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
         ScaleUnderwaterDust();
 
