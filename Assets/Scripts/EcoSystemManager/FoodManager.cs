@@ -21,7 +21,7 @@ public class FoodManager : MonoBehaviour
         mapGenerator = FindObjectOfType<MapGenerator>();
         mapSize = mapGenerator.mapSize;
         spawnOffset = mapSize * 0.06f;
-        randomColor = new Color[] { Color.red, Color.green, Color.blue, Color.yellow };
+        randomColor = new Color[] { Color.yellow }; //{ Color.red, Color.green, Color.blue, Color.yellow };
     }
 
     void Update()
