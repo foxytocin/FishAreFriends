@@ -218,7 +218,7 @@ public class OpponentPlayer : MonoBehaviour
                         }
 
                         // if the nearest leaders swarm is smaler than mine, than attack im
-                        if (distanceToLeader < 80f && leaderToAttack.GetSwarmSize() < myLeaderScript.GetSwarmSize())
+                        if (distanceToLeader < 80f && leaderToAttack.GetSwarmSize() < myLeaderScript.GetSwarmSize() && leaderToAttack.GetSwarmSize() > 0)
                         {
                             timeToStayNextToAttackedLeader = 7f;
                             // Debug.Log("Strength is ok. Lets attack him.");
@@ -245,7 +245,7 @@ public class OpponentPlayer : MonoBehaviour
 
                     // if i got some boids, go away from this leader
                     float distanceToOtherLeader = Vector3.Distance(leaderToAttack.transform.position, position);
-                    if (distanceToOtherLeader < 5f && timeToStayNextToAttackedLeader > 0)
+                    if (distanceToOtherLeader < 6f && timeToStayNextToAttackedLeader > 0)
                     {
                         // stay next to leader a specific time
                         timeToStayNextToAttackedLeader -= Time.deltaTime;
@@ -255,9 +255,9 @@ public class OpponentPlayer : MonoBehaviour
                     else if (distanceToOtherLeader < 10f && timeToStayNextToAttackedLeader <= 0)
                     {
                         // go away from other leader
-                        acceleration += position;
+                        acceleration = leaderToAttack.transform.position * -1;
                     }
-                    else if (distanceToOtherLeader > 10f && timeToStayNextToAttackedLeader <= 0)
+                    else if (distanceToOtherLeader > 15f && timeToStayNextToAttackedLeader <= 0)
                     {
                         // Debug.Log("I can search for a new leader to attack.");
                         // delete leaderToAttack, if i am fa
