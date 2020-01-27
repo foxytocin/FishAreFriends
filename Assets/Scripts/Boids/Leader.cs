@@ -74,8 +74,6 @@ public class Leader : MonoBehaviour
         if (humanPlayer)
             guiOverlay.SetPlayerSwarmSize(swarmList.Count);
 
-
-
         if (!coroutineFeedSwarmRunning)
             StartCoroutine(FeedSwarm());
         else
@@ -127,10 +125,10 @@ public class Leader : MonoBehaviour
 
         if (humanPlayer)
         {
-            guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
+            //guiOverlay.SetDebugInfo("FoodNeed: " + hungerOfSwarm + " | H: " + boidsHungry + " | S: " + boidsStarving + " | FoodAv: " + availableEnergie);
 
             int avgEnergieSwarm = (swarmSize > 0) ? (energie / swarmSize) : 0;
-            guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
+            //guiOverlay.SetPlayerEnergie(avgEnergieSwarm);
             energyDisplay.SetEnergyStatus(avgEnergieSwarm);
         }
     }
@@ -271,7 +269,7 @@ public class Leader : MonoBehaviour
             Debug.Log(swarmList.Count);
             foreach (Boid boid in swarmList)
                 boid.setFoodNeeds(foodViaBoid);
-                
+
 
             boidAddedWhileCheckFoodNeeds = false;
             yield return new WaitForSeconds(0.2f);

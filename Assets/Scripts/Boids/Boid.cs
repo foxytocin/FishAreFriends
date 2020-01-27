@@ -140,7 +140,6 @@ public class Boid : MonoBehaviour
 
 
     Food foodTarget = null;
-    Vector3 foodPosition;
 
     private IEnumerator CalculateFoodBehavior()
     {
@@ -153,7 +152,7 @@ public class Boid : MonoBehaviour
 
             if (status == Status.swimmsToFood)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.2f);
             }
 
             foodNeeds += hungerRate;
@@ -171,7 +170,7 @@ public class Boid : MonoBehaviour
             if (foodTarget != null && foodTarget.checkAmount() > 0)
             {
                 //Debug.Log("Schwimmt zur bekannten Futterquelle");
-                accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce;
+                accelerationFoodBehavior = (foodTarget.GetPosition() - position) * settings.chaisingForFoodForce;
             }
             else
             {
@@ -200,15 +199,14 @@ public class Boid : MonoBehaviour
                         }
 
                         // found food: setting food-parameters
-                        if (nearestFood < 15f)
+                        if (nearestFood < 25f)
                         {
                             //Debug.Log("Futterquelle gefunden");
                             // swim towards food
                             status = Status.swimmsToFood;
 
                             foodTarget = foodList[nearestFoodIndex];
-                            foodPosition = foodTarget.GetPosition();
-                            accelerationFoodBehavior = (foodPosition - position) * settings.chaisingForFoodForce;
+                            accelerationFoodBehavior = (foodTarget.GetPosition() - position) * settings.chaisingForFoodForce;
                         }
                     }
                 }
@@ -218,7 +216,7 @@ public class Boid : MonoBehaviour
             if (status == Status.swimmsToFood)
             {
 
-                if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
                 {
                     foodNeeds -= foodTarget.getFood(foodNeeds);
                     setFoodNeeds();
