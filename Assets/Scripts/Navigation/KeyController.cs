@@ -123,32 +123,29 @@ public class KeyController : MonoBehaviour
         speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
         velocity = dir * speed;
 
-        // handle key events
-        if (!isHeadingForCollision)
-        {
-            // key ups
-            if (Input.GetKeyDown(KeyCode.A))
-                leftKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.D))
-                rightKeyPressed = true;
 
-            if (!invertedControlls)
-            {
-                if (Input.GetKeyDown(KeyCode.W))
-                    upKeyPressed = true;
-                if (Input.GetKeyDown(KeyCode.S))
-                    downKeyPressed = true;
-            }
-            else
-            {
-                if (Input.GetKeyDown(KeyCode.S))
-                    upKeyPressed = true;
-                if (Input.GetKeyDown(KeyCode.W))
-                    downKeyPressed = true;
-            }
+        // key ups
+        if (Input.GetKeyDown(KeyCode.A))
+            leftKeyPressed = true;
+        if (Input.GetKeyDown(KeyCode.D))
+            rightKeyPressed = true;
+
+        if (!invertedControlls)
+        {
+            if (Input.GetKeyDown(KeyCode.W))
+                upKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.S))
+                downKeyPressed = true;
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.S))
+                upKeyPressed = true;
+            if (Input.GetKeyDown(KeyCode.W))
+                downKeyPressed = true;
         }
 
-        // key downs
+        // key ups
         if (Input.GetKeyUp(KeyCode.A))
             leftKeyPressed = false;
         if (Input.GetKeyUp(KeyCode.D))
@@ -173,15 +170,23 @@ public class KeyController : MonoBehaviour
         {
 
             if (leftKeyPressed)
-                velocity -= transform.right * Time.deltaTime * speed;
+                velocity += Quaternion.Euler(0f, -1f * speed, 0f) * velocity;
             if (rightKeyPressed)
-                velocity += transform.right * Time.deltaTime * speed;
+                velocity += Quaternion.Euler(0f, 1f * speed, 0f) * velocity;
             if (upKeyPressed)
-                velocity += transform.up * Time.deltaTime * speed;
+            {
+                velocity += Quaternion.Euler(-6f * speed, 0f, 0f) * velocity;
+            }
+                
             if (downKeyPressed)
-                velocity -= transform.up * Time.deltaTime * speed;
+            {
+                velocity += Quaternion.Euler(6f * speed, 0f, 0f) * velocity;
+            }
+                
 
         }
+
+
 
 
         cachedTransform.position += velocity * Time.deltaTime;
