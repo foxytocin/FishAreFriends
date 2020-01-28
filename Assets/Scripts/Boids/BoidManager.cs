@@ -17,11 +17,13 @@ public class BoidManager : MonoBehaviour
     NativeArray<float3> velocityArray;
     NativeArray<float3> targetPositionArray;
     NativeArray<bool> hasTargetArray;
+    NativeArray<bool> hasLeaderArray;
     float viewRadius;
     float avoidRadius;
     float alignWeight;
     float cohesionWeight;
     float seperateWeight;
+    float seperateWeightLeader;
     float maxSpeed;
     float maxSteerForce;
     float targetWeight;
@@ -39,6 +41,7 @@ public class BoidManager : MonoBehaviour
         alignWeight = settings.alignWeight;
         cohesionWeight = settings.cohesionWeight;
         seperateWeight = settings.seperateWeight;
+        seperateWeightLeader = settings.seperateWeightLeader;
         maxSpeed = settings.maxSpeed;
         maxSteerForce = settings.maxSteerForce;
         targetWeight = settings.targetWeight;
@@ -74,6 +77,7 @@ public class BoidManager : MonoBehaviour
                 velocityArray = new NativeArray<float3>(Count, Allocator.TempJob);
                 targetPositionArray = new NativeArray<float3>(Count, Allocator.TempJob);
                 hasTargetArray = new NativeArray<bool>(Count, Allocator.TempJob);
+                hasLeaderArray = new NativeArray<bool>(Count, Allocator.TempJob);
 
                 for (int i = 0; i < Count; i++)
                 {
@@ -82,6 +86,7 @@ public class BoidManager : MonoBehaviour
                     positionArray[i] = boid.position;
                     directionArray[i] = boid.forward;
                     velocityArray[i] = boid.velocity;
+                    hasLeaderArray[i] = boid.HasLeader();
 
                     if (boid.velocity != null)
                         velocityArray[i] = boid.velocity;
@@ -99,6 +104,7 @@ public class BoidManager : MonoBehaviour
                     directionArray = directionArray,
                     accelerationArray = accelerationArray,
                     velocityArray = velocityArray,
+                    hasLeaderArray = hasLeaderArray,
                     viewRadiusSqr = viewRadius * viewRadius,
                     avoidRadiusSqr = avoidRadius * avoidRadius,
                     alignWeight = alignWeight,
@@ -106,7 +112,8 @@ public class BoidManager : MonoBehaviour
                     seperateWeight = seperateWeight,
                     maxSpeed = maxSpeed,
                     maxSteerForce = maxSteerForce,
-                    targetWeight = targetWeight
+                    targetWeight = targetWeight,
+                    seperateWeightLeader = seperateWeightLeader
                 };
 
                 JobHandle jobHandle1 = cellBoidParallelJob.Schedule(Count, 128);
@@ -228,12 +235,14 @@ public struct CellBoidParallelJob : IJobParallelFor
     [ReadOnly] public NativeArray<float3> directionArray;
     public NativeArray<float3> accelerationArray;
     [ReadOnly] public NativeArray<float3> velocityArray;
+    [ReadOnly] public NativeArray<bool> hasLeaderArray;
 
     [ReadOnly] public float viewRadiusSqr;
     [ReadOnly] public float avoidRadiusSqr;
     [ReadOnly] public float alignWeight;
     [ReadOnly] public float cohesionWeight;
     [ReadOnly] public float seperateWeight;
+    [ReadOnly] public float seperateWeightLeader;
     [ReadOnly] public float maxSpeed;
     [ReadOnly] public float maxSteerForce;
     [ReadOnly] public float targetWeight;
@@ -250,6 +259,12 @@ public struct CellBoidParallelJob : IJobParallelFor
         separationHeading = new float3();
         acceleration = new float3();
 
+        // if boid has leader, use other seperate weight
+        float usedSeperateWeight = seperateWeight;
+        if (hasLeaderArray[index])
+            usedSeperateWeight = seperateWeightLeader;
+
+          
         for (int i = 0; i < positionArray.Length; i++)
         {
             if (index != i)
@@ -285,7 +300,7 @@ public struct CellBoidParallelJob : IJobParallelFor
 
             acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(flockHeading) * maxSpeed - velocity, maxSteerForce) * alignWeight;
             acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(offsetToFlockmatesCentre) * maxSpeed - velocity, maxSteerForce) * cohesionWeight;
-            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocity, maxSteerForce) * seperateWeight;
+            acceleration += (float3)Vector3.ClampMagnitude(math.normalizesafe(separationHeading) * maxSpeed - velocity, maxSteerForce) * usedSeperateWeight;
         }
 
         accelerationArray[index] = acceleration;
