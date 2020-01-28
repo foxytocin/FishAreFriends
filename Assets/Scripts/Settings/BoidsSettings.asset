@@ -30,3 +30,4 @@ MonoBehaviour:
   predatorAvoidanceForce: 2
   leadingForce: 4
   chaisingForFoodForce: 5
+  seperateWeightLeader: 5
