@@ -125,6 +125,7 @@ public class BoidManager : MonoBehaviour
                 velocityArray.Dispose();
                 targetPositionArray.Dispose();
                 hasTargetArray.Dispose();
+                hasLeaderArray.Dispose();
 
                 for (int i = 0; i < Count; i++)
                 {
