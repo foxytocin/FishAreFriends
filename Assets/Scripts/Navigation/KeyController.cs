@@ -5,6 +5,7 @@ using System.Collections;
 public class KeyController : MonoBehaviour
 {
 
+    FlowStream flowStream;
     CellGroups cellGroups;
     GuiOverlay guiOverlay;
 
@@ -42,6 +43,7 @@ public class KeyController : MonoBehaviour
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cellGroups = FindObjectOfType<CellGroups>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
+        flowStream = FindObjectOfType<FlowStream>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         Cursor.visible = false;
@@ -234,6 +236,7 @@ public class KeyController : MonoBehaviour
         float3[] rayDirections = BoidHelper.directions;
 
 
+
         for (int i = 0; i < rayDirections.Length; i++)
         {
 
@@ -248,6 +251,8 @@ public class KeyController : MonoBehaviour
 
             if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
             {
+                Debug.Log("ObstacleForward: " + dir);
+                flowStream.playFlowStream(dir);
                 return dir;
             }
         }
