@@ -128,9 +128,22 @@ Foto-Quelle: Getty Images/Last Resort
 
 ---
 
+## 31.12.2019: Peformance-Optimierungen durch Cells
+![Fish Are Friends](Doku/cells_01.jpg?raw=true "Cell Demo")
+#### Full Procedural Map-Generator
+- Optimierung durch Unterteilung der Welt in 'Cells'
+  - dymaische Anpassung an Levelgröße möglich
+- nur Fische innerhalb der gleichen Cell 'sehen sich'
+  - reduzierung der Berechnungen von Interaktionen
+- Zuordnung innerhalb der Cellen wird nur alle 5 Sekunden neu berechnet
+  - nur möglich in intervallen zwischen dem Multithreading
+  - Lastreduzierung durch
+
+---
+
 ## 06.02.2020: Interface & Rocks
 #### Interface
-![Fish Are Friends](Doku/interface_01.jpg?raw=true "Underwater Scene")
+![Fish Are Friends](Doku/interface_01.jpg?raw=true "User Interace")
 - Dynamisches UI mit Spielstatisiken
 - Schwarmgrößen aller Spieler (Player und KI)
   - eigener Schwarm zusätzlich als konkreter Zahlenwert
@@ -139,7 +152,7 @@ Foto-Quelle: Getty Images/Last Resort
   - blinkt wenn Nahrung lebensbedrohlich knapp wird
 
 #### Rocks
-![Fish Are Friends](Doku/rocks_01.jpg?raw=true "Underwater Scene")
+![Fish Are Friends](Doku/rocks_01.jpg?raw=true "Rocks")
 - neue Felsen in der gesamten Unterwasserwelt
 
 ---
