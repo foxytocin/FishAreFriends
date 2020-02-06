@@ -19,7 +19,11 @@ public class MapGenerator : MonoBehaviour
     [Header("Bricks")]
     public GameObject prefabCube;
     public int amountSzeneElements = 30;
-    public int sizeVariationBrick = 3;
+
+    [Range(0, 3f)]
+    public float sizeVariationBrick = 1.3f;
+    public GameObject[] bricks = new GameObject[2];
+
 
     [Header("Stones")]
     public GameObject[] stones = new GameObject[5];
@@ -276,8 +280,8 @@ public class MapGenerator : MonoBehaviour
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
-            float elementHeight = Random.Range(3f * sizeVariationBrick, 9f * sizeVariationBrick);
-            float elementWidth = Random.Range(1f * sizeVariationBrick, 3f * sizeVariationBrick);
+            float elementHeight = Random.Range(1f * sizeVariationBrick, 2f * sizeVariationBrick);
+            float elementWidth = Random.Range(1f * sizeVariationBrick, 2f * sizeVariationBrick);
 
             int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
             int y = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
@@ -285,10 +289,11 @@ public class MapGenerator : MonoBehaviour
             float sample = noiseMap[x, y];
             float heightOffset = sample * heightScale;
 
-            Vector3 position = new Vector3(x, elementHeight / 2f, y);
-            GameObject instName = prefabCube; //(Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
+            Vector3 position = new Vector3(x, heightOffset, y);
+            // GameObject instName = prefabCube; //(Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
+            GameObject brick = bricks[(int)Random.Range(0, bricks.Length)];
 
-            GameObject go = Instantiate(instName, position, Quaternion.identity);
+            GameObject go = Instantiate(brick, position, Quaternion.identity);
             go.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
             go.transform.localEulerAngles = new Vector3(Random.Range(-8f, 8f), Random.Range(0f, 90f), Random.Range(-8f, 8f));
             go.transform.parent = enviromentHolder;

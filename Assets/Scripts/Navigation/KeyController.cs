@@ -5,6 +5,7 @@ using System.Collections;
 public class KeyController : MonoBehaviour
 {
 
+    FlowStream flowStream;
     CellGroups cellGroups;
     GuiOverlay guiOverlay;
 
@@ -42,6 +43,7 @@ public class KeyController : MonoBehaviour
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cellGroups = FindObjectOfType<CellGroups>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
+        flowStream = FindObjectOfType<FlowStream>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         Cursor.visible = false;
@@ -180,7 +182,6 @@ public class KeyController : MonoBehaviour
                 velocity += transform.up * Time.deltaTime * speed;
             if (downKeyPressed)
                 velocity -= transform.up * Time.deltaTime * speed;
-
         }
 
 
@@ -212,6 +213,7 @@ public class KeyController : MonoBehaviour
     }
 
 
+    Vector3 hitPoint;
     bool IsHeadingForCollision()
     {
         if (showDebug)
@@ -223,6 +225,8 @@ public class KeyController : MonoBehaviour
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
         {
+            //Debug.Log("HIT: " + hit.point);
+            hitPoint = hit.point;
             return true;
         }
         else { }
@@ -232,7 +236,6 @@ public class KeyController : MonoBehaviour
     Vector3 ObstacleRays()
     {
         float3[] rayDirections = BoidHelper.directions;
-
 
         for (int i = 0; i < rayDirections.Length; i++)
         {
@@ -248,6 +251,8 @@ public class KeyController : MonoBehaviour
 
             if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
             {
+                //Debug.Log("ObstacleForward: " + dir);
+                flowStream.playFlowStream(dir, hitPoint);
                 return dir;
             }
         }

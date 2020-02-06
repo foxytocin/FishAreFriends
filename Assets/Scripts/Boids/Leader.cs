@@ -265,8 +265,8 @@ public class Leader : MonoBehaviour
 
             // set food in boids
             int foodViaBoid = existingFoodInBoids / swarmList.Count;
-            Debug.Log(foodViaBoid);
-            Debug.Log(swarmList.Count);
+            //Debug.Log(foodViaBoid);
+            //Debug.Log(swarmList.Count);
             foreach (Boid boid in swarmList)
                 boid.setFoodNeeds(foodViaBoid);
 
