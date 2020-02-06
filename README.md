@@ -127,3 +127,19 @@ Foto-Quelle: Getty Images/Last Resort
   - Boden- und Wasser-Detailstunfen: bis zu 95% weniger Mesh
 
 ---
+
+## 06.02.2020: Interface & Rocks
+#### Interface
+![Fish Are Friends](Doku/interface_01.jpg?raw=true "Underwater Scene")
+- Dynamisches UI mit Spielstatisiken
+- Schwarmgrößen aller Spieler (Player und KI)
+  - eigener Schwarm zusätzlich als konkreter Zahlenwert
+- Nahrungsbedarf
+  - animiert
+  - blinkt wenn Nahrung lebensbedrohlich knapp wird
+
+![Fish Are Friends](Doku/rocks_01.jpg?raw=true "Underwater Scene")
+#### Rocks
+- neue Felsen in der gesamten Unterwasserwelt
+
+---
