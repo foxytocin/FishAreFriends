@@ -138,8 +138,8 @@ Foto-Quelle: Getty Images/Last Resort
   - animiert
   - blinkt wenn Nahrung lebensbedrohlich knapp wird
 
-![Fish Are Friends](Doku/rocks_01.jpg?raw=true "Underwater Scene")
 #### Rocks
+![Fish Are Friends](Doku/rocks_01.jpg?raw=true "Underwater Scene")
 - neue Felsen in der gesamten Unterwasserwelt
 
 ---
