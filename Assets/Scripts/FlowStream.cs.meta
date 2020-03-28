@@ -3,7 +3,14 @@ guid: 0c874d5437d634f62848d5025d74a742
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - leader: {instanceID: 0}
+  - p_oben: {instanceID: 0}
+  - p_rechts: {instanceID: 0}
+  - p_unten: {instanceID: 0}
+  - p_links: {instanceID: 0}
+  - p_florian: {fileID: 5155418450095016832, guid: 1bfc8956d5b7f4653946b300e79f27ca,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
