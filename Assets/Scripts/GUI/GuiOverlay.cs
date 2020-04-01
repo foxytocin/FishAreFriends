@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GuiOverlay : MonoBehaviour
 {
@@ -16,6 +18,13 @@ public class GuiOverlay : MonoBehaviour
     private float timeToFade = 2;
     private bool broadcastingMessage = false;
 
+    public Button playButton;
+    public TextMeshProUGUI playButtonText;
+
+    public Button quitButton;
+
+    public Button restartButton;
+
 
     public enum MessageType
     {
@@ -30,6 +39,41 @@ public class GuiOverlay : MonoBehaviour
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
+
+        Cursor.visible = true;
+
+        playButton.onClick.AddListener(PlayButtonClickEvent);
+        playButtonText.text = "Pause";
+
+        quitButton.onClick.AddListener(QuitButtonClickEvent);
+        quitButton.gameObject.SetActive(false);
+
+        restartButton.onClick.AddListener(RestartButtonClickEvent);
+        restartButton.gameObject.SetActive(false);
+
+    }
+
+    void PlayButtonClickEvent()
+    {
+        playButtonText.text = "Fortsetzen";
+        //playButtonText.text = "Neustarten";
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = -1;
+
+        quitButton.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(true);
+    }
+
+    void QuitButtonClickEvent()
+    {
+        Application.Quit();
+    }
+
+    void RestartButtonClickEvent()
+    {
+        quitButton.gameObject.SetActive(false);
+        restartButton.gameObject.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 
