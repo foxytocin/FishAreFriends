@@ -34,6 +34,10 @@ public class CameraPosition : MonoBehaviour
     float startPosition = 0;
     Coroutine setClippingPlane = null;
 
+    bool switchingPerspevtiv = false;
+    public bool toggleView = false;
+
+
     void Awake()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
@@ -45,6 +49,7 @@ public class CameraPosition : MonoBehaviour
 
         // start at top
         side = false;
+        toggleView = false;
         targetPosition = Top_View;
         switchingPerspevtiv = true;
         myCamera.farClipPlane = 1000;
@@ -66,10 +71,6 @@ public class CameraPosition : MonoBehaviour
         originalFieldOfView = myCamera.fieldOfView;
         startPosition = transform.position.y;
     }
-
-
-    bool switchingPerspevtiv = false;
-    public bool toggleView = false;
 
 
     void FixedUpdate()
