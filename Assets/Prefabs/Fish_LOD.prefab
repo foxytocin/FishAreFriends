@@ -184,12 +184,12 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: b11b1234b15824fc9b343d9ca61957c7,
         type: 3}
       propertyPath: m_LightProbeUsage
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: b11b1234b15824fc9b343d9ca61957c7,
         type: 3}
       propertyPath: m_ReflectionProbeUsage
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: b11b1234b15824fc9b343d9ca61957c7,
         type: 3}
@@ -310,7 +310,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: c870c02e43b5a40839a00bf7f10edcac,
         type: 3}
       propertyPath: m_ReflectionProbeUsage
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: c870c02e43b5a40839a00bf7f10edcac,
         type: 3}
@@ -421,7 +421,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: 6b641d79469374efbafb098881cad99e,
         type: 3}
       propertyPath: m_ReflectionProbeUsage
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 6b641d79469374efbafb098881cad99e,
         type: 3}
