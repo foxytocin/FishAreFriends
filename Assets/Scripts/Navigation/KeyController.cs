@@ -84,9 +84,7 @@ public class KeyController : MonoBehaviour
     void Update()
     {
         if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
-            if (Input.GetKeyDown(KeyCode.Escape))
-                Application.Quit();
-
+           
             cellGroups.SetPlayerCell(transform.position);
 
             if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))
