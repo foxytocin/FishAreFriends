@@ -35,7 +35,7 @@ public class KeyController : MonoBehaviour
     private bool invertingSemaphor = false;
 
     // Debug
-    private bool showDebug = true;
+    private bool showDebug = false;
 
 
     void Awake()
@@ -251,8 +251,10 @@ public class KeyController : MonoBehaviour
 
             if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
             {
-                //Debug.Log("ObstacleForward: " + dir);
-                flowStream.playFlowStream(dir, hitPoint);
+
+                Vector3 forward = transform.TransformDirection(Vector3.forward);
+
+                flowStream.playFlowStream(forward, hitPoint);
                 return dir;
             }
         }

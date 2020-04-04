@@ -1,59 +1,97 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
+
+class GameObjectWithTime
+{
+    public GameObject gameObject;
+    public long creationTime;
+
+    public GameObjectWithTime(GameObject gameObject, long creationTime)
+    {
+        this.gameObject = gameObject;
+        this.creationTime = creationTime;
+    }
+}
 
 public class FlowStream : MonoBehaviour
 {
     public Leader leader;
-    public ParticleSystem p_oben;
-    public ParticleSystem p_rechts;
-    public ParticleSystem p_unten;
-    public ParticleSystem p_links;
-    private bool running = false;
+    public GameObject emitter;
+
+    private Queue<GameObjectWithTime> flowObjectEmitter;
+    private long lastUpdate = 0;
 
 
-    public void playFlowStream(Vector3 vec, Vector3 pos)
+    public void Awake()
     {
-        if (running)
+
+        flowObjectEmitter = new Queue<GameObjectWithTime>();
+
+        for(int i=0; i<20; i++)
+        {
+            GameObject gameObject = Instantiate(emitter);
+            gameObject.SetActive(false);
+            flowObjectEmitter.Enqueue(new GameObjectWithTime(gameObject, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()));
+        }
+
+        print(flowObjectEmitter.Count);
+        StartCoroutine(disableGameObjects());
+
+    }
+
+
+    public void playFlowStream(Vector3 forward, Vector3 hitpoint)
+    {
+
+        instanciateNewFlowEmitter(leader.transform.position, forward);
+
+    }
+
+
+    private void instanciateNewFlowEmitter(Vector3 position, Vector3 forward)
+    {
+
+        long now = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        if (lastUpdate > now - 2)
             return;
+        lastUpdate = now;
 
-        running = true;
-        StartCoroutine(runTimer());
-        float x = vec.x;
-        float y = vec.y;
-        bool horizontal = false;
+        GameObjectWithTime gameObjectWithTime = flowObjectEmitter.Dequeue();
 
-        if (Mathf.Abs(x) > Mathf.Abs(y))
-            horizontal = true;
+        GameObject gameObject = gameObjectWithTime.gameObject;
+        gameObject.transform.position = leader.transform.position;
+        gameObject.transform.rotation = Quaternion.LookRotation(forward);
+        gameObject.SetActive(true);
 
-        if (horizontal)
-        {
-            if (x > 0)
-            {
-                ParticleSystem ps = Instantiate(p_rechts, pos, Quaternion.identity);
-                ps.transform.eulerAngles = new Vector3(0, leader.transform.rotation.y, 0);
-            }
-            else
-            {
-                ParticleSystem ps = Instantiate(p_links, pos, Quaternion.identity);
-                ps.transform.eulerAngles = new Vector3(0, leader.transform.rotation.y, 0);
-            }
-        }
-        else
-        {
-            if (y > 0)
-            {
-                ParticleSystem ps = Instantiate(p_oben, pos, Quaternion.identity);
-            }
-            else
-            {
-                ParticleSystem ps = Instantiate(p_unten, pos, Quaternion.identity);
-            }
-        }
+        gameObjectWithTime.creationTime = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+        flowObjectEmitter.Enqueue(gameObjectWithTime);
+
     }
 
-    private IEnumerator runTimer()
+    private IEnumerator disableGameObjects()
     {
-        yield return new WaitForSeconds(3);
-        running = false;
+
+        while (true)
+        {
+            //GameObjectWithTime gameObjectWithTime = flowObjectEmitter.Peek();
+            long now = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+
+            foreach(GameObjectWithTime gameObjectWithTime in flowObjectEmitter)
+            {
+                if (gameObjectWithTime.creationTime < now - 5)
+                    gameObjectWithTime.gameObject.SetActive(false);
+            }
+
+
+            yield return new WaitForSeconds(3);
+        }
+
+        
+        
     }
+
 }
