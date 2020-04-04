@@ -16,8 +16,7 @@ public class MapGenerator : MonoBehaviour
     public bool generateWalls = true;
 
 
-    [Header("Bricks")]
-    public GameObject prefabCube;
+    [Header("Rocks")]
     public int amountSzeneElements = 30;
 
     [Range(0, 3f)]
