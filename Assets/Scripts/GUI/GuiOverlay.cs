@@ -42,6 +42,7 @@ public class GuiOverlay : MonoBehaviour
 
     void Awake()
     {
+        allowToggle = false;
         gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         cameraPosition = FindObjectOfType<CameraPosition>();
@@ -54,12 +55,13 @@ public class GuiOverlay : MonoBehaviour
 
     void LateUpdate() {
         if (allowToggle && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))) {
+            allowToggle = false;
 
-            if(gameStatus == GameStatus.inGame)
+            if(gameStatus == GameStatus.inGame) {
                 Pause();
-
-            if (gameStatus == GameStatus.pausedGame)
-                Play();
+            } else if(gameStatus == GameStatus.pausedGame) {
+                 Play();
+            }
         }
     }
 
@@ -77,7 +79,6 @@ public class GuiOverlay : MonoBehaviour
         restartButton.onClick.AddListener(RestartButtonClickEvent);
         restartButton.gameObject.SetActive(true);
 
-        allowToggle = false;
         playButton.gameObject.SetActive(false); 
         StartCoroutine(WaitForCamAnimation());
     }
@@ -101,13 +102,10 @@ public class GuiOverlay : MonoBehaviour
             cameraPosition.toggleView = true;
 
             playButtonText.text = "Pause";
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = -1;
 
             quitButton.gameObject.SetActive(false);
             restartButton.gameObject.SetActive(false);
 
-            allowToggle = false;
             playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
@@ -117,13 +115,10 @@ public class GuiOverlay : MonoBehaviour
             cameraPosition.toggleView = true;
 
             playButtonText.text = "Fortsetzen";
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 0;
 
             quitButton.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
 
-            allowToggle = false;
             playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
@@ -131,8 +126,10 @@ public class GuiOverlay : MonoBehaviour
     // display Play/Pause button after the camera-animation has finished
     private IEnumerator WaitForCamAnimation()
     {
-        yield return new WaitForSeconds(5);
-        playButton.gameObject.SetActive(true);
+        yield return new WaitForSeconds(4);
+        if(gameStatus != GameStatus.inGame)
+            playButton.gameObject.SetActive(true);
+        
         allowToggle = true;
     }
 

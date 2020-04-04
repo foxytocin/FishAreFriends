@@ -74,7 +74,7 @@ public class CameraPosition : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!switchingPerspevtiv && toggleView & side)
+        if (!switchingPerspevtiv && toggleView && side)
         {
             if (setClippingPlane != null)
                 StopCoroutine(setClippingPlane);
@@ -93,7 +93,7 @@ public class CameraPosition : MonoBehaviour
             ambientMusic.StopAmbientMusic();
 
         }
-        else if (!switchingPerspevtiv && toggleView & !side)
+        else if (!switchingPerspevtiv && toggleView && !side)
         {
             side = true;
             switchingPerspevtiv = true;

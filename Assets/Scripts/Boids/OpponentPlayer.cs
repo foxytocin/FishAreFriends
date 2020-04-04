@@ -41,6 +41,8 @@ public class OpponentPlayer : MonoBehaviour
         AttackOtherLeader
     }
 
+    public bool debug = false;
+
     // food stuff
     private List<Food> foodList;
     private Food foodTarget = null;
@@ -85,11 +87,11 @@ public class OpponentPlayer : MonoBehaviour
     {
         if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
             // just for debuging
-            if (Input.GetKeyDown(KeyCode.U))
+            if (debug && Input.GetKeyDown(KeyCode.U))
                 opponentBehavior = OpponentBehavior.SearchForBoids;
-            if (Input.GetKeyDown(KeyCode.I))
+            if (debug && Input.GetKeyDown(KeyCode.I))
                 opponentBehavior = OpponentBehavior.AttackOtherLeader;
-            if (Input.GetKeyDown(KeyCode.O))
+            if (debug && Input.GetKeyDown(KeyCode.O))
                 opponentBehavior = OpponentBehavior.SearchForFood;
 
             // end
