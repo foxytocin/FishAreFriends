@@ -27,6 +27,7 @@ public class GuiOverlay : MonoBehaviour
     private bool allowToggle = false;
 
     private MapGenerator mapGenerator;
+    private Spawner spawner;
 
     public enum MessageType
     {
@@ -53,6 +54,7 @@ public class GuiOverlay : MonoBehaviour
         cameraPosition = FindObjectOfType<CameraPosition>();
         menuScroller = FindObjectOfType<MenuScroller>();
         mapGenerator = FindObjectOfType<MapGenerator>();
+        spawner = FindObjectOfType<Spawner>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
@@ -113,6 +115,11 @@ public class GuiOverlay : MonoBehaviour
 
 
     void Play() {
+
+            if(gameStatus == GameStatus.newGame)
+                spawner.SpawnFishSwarms();
+
+            Cursor.visible = false;
             gameStatus = GameStatus.inGame;
             cameraPosition.toggleView = true;
 
@@ -127,6 +134,7 @@ public class GuiOverlay : MonoBehaviour
     }
 
     void Pause() {
+            Cursor.visible = true;
             gameStatus = GameStatus.pausedGame;
             cameraPosition.toggleView = true;
 

@@ -489,18 +489,18 @@ public class MapGenerator : MonoBehaviour
 
     public void Cleanup()
     {
-        {
-            GameObject[] go = GameObject.FindGameObjectsWithTag("Enviroment");
-            foreach (GameObject tgo in go)
-            {
-                DestroyImmediate(tgo);
-            }
+        ecoSystemManager.ResetSpawnPoints();
 
-            if (!enviromentHolder)
-            {
-                enviromentHolder = new GameObject("Enviroment").transform;
-                enviromentHolder.tag = "Enviroment";
-            }
+        GameObject[] go = GameObject.FindGameObjectsWithTag("Enviroment");
+        foreach (GameObject tgo in go)
+        {
+            DestroyImmediate(tgo);
+        }
+
+        if (!enviromentHolder)
+        {
+            enviromentHolder = new GameObject("Enviroment").transform;
+            enviromentHolder.tag = "Enviroment";
         }
     }
 

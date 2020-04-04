@@ -128,45 +128,45 @@ public class KeyController : MonoBehaviour
             if (!isHeadingForCollision)
             {
                 // key ups
-                if (Input.GetKeyDown(KeyCode.A))
+                if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
                     leftKeyPressed = true;
-                if (Input.GetKeyDown(KeyCode.D))
+                if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
                     rightKeyPressed = true;
 
                 if (!invertedControlls)
                 {
-                    if (Input.GetKeyDown(KeyCode.W))
+                    if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
                         upKeyPressed = true;
-                    if (Input.GetKeyDown(KeyCode.S))
+                    if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                         downKeyPressed = true;
                 }
                 else
                 {
-                    if (Input.GetKeyDown(KeyCode.S))
+                    if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                         upKeyPressed = true;
-                    if (Input.GetKeyDown(KeyCode.W))
+                    if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
                         downKeyPressed = true;
                 }
             }
 
             // key downs
-            if (Input.GetKeyUp(KeyCode.A))
+            if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow))
                 leftKeyPressed = false;
-            if (Input.GetKeyUp(KeyCode.D))
+            if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow))
                 rightKeyPressed = false;
 
             if (!invertedControlls)
             {
-                if (Input.GetKeyUp(KeyCode.W))
+                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow))
                     upKeyPressed = false;
-                if (Input.GetKeyUp(KeyCode.S))
+                if (Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.DownArrow))
                     downKeyPressed = false;
             }
             else
             {
-                if (Input.GetKeyUp(KeyCode.S))
+                if (Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.DownArrow))
                     upKeyPressed = false;
-                if (Input.GetKeyUp(KeyCode.W))
+                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow))
                     downKeyPressed = false;
             }
 
