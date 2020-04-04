@@ -19,7 +19,7 @@ public class Tutorial : MonoBehaviour
     }
 
 
-    void FixedUpdate() {
+    void LateUpdate() {
 
         if(showTutorial) {
             if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {

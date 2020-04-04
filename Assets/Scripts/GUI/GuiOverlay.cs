@@ -8,10 +8,8 @@ public class GuiOverlay : MonoBehaviour
 {
 
     private TextMeshProUGUI textMeshPro;
-    public TextMeshProUGUI playerEnergie;
     public TextMeshProUGUI playerSwarmSize;
     public TextMeshProUGUI mainMessages;
-    public TextMeshProUGUI debugInfos;
     private Color mainMessagesColor;
     private Color mainMessagesColorStandard;
     private float alpha = 1f;
@@ -22,8 +20,8 @@ public class GuiOverlay : MonoBehaviour
     public TextMeshProUGUI playButtonText;
     public Button quitButton;
     public Button restartButton;
-
     private CameraPosition cameraPosition;
+    private bool allowToggle = false;
 
     public enum MessageType
     {
@@ -54,6 +52,17 @@ public class GuiOverlay : MonoBehaviour
         NewGame();
     }
 
+    void LateUpdate() {
+        if (allowToggle && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))) {
+
+            if(gameStatus == GameStatus.inGame)
+                Pause();
+
+            if (gameStatus == GameStatus.pausedGame)
+                Play();
+        }
+    }
+
     void NewGame() {
         gameStatus = GameStatus.newGame;
         Cursor.visible = true;
@@ -68,6 +77,7 @@ public class GuiOverlay : MonoBehaviour
         restartButton.onClick.AddListener(RestartButtonClickEvent);
         restartButton.gameObject.SetActive(true);
 
+        allowToggle = false;
         playButton.gameObject.SetActive(false); 
         StartCoroutine(WaitForCamAnimation());
     }
@@ -78,12 +88,10 @@ public class GuiOverlay : MonoBehaviour
         // If PLAY / UNPAUSE is clicked
         if(gameStatus == GameStatus.newGame || gameStatus == GameStatus.pausedGame) {
             Play();
-            Debug.Log(gameStatus);
 
         // If PAUSE is clicked
         } else if(gameStatus == GameStatus.inGame) {
            Pause();
-            Debug.Log(gameStatus);
         }
     }
 
@@ -99,6 +107,7 @@ public class GuiOverlay : MonoBehaviour
             quitButton.gameObject.SetActive(false);
             restartButton.gameObject.SetActive(false);
 
+            allowToggle = false;
             playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
@@ -113,7 +122,8 @@ public class GuiOverlay : MonoBehaviour
 
             quitButton.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
-            
+
+            allowToggle = false;
             playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
@@ -123,6 +133,7 @@ public class GuiOverlay : MonoBehaviour
     {
         yield return new WaitForSeconds(5);
         playButton.gameObject.SetActive(true);
+        allowToggle = true;
     }
 
     void UnPause() {
@@ -151,11 +162,6 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    // public void SetPlayerEnergie(int energie)
-    // {
-    //     playerEnergie.text = energie.ToString();
-    // }
-
     public void SetPlayerSwarmSize(int size)
     {
         if (size == 0)
@@ -164,10 +170,6 @@ public class GuiOverlay : MonoBehaviour
         playerSwarmSize.text = size.ToString();
     }
 
-    // public void SetDebugInfo(string text)
-    // {
-    //     debugInfos.text = text;
-    // }
 
     public void DisplayMainMessage(string message, int timeToFade_, MessageType type)
     {
