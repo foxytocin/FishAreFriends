@@ -19,6 +19,7 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
@@ -52,9 +53,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: MontereyFLF-Bold SDF
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: -1711922650
   material: {fileID: 190790015200357512}
-  materialHashCode: 0
+  materialHashCode: -1330334739
   m_Version: 1.1.0
   m_SourceFontFileGUID: 5a1ec45709de9ab459f4f347d69d718b
   m_SourceFontFile_EditorRef: {fileID: 0}
