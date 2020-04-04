@@ -67,6 +67,9 @@ public class GuiOverlay : MonoBehaviour
 
         restartButton.onClick.AddListener(RestartButtonClickEvent);
         restartButton.gameObject.SetActive(true);
+
+        playButton.gameObject.SetActive(false); 
+        StartCoroutine(WaitForCamAnimation());
     }
 
 
