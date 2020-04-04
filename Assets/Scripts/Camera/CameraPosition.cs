@@ -16,7 +16,7 @@ public class CameraPosition : MonoBehaviour
     Vector3 lookAtLeader;
     Vector3 lookAtCenterOfTank;
 
-    bool side = true;
+    bool side = false;
 
     private Transform targetPosition;
     private Vector3 centerOfTank;
@@ -47,24 +47,35 @@ public class CameraPosition : MonoBehaviour
 
     void Start()
     {
-        targetPosition = Side_View;
+        targetPosition = Top_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
         lookAtCenterOfTank = centerOfTank + new Vector3(0, 0, 20);
         originalFogDensity = RenderSettings.fogDensity;
         originalFieldOfView = myCamera.fieldOfView;
         startPosition = transform.position.y;
+
+        // start at top
+        side = false;
+        switchingPerspevtiv = true;
+        myCamera.farClipPlane = 1000;
+        SwitchFieldOfViewToTop(true);
+        totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
+        DisablePostEffects(true);
+        SwitchFogDensityToTop(true);
+        topStatsScroller.FadeOutTopStats();
+        musicMenu.StartMenuMusic();
+        ambientMusic.StopAmbientMusic();
     }
 
 
     bool switchingPerspevtiv = false;
+    public bool toggleView = false;
+
 
     void FixedUpdate()
     {
-
-        bool down = Input.GetKeyDown(KeyCode.Space);
-
-        if (!switchingPerspevtiv && down & side)
+        if (!switchingPerspevtiv && toggleView & side)
         {
             if (setClippingPlane != null)
                 StopCoroutine(setClippingPlane);
@@ -77,13 +88,13 @@ public class CameraPosition : MonoBehaviour
             targetPosition = Top_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
             DisablePostEffects(true);
-            SwitchFodDensityToTop(true);
+            SwitchFogDensityToTop(true);
             topStatsScroller.FadeOutTopStats();
             musicMenu.StartMenuMusic();
             ambientMusic.StopAmbientMusic();
 
         }
-        else if (!switchingPerspevtiv && down & !side)
+        else if (!switchingPerspevtiv && toggleView & !side)
         {
             side = true;
             switchingPerspevtiv = true;
@@ -93,7 +104,7 @@ public class CameraPosition : MonoBehaviour
             targetPosition = Side_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - lookAtLeader.y);
             DisablePostEffects(false);
-            SwitchFodDensityToTop(false);
+            SwitchFogDensityToTop(false);
             setClippingPlane = StartCoroutine(SetClippingPlane());
             topStatsScroller.FadeInTopStats();
             musicMenu.StopMenuMusic();
@@ -144,7 +155,7 @@ public class CameraPosition : MonoBehaviour
         }
     }
 
-    private void SwitchFodDensityToTop(bool top)
+    private void SwitchFogDensityToTop(bool top)
     {
         StopCoroutine(AnimateFogDensity());
 
@@ -176,6 +187,7 @@ public class CameraPosition : MonoBehaviour
             }
 
             switchingPerspevtiv = false;
+            toggleView = false;
         }
         else
         {
@@ -186,6 +198,7 @@ public class CameraPosition : MonoBehaviour
             }
 
             switchingPerspevtiv = false;
+            toggleView = false;
 
             if (RenderSettings.fogDensity < 0)
                 RenderSettings.fogDensity = 0;

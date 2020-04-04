@@ -20,11 +20,10 @@ public class GuiOverlay : MonoBehaviour
 
     public Button playButton;
     public TextMeshProUGUI playButtonText;
-
     public Button quitButton;
-
     public Button restartButton;
 
+    private CameraPosition cameraPosition;
 
     public enum MessageType
     {
@@ -33,36 +32,99 @@ public class GuiOverlay : MonoBehaviour
         warning
     }
 
+      public enum GameStatus
+    {
+        newGame,
+        inGame,
+        pausedGame
+    }
+
+    public GameStatus gameStatus;
+
+
     void Awake()
     {
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
+        cameraPosition = FindObjectOfType<CameraPosition>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
 
+        NewGame();
+    }
+
+    void NewGame() {
+        gameStatus = GameStatus.newGame;
         Cursor.visible = true;
+        Application.targetFrameRate = 0;
 
         playButton.onClick.AddListener(PlayButtonClickEvent);
-        playButtonText.text = "Pause";
+        playButtonText.text = "Start";
 
         quitButton.onClick.AddListener(QuitButtonClickEvent);
-        quitButton.gameObject.SetActive(false);
+        quitButton.gameObject.SetActive(true);
 
         restartButton.onClick.AddListener(RestartButtonClickEvent);
-        restartButton.gameObject.SetActive(false);
-
+        restartButton.gameObject.SetActive(true);
     }
+
 
     void PlayButtonClickEvent()
     {
-        playButtonText.text = "Fortsetzen";
-        //playButtonText.text = "Neustarten";
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = -1;
+        if(gameStatus == GameStatus.newGame || gameStatus == GameStatus.pausedGame) {
 
+            gameStatus = GameStatus.inGame;
+            cameraPosition.toggleView = true;
+
+            playButtonText.text = "Pause";
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
+
+            quitButton.gameObject.SetActive(false);
+            restartButton.gameObject.SetActive(false);
+
+        } else if(gameStatus == GameStatus.inGame) {
+            
+            gameStatus = GameStatus.pausedGame;
+            cameraPosition.toggleView = true;
+
+            playButtonText.text = "Fortsetzen";
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 0;
+
+            quitButton.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(true);
+        }
+    }
+
+    void Pause() {
+        Cursor.visible = true;
+
+        playButton.onClick.AddListener(PlayButtonClickEvent);
+        playButtonText.text = "Start";
+
+        quitButton.onClick.AddListener(QuitButtonClickEvent);
         quitButton.gameObject.SetActive(true);
+
+        restartButton.onClick.AddListener(RestartButtonClickEvent);
         restartButton.gameObject.SetActive(true);
     }
+
+    void UnPause() {
+        Cursor.visible = true;
+
+        playButton.onClick.AddListener(PlayButtonClickEvent);
+        playButtonText.text = "Start";
+
+        quitButton.onClick.AddListener(QuitButtonClickEvent);
+        quitButton.gameObject.SetActive(true);
+
+        restartButton.onClick.AddListener(RestartButtonClickEvent);
+        restartButton.gameObject.SetActive(true);
+    }
+
+
+
 
     void QuitButtonClickEvent()
     {
@@ -71,8 +133,6 @@ public class GuiOverlay : MonoBehaviour
 
     void RestartButtonClickEvent()
     {
-        quitButton.gameObject.SetActive(false);
-        restartButton.gameObject.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
