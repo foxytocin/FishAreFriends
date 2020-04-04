@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MenuScroller : MonoBehaviour
 {
-
     float offScreenOffset = 145f;
     float target;
     float position;
@@ -12,6 +12,7 @@ public class MenuScroller : MonoBehaviour
     private RectTransform[] rectTransform;
     Coroutine fadeInTopStatsCore = null;
     Coroutine fadeOutTopStatsCore = null;
+    public Animator transition;
 
     void Awake() {
         rectTransform = GetComponents<RectTransform>();
@@ -20,6 +21,8 @@ public class MenuScroller : MonoBehaviour
 
 
     public void FadeIn() {
+
+            transition.SetTrigger("FadeIn");
             target = -110;
             position = rectTransform[0].anchoredPosition.x;
             fadeInTopStatsCore = StartCoroutine(FadeInTopStatsCore());
@@ -40,6 +43,9 @@ public class MenuScroller : MonoBehaviour
 
 
     public void FadeOut() {
+
+        transition.SetTrigger("FadeOut");
+
         position = rectTransform[0].anchoredPosition.x;
         target = offScreenOffset;
         fadeOutTopStatsCore = StartCoroutine(FadeOutTopStatsCore());
