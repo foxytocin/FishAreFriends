@@ -12,18 +12,22 @@ public class TopStatsScroller : MonoBehaviour
     private RectTransform[] rectTransform;
     Coroutine fadeInTopStatsCore = null;
     Coroutine fadeOutTopStatsCore = null;
+    private Tutorial tutorial;
 
     void Awake() {
         rectTransform = GetComponents<RectTransform>();
         rectTransform[0].anchoredPosition = new Vector2(0, offScreenOffset);
+        tutorial = FindObjectOfType<Tutorial>();
     }
 
 
     public void FadeInTopStats() {
 
-        target = 0;
-        position = rectTransform[0].anchoredPosition.y;
-        fadeInTopStatsCore = StartCoroutine(FadeInTopStatsCore());
+        if(tutorial.reachedTopStatsStep) {
+            target = 0;
+            position = rectTransform[0].anchoredPosition.y;
+            fadeInTopStatsCore = StartCoroutine(FadeInTopStatsCore());
+        }
     }
     
     private IEnumerator FadeInTopStatsCore() {

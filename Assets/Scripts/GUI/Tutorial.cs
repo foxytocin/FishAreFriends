@@ -10,6 +10,8 @@ public class Tutorial : MonoBehaviour
 
     GameObject aiPlayer;
 
+    public bool reachedTopStatsStep = false;
+
     void Awake()
     {
         guiOverlay = FindObjectOfType<GuiOverlay>();
@@ -45,6 +47,7 @@ public class Tutorial : MonoBehaviour
 
         // display
         yield return new WaitForSeconds(13);
+        reachedTopStatsStep = true;
         topStatsScroller.FadeInTopStats();
 
         yield return new WaitForSeconds(3);
