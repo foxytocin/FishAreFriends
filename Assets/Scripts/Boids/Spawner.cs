@@ -12,7 +12,7 @@ public class Spawner : MonoBehaviour
     public Boid prefab;
     public GameObject opponentPlayerPrefab;
     public GameObject predatorPrefab;
-    public float spawnRadius = 10;
+    public float spawnRadius = 1;
     public int spawnCount = 10;
     public Color color1;
     public Color color2;
@@ -31,10 +31,6 @@ public class Spawner : MonoBehaviour
         fishHolder = new GameObject("Fishes").transform;
     }
 
-    void Start()
-    {
-        StartCoroutine(InitializeBoidSlowly());
-    }
 
     public void SpawnOpponentPlayers()
     {
@@ -67,12 +63,15 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    public void SpawnFishSwarms() {
+        StartCoroutine(InitializeBoidSlowly());
+    }
+
 
     private IEnumerator InitializeBoidSlowly()
     {
 
         int count = 0;
-
         yield return new WaitForSeconds(10);
 
         while (count < spawnCount)

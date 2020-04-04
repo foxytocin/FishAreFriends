@@ -120,7 +120,10 @@ public class EcoSystemManager : MonoBehaviour
         point = initialSpawnPoints.Dequeue();
         initialSpawnPoints.Enqueue(point);
         return point;
+    }
 
-
+    public void ResetSpawnPoints() {
+        spawnPoints = new Queue<Vector3>();
+        initialSpawnPoints = new Queue<Vector3>();
     }
 }
