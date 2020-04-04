@@ -52,10 +52,8 @@ public class OpponentPlayer : MonoBehaviour
     // predator stuff
     private List<Predator> availablePredators;
 
-
     // gui
     GuiOverlay guiOverlay;
-
 
     void Awake()
     {
@@ -80,302 +78,275 @@ public class OpponentPlayer : MonoBehaviour
         float startSpeed = maxSpeed / 2;
         velocity = transform.forward * startSpeed;
 
-
-
         StartCoroutine(CalculateFoodBehavior());
     }
 
     void Update()
     {
-        // just for debuging
-        if (Input.GetKeyDown(KeyCode.U))
-            opponentBehavior = OpponentBehavior.SearchForBoids;
-        if (Input.GetKeyDown(KeyCode.I))
-            opponentBehavior = OpponentBehavior.AttackOtherLeader;
-        if (Input.GetKeyDown(KeyCode.O))
-            opponentBehavior = OpponentBehavior.SearchForFood;
+        if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
+            // just for debuging
+            if (Input.GetKeyDown(KeyCode.U))
+                opponentBehavior = OpponentBehavior.SearchForBoids;
+            if (Input.GetKeyDown(KeyCode.I))
+                opponentBehavior = OpponentBehavior.AttackOtherLeader;
+            if (Input.GetKeyDown(KeyCode.O))
+                opponentBehavior = OpponentBehavior.SearchForFood;
 
-        // end
-
-
-        if (myLeaderScript.GetSwarmSize() < 150)
-        {
-            opponentBehavior = OpponentBehavior.SearchForBoids;
-            //Debug.Log("Switched opponentBehavior to searchForBoids");
-        }
-        else
-        {
-            opponentBehavior = OpponentBehavior.AttackOtherLeader;
-            // Debug.Log("Switched opponentBehavior to attackOtherLeader");
-        }
-
-        if (avgEnergieSwarm < 500)
-        {
-            // Debug.Log("Opponent Player swarm is hungry");
-            opponentBehavior = OpponentBehavior.SearchForFood;
-        }
-
-
-
-
-
-
-
-        // reset variables
-        if (!opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
-            boidToHunt = null;
-
-        if (!opponentBehavior.Equals(OpponentBehavior.AttackOtherLeader))
-        {
-            leaderToAttack = null;
-            timeToStayNextToAttackedLeader = 0;
-            timeToRehunt = 0;
-        }
-
-
-        Vector3 acceleration = Vector3.zero;
-        bool isHeadingForCollision = IsHeadingForCollision();
-
-        // avoid collisiton
-        if (isHeadingForCollision)
-        {
-            Vector3 collisionAvoidDir = ObstacleRays();
-            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
-            acceleration += collisionAvoidForce;
-        }
-
-
-        float speed = 0;
-        if (!isHeadingForCollision)
-        {
-
-            //////////////////////////////
-            ////// search for boids //////
-            //////////////////////////////
-
-            // search for boids to join them to your swarm
-            if (boidToHunt == null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
+            // end
+            if (myLeaderScript.GetSwarmSize() < 150)
             {
-                List<Boid> boidsNearby = cellGroups.allBoidCells[cellGroups.GetIndex(transform.position)];
+                opponentBehavior = OpponentBehavior.SearchForBoids;
+                //Debug.Log("Switched opponentBehavior to searchForBoids");
+            }
+            else
+            {
+                opponentBehavior = OpponentBehavior.AttackOtherLeader;
+                // Debug.Log("Switched opponentBehavior to attackOtherLeader");
+            }
 
-                for (int i = 0; i < boidsNearby.Count; i++)
+            if (avgEnergieSwarm < 500)
+            {
+                // Debug.Log("Opponent Player swarm is hungry");
+                opponentBehavior = OpponentBehavior.SearchForFood;
+            }
+
+
+            // reset variables
+            if (!opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
+                boidToHunt = null;
+
+            if (!opponentBehavior.Equals(OpponentBehavior.AttackOtherLeader))
+            {
+                leaderToAttack = null;
+                timeToStayNextToAttackedLeader = 0;
+                timeToRehunt = 0;
+            }
+
+
+            Vector3 acceleration = Vector3.zero;
+            bool isHeadingForCollision = IsHeadingForCollision();
+
+            // avoid collisiton
+            if (isHeadingForCollision)
+            {
+                Vector3 collisionAvoidDir = ObstacleRays();
+                Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
+                acceleration += collisionAvoidForce;
+            }
+
+
+            float speed = 0;
+            if (!isHeadingForCollision)
+            {
+                //////////////////////////////
+                ////// search for boids //////
+                //////////////////////////////
+
+                // search for boids to join them to your swarm
+                if (boidToHunt == null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
                 {
-                    if (!boidsNearby[i].HasLeader())
+                    List<Boid> boidsNearby = cellGroups.allBoidCells[cellGroups.GetIndex(transform.position)];
+
+                    for (int i = 0; i < boidsNearby.Count; i++)
                     {
-                        boidToHunt = boidsNearby[i];
-                        speed = maxSpeed;
-                        //Debug.Log("Hunt boid");
+                        if (!boidsNearby[i].HasLeader())
+                        {
+                            boidToHunt = boidsNearby[i];
+                            speed = maxSpeed;
+                            //Debug.Log("Hunt boid");
+                        }
                     }
                 }
-            }
 
-            if (boidToHunt != null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
-            {
-                acceleration += boidToHunt.transform.position - position;
-                if (boidToHunt.HasLeader())
+                if (boidToHunt != null && opponentBehavior.Equals(OpponentBehavior.SearchForBoids))
                 {
-                    boidToHunt = null;
-                    // Debug.Log("Boid reached or joined to other swarm.");
-                    speed = maxSpeed / 4;
+                    acceleration += boidToHunt.transform.position - position;
+                    if (boidToHunt.HasLeader())
+                    {
+                        boidToHunt = null;
+                        // Debug.Log("Boid reached or joined to other swarm.");
+                        speed = maxSpeed / 4;
+                    }
+
                 }
 
-            }
 
-
-
-
-            ////////////////////////////////
-            ////// attack other swarm //////
-            ////////////////////////////////
-            if (opponentBehavior.Equals(OpponentBehavior.AttackOtherLeader))
-            {
-
-
-                // set time, that avoid attacking swarm again and again
-                timeToRehunt -= Time.deltaTime;
-
-
-                // if i have no leader to hunt
-                if (leaderToAttack == null && timeToRehunt <= 0)
+                ////////////////////////////////
+                ////// attack other swarm //////
+                ////////////////////////////////
+                if (opponentBehavior.Equals(OpponentBehavior.AttackOtherLeader))
                 {
-                    // Debug.Log("Search for other leader");
-                    // find other leader
-                    float distanceToLeader = float.MaxValue;
-                    if (Leader.leaderList != null)
+                    // set time, that avoid attacking swarm again and again
+                    timeToRehunt -= Time.deltaTime;
+
+                    // if i have no leader to hunt
+                    if (leaderToAttack == null && timeToRehunt <= 0)
                     {
-                        foreach (Leader leader in Leader.leaderList)
+                        // Debug.Log("Search for other leader");
+                        // find other leader
+                        float distanceToLeader = float.MaxValue;
+                        if (Leader.leaderList != null)
                         {
-                            if (leader.Equals(myLeaderScript))
-                                continue;
-
-                            float tempDistance = Vector3.Distance(position, leader.getPosition());
-                            if (tempDistance < distanceToLeader)
+                            foreach (Leader leader in Leader.leaderList)
                             {
-                                leaderToAttack = leader;
-                                distanceToLeader = tempDistance;
-                                // Debug.Log("I found an other leader, but check his strength.");
-                            }
-                        }
+                                if (leader.Equals(myLeaderScript))
+                                    continue;
 
-                        // if the nearest leaders swarm is smaler than mine, than attack im
-                        if (distanceToLeader < 80f && leaderToAttack.GetSwarmSize() < myLeaderScript.GetSwarmSize() && leaderToAttack.GetSwarmSize() > 0)
-                        {
-                            timeToStayNextToAttackedLeader = 7f;
-                            // Debug.Log("Strength is ok. Lets attack him.");
-
-                            if (leaderToAttack.LeaderIsHumanPlayer())
-                            {
-                                guiOverlay.DisplayMainMessage("Achtung! Ein anderer Schwarm greift dich an", 4, GuiOverlay.MessageType.warning);
+                                float tempDistance = Vector3.Distance(position, leader.getPosition());
+                                if (tempDistance < distanceToLeader)
+                                {
+                                    leaderToAttack = leader;
+                                    distanceToLeader = tempDistance;
+                                    // Debug.Log("I found an other leader, but check his strength.");
+                                }
                             }
 
+                            // if the nearest leaders swarm is smaler than mine, than attack im
+                            if (distanceToLeader < 80f && leaderToAttack.GetSwarmSize() < myLeaderScript.GetSwarmSize() && leaderToAttack.GetSwarmSize() > 0)
+                            {
+                                timeToStayNextToAttackedLeader = 7f;
+                                // Debug.Log("Strength is ok. Lets attack him.");
+
+                                if (leaderToAttack.LeaderIsHumanPlayer())
+                                {
+                                    guiOverlay.DisplayMainMessage("Achtung! Ein anderer Schwarm greift dich an", 4, GuiOverlay.MessageType.warning);
+                                }
+
+                            }
+                            else
+                            {
+                                // if other swarm is too big, search for boids
+                                // Debug.Log("The other swarm is to strong for me. I search for boids.");
+                                opponentBehavior = OpponentBehavior.SearchForBoids;
+                                leaderToAttack = null;
+                            }
                         }
-                        else
+                    }
+                    else if (leaderToAttack != null)
+                    {
+                        // if i have a leader to attack
+                        acceleration += leaderToAttack.transform.position - position;
+
+                        // if i got some boids, go away from this leader
+                        float distanceToOtherLeader = Vector3.Distance(leaderToAttack.transform.position, position);
+                        if (distanceToOtherLeader < 6f && timeToStayNextToAttackedLeader > 0)
                         {
-                            // if other swarm is too big, search for boids
-                            // Debug.Log("The other swarm is to strong for me. I search for boids.");
-                            opponentBehavior = OpponentBehavior.SearchForBoids;
+                            // stay next to leader a specific time
+                            timeToStayNextToAttackedLeader -= Time.deltaTime;
+                            // Debug.Log("I came to the other leader less than 5 EE.");
+
+                        }
+                        else if (distanceToOtherLeader < 10f && timeToStayNextToAttackedLeader <= 0)
+                        {
+                            // go away from other leader
+                            acceleration = leaderToAttack.transform.position * -1;
+                        }
+                        else if (distanceToOtherLeader > 15f && timeToStayNextToAttackedLeader <= 0)
+                        {
+                            // Debug.Log("I can search for a new leader to attack.");
+                            // delete leaderToAttack, if i am fa
                             leaderToAttack = null;
+                            speed = maxSpeed / 3f;
+                            timeToRehunt = 15f;
                         }
                     }
                 }
-                else if (leaderToAttack != null)
+
+
+                /////////////////////////////
+                ////// search for food //////
+                /////////////////////////////
+                ///
+                if (opponentBehavior.Equals(OpponentBehavior.SearchForFood))
                 {
-                    // if i have a leader to attack
-                    acceleration += leaderToAttack.transform.position - position;
-
-                    // if i got some boids, go away from this leader
-                    float distanceToOtherLeader = Vector3.Distance(leaderToAttack.transform.position, position);
-                    if (distanceToOtherLeader < 6f && timeToStayNextToAttackedLeader > 0)
+                    if (foodTarget == null)
                     {
-                        // stay next to leader a specific time
-                        timeToStayNextToAttackedLeader -= Time.deltaTime;
-                        // Debug.Log("I came to the other leader less than 5 EE.");
-
-                    }
-                    else if (distanceToOtherLeader < 10f && timeToStayNextToAttackedLeader <= 0)
-                    {
-                        // go away from other leader
-                        acceleration = leaderToAttack.transform.position * -1;
-                    }
-                    else if (distanceToOtherLeader > 15f && timeToStayNextToAttackedLeader <= 0)
-                    {
-                        // Debug.Log("I can search for a new leader to attack.");
-                        // delete leaderToAttack, if i am fa
-                        leaderToAttack = null;
-                        speed = maxSpeed / 3f;
-                        timeToRehunt = 15f;
-                    }
-                }
-
-
-
-
-            }
-
-
-            /////////////////////////////
-            ////// search for food //////
-            /////////////////////////////
-            ///
-            if (opponentBehavior.Equals(OpponentBehavior.SearchForFood))
-            {
-                if (foodTarget == null)
-                {
-                    // find nearest food
-                    float nearestFood = float.PositiveInfinity;
-                    int nearestFoodIndex = 0;
-                    for (int i = 0; i < foodList.Count; i++)
-                    {
-                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
-                        if (dist < nearestFood)
+                        // find nearest food
+                        float nearestFood = float.PositiveInfinity;
+                        int nearestFoodIndex = 0;
+                        for (int i = 0; i < foodList.Count; i++)
                         {
-                            nearestFood = dist;
-                            nearestFoodIndex = i;
+                            float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                            if (dist < nearestFood)
+                            {
+                                nearestFood = dist;
+                                nearestFoodIndex = i;
+                            }
+                        }
+                        // Debug.Log("Nächste Futterquelle ist " + nearestFood + " entfernt");
+
+                        // found food: setting food-parameters
+                        if (nearestFood < 20f)
+                        {
+                            // Debug.Log("Futterquelle ist nahe gefunden");
+
+                            foodTarget = foodList[nearestFoodIndex];
                         }
                     }
-                    // Debug.Log("Nächste Futterquelle ist " + nearestFood + " entfernt");
 
-                    // found food: setting food-parameters
-                    if (nearestFood < 20f)
+
+                    if (foodTarget != null)
                     {
-                        // Debug.Log("Futterquelle ist nahe gefunden");
+                        acceleration += foodTarget.GetPosition() - position;
 
-                        foodTarget = foodList[nearestFoodIndex];
+                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                        {
+                            cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
+                            foodTarget = null;
+                            // Debug.Log("I got newFood " + cachedFoodInLeader);
 
-
+                            // feed the swarm if not alreay feeding
+                            if (!coroutineFeedSwarmRunning && cachedFoodInLeader > 0)
+                                StartCoroutine(FeedSwarm());
+                        }
                     }
-
                 }
 
 
-                if (foodTarget != null)
+                ////////////////////////////
+                ////// avoid predator //////
+                ////////////////////////////
+                foreach (Predator predator in availablePredators)
                 {
-                    acceleration += foodTarget.GetPosition() - position;
-
-                    if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                    float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+                    if (distanceToPredator < 4.5f)
                     {
-                        cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
-                        foodTarget = null;
-                        // Debug.Log("I got newFood " + cachedFoodInLeader);
-
-                        // feed the swarm if not alreay feeding
-                        if (!coroutineFeedSwarmRunning && cachedFoodInLeader > 0)
-                            StartCoroutine(FeedSwarm());
+                        Vector3 positionToPredator = predator.getPosition() - position;
+                        acceleration = positionToPredator * -1;
                     }
                 }
-
-
-
             }
 
 
-            ////////////////////////////
-            ////// avoid predator //////
-            ////////////////////////////
-            foreach (Predator predator in availablePredators)
+            velocity += acceleration * Time.deltaTime;
+
+            // if speed not set befor
+            if (speed == 0)
+                speed = velocity.magnitude;
+
+            Vector3 dir = velocity / speed;
+
+            speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
+            velocity = dir * speed;
+            cachedTransform.position += velocity * Time.deltaTime;
+            cachedTransform.forward = dir;
+
+            position = cachedTransform.position;
+            forward = dir;
+
+            float ws = material.GetFloat("_WobbleSpeed");
+            if (ws != speed)
             {
-                float distanceToPredator = Vector3.Distance(position, predator.getPosition());
-                if (distanceToPredator < 4.5f)
-                {
-                    Vector3 positionToPredator = predator.getPosition() - position;
-                    acceleration = positionToPredator * -1;
-                }
+                if (speed < 0)
+                    speed = 0;
+
+                ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
             }
 
-
-
+            setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
         }
-
-
-        velocity += acceleration * Time.deltaTime;
-
-        // if speed not set befor
-        if (speed == 0)
-            speed = velocity.magnitude;
-
-        Vector3 dir = velocity / speed;
-
-
-
-        speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
-        velocity = dir * speed;
-        cachedTransform.position += velocity * Time.deltaTime;
-        cachedTransform.forward = dir;
-
-        position = cachedTransform.position;
-        forward = dir;
-
-        float ws = material.GetFloat("_WobbleSpeed");
-        if (ws != speed)
-        {
-            if (speed < 0)
-                speed = 0;
-
-            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
-        }
-
-        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
+
 
     private IEnumerator CalculateFoodBehavior()
     {

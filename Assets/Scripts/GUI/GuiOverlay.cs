@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GuiOverlay : MonoBehaviour
 {
@@ -16,6 +18,12 @@ public class GuiOverlay : MonoBehaviour
     private float timeToFade = 2;
     private bool broadcastingMessage = false;
 
+    public Button playButton;
+    public TextMeshProUGUI playButtonText;
+    public Button quitButton;
+    public Button restartButton;
+
+    private CameraPosition cameraPosition;
 
     public enum MessageType
     {
@@ -24,12 +32,122 @@ public class GuiOverlay : MonoBehaviour
         warning
     }
 
+    public enum GameStatus
+    {
+        newGame,
+        inGame,
+        pausedGame
+    }
+
+    public GameStatus gameStatus;
+
+
     void Awake()
     {
+        gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
+        cameraPosition = FindObjectOfType<CameraPosition>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
+
+        NewGame();
+    }
+
+    void NewGame() {
+        gameStatus = GameStatus.newGame;
+        Cursor.visible = true;
+        Application.targetFrameRate = 0;
+
+        playButton.onClick.AddListener(PlayButtonClickEvent);
+        playButtonText.text = "Start";
+
+        quitButton.onClick.AddListener(QuitButtonClickEvent);
+        quitButton.gameObject.SetActive(true);
+
+        restartButton.onClick.AddListener(RestartButtonClickEvent);
+        restartButton.gameObject.SetActive(true);
+
+        playButton.gameObject.SetActive(false); 
+        StartCoroutine(WaitForCamAnimation());
+    }
+
+
+    void PlayButtonClickEvent()
+    {
+        // If PLAY / UNPAUSE is clicked
+        if(gameStatus == GameStatus.newGame || gameStatus == GameStatus.pausedGame) {
+            Play();
+            Debug.Log(gameStatus);
+
+        // If PAUSE is clicked
+        } else if(gameStatus == GameStatus.inGame) {
+           Pause();
+            Debug.Log(gameStatus);
+        }
+    }
+
+
+    void Play() {
+            gameStatus = GameStatus.inGame;
+            cameraPosition.toggleView = true;
+
+            playButtonText.text = "Pause";
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
+
+            quitButton.gameObject.SetActive(false);
+            restartButton.gameObject.SetActive(false);
+
+            playButton.gameObject.SetActive(false);
+            StartCoroutine(WaitForCamAnimation());
+    }
+
+    void Pause() {
+            gameStatus = GameStatus.pausedGame;
+            cameraPosition.toggleView = true;
+
+            playButtonText.text = "Fortsetzen";
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 0;
+
+            quitButton.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(true);
+            
+            playButton.gameObject.SetActive(false);
+            StartCoroutine(WaitForCamAnimation());
+    }
+
+    // display Play/Pause button after the camera-animation has finished
+    private IEnumerator WaitForCamAnimation()
+    {
+        yield return new WaitForSeconds(5);
+        playButton.gameObject.SetActive(true);
+    }
+
+    void UnPause() {
+        Cursor.visible = true;
+
+        playButton.onClick.AddListener(PlayButtonClickEvent);
+        playButtonText.text = "Start";
+
+        quitButton.onClick.AddListener(QuitButtonClickEvent);
+        quitButton.gameObject.SetActive(true);
+
+        restartButton.onClick.AddListener(RestartButtonClickEvent);
+        restartButton.gameObject.SetActive(true);
+    }
+
+
+    void QuitButtonClickEvent()
+    {
+        Application.Quit();
+    }
+
+    void RestartButtonClickEvent()
+    {
+        NewGame();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 

@@ -16,7 +16,7 @@ public class CameraPosition : MonoBehaviour
     Vector3 lookAtLeader;
     Vector3 lookAtCenterOfTank;
 
-    bool side = true;
+    bool side = false;
 
     private Transform targetPosition;
     private Vector3 centerOfTank;
@@ -42,12 +42,23 @@ public class CameraPosition : MonoBehaviour
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         musicMenu = FindObjectOfType<MusicMenu>();
         ambientMusic = FindObjectOfType<AmbientMusic>();
-    }
 
+        // start at top
+        side = false;
+        targetPosition = Top_View;
+        switchingPerspevtiv = true;
+        myCamera.farClipPlane = 1000;
+        SwitchFieldOfViewToTop(true);
+        totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
+        // DisablePostEffects(true);
+        SwitchFogDensityToTop(true);
+        topStatsScroller.FadeOutTopStats();
+        musicMenu.StartMenuMusic();
+        ambientMusic.StopAmbientMusic();
+    }
 
     void Start()
     {
-        targetPosition = Side_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
         lookAtCenterOfTank = centerOfTank + new Vector3(0, 0, 20);
@@ -58,13 +69,12 @@ public class CameraPosition : MonoBehaviour
 
 
     bool switchingPerspevtiv = false;
+    public bool toggleView = false;
+
 
     void FixedUpdate()
     {
-
-        bool down = Input.GetKeyDown(KeyCode.Space);
-
-        if (!switchingPerspevtiv && down & side)
+        if (!switchingPerspevtiv && toggleView & side)
         {
             if (setClippingPlane != null)
                 StopCoroutine(setClippingPlane);
@@ -76,14 +86,14 @@ public class CameraPosition : MonoBehaviour
             startPosition = transform.position.y;
             targetPosition = Top_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
-            DisablePostEffects(true);
-            SwitchFodDensityToTop(true);
+            // DisablePostEffects(true);
+            SwitchFogDensityToTop(true);
             topStatsScroller.FadeOutTopStats();
             musicMenu.StartMenuMusic();
             ambientMusic.StopAmbientMusic();
 
         }
-        else if (!switchingPerspevtiv && down & !side)
+        else if (!switchingPerspevtiv && toggleView & !side)
         {
             side = true;
             switchingPerspevtiv = true;
@@ -92,8 +102,8 @@ public class CameraPosition : MonoBehaviour
             lookAtLeader = target.position;
             targetPosition = Side_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - lookAtLeader.y);
-            DisablePostEffects(false);
-            SwitchFodDensityToTop(false);
+            // DisablePostEffects(false);
+            SwitchFogDensityToTop(false);
             setClippingPlane = StartCoroutine(SetClippingPlane());
             topStatsScroller.FadeInTopStats();
             musicMenu.StopMenuMusic();
@@ -144,7 +154,7 @@ public class CameraPosition : MonoBehaviour
         }
     }
 
-    private void SwitchFodDensityToTop(bool top)
+    private void SwitchFogDensityToTop(bool top)
     {
         StopCoroutine(AnimateFogDensity());
 
@@ -176,6 +186,7 @@ public class CameraPosition : MonoBehaviour
             }
 
             switchingPerspevtiv = false;
+            toggleView = false;
         }
         else
         {
@@ -185,10 +196,11 @@ public class CameraPosition : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
 
-            switchingPerspevtiv = false;
-
             if (RenderSettings.fogDensity < 0)
                 RenderSettings.fogDensity = 0;
+
+            switchingPerspevtiv = false;
+            toggleView = false;
         }
     }
 
@@ -213,7 +225,6 @@ public class CameraPosition : MonoBehaviour
 
     private void DisablePostEffects(bool top)
     {
-
         DepthOfField tempDof;
 
         if (volume.profile.TryGet<DepthOfField>(out tempDof))
@@ -223,12 +234,12 @@ public class CameraPosition : MonoBehaviour
 
         if (top)
         {
-            //depthOfField.focusDistance.value = 42f;
+            depthOfField.focusDistance.value = 42f;
             depthOfField.active = false;
         }
         else
         {
-            //depthOfField.active = true;
+            depthOfField.active = true;
         }
     }
 

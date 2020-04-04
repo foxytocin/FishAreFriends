@@ -136,80 +136,81 @@ public class Leader : MonoBehaviour
 
     public void LateUpdate()
     {
-        if (humanPlayer)
-        {
-            CalculateSwarmFoodNeeds();
-            CheckFoodSource();
-        }
-
-
-        if (waitForNextRipCount > 0)
-        {
-            waitForNextRipCount -= Time.deltaTime;
-            return;
-        }
-
-
-        Leader otherLeader = null;
-        // find other leader
-        float distanceToOtherLeader = float.MaxValue;
-        if (leaderList != null)
-        {
-            foreach (Leader l in Leader.leaderList)
+        if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
+            if (humanPlayer)
             {
-                if (l.Equals(this))
-                    continue;
-
-                float tempDistance = Vector3.Distance(transform.position, l.getPosition());
-                if (tempDistance < distanceToOtherLeader)
-                {
-                    otherLeader = l;
-                    distanceToOtherLeader = tempDistance;
-                }
+                CalculateSwarmFoodNeeds();
+                CheckFoodSource();
             }
-        }
 
 
-        if (distanceToOtherLeader <= 5f && otherLeader != null)
-        {
-            // Debug.Log("Found other leader");
-            int otherSwarmCount = otherLeader.GetSwarmSize();
-            int mySwarmCount = GetSwarmSize();
-
-            forceField.StartPulse();
-
-            // if my swarm is extremly bigger than the other swarm
-            //  i get half the boids of the other
-            int ripCount = 0;
-
-            if (otherSwarmCount < mySwarmCount)
-                ripCount = otherSwarmCount / 4;
-
-            if (otherSwarmCount * 2 < mySwarmCount)
-                ripCount = otherSwarmCount / 3;
-
-            if (otherSwarmCount * 3 < mySwarmCount)
-                ripCount = otherSwarmCount / 2;
-
-            if (ripCount != 0)
+            if (waitForNextRipCount > 0)
             {
-                Debug.Log("Swarm riped " + ripCount + " boids from " + otherSwarmCount);
-                List<Boid> boidsToRip = otherLeader.GetSwarmList().GetRange(0, otherSwarmCount < ripCount ? otherSwarmCount : ripCount);
+                waitForNextRipCount -= Time.deltaTime;
+                return;
+            }
 
-                // lets rip
-                foreach (Boid boid in boidsToRip)
+
+            Leader otherLeader = null;
+            // find other leader
+            float distanceToOtherLeader = float.MaxValue;
+            if (leaderList != null)
+            {
+                foreach (Leader l in Leader.leaderList)
                 {
-                    boid.ToggleActualSwarm(this);
+                    if (l.Equals(this))
+                        continue;
+
+                    float tempDistance = Vector3.Distance(transform.position, l.getPosition());
+                    if (tempDistance < distanceToOtherLeader)
+                    {
+                        otherLeader = l;
+                        distanceToOtherLeader = tempDistance;
+                    }
                 }
             }
 
-            waitForNextRipCount = 10f;
-        }
-        else
-        {
-            forceField.StopPulse();
-        }
 
+            if (distanceToOtherLeader <= 5f && otherLeader != null)
+            {
+                // Debug.Log("Found other leader");
+                int otherSwarmCount = otherLeader.GetSwarmSize();
+                int mySwarmCount = GetSwarmSize();
+
+                forceField.StartPulse();
+
+                // if my swarm is extremly bigger than the other swarm
+                //  i get half the boids of the other
+                int ripCount = 0;
+
+                if (otherSwarmCount < mySwarmCount)
+                    ripCount = otherSwarmCount / 4;
+
+                if (otherSwarmCount * 2 < mySwarmCount)
+                    ripCount = otherSwarmCount / 3;
+
+                if (otherSwarmCount * 3 < mySwarmCount)
+                    ripCount = otherSwarmCount / 2;
+
+                if (ripCount != 0)
+                {
+                    Debug.Log("Swarm riped " + ripCount + " boids from " + otherSwarmCount);
+                    List<Boid> boidsToRip = otherLeader.GetSwarmList().GetRange(0, otherSwarmCount < ripCount ? otherSwarmCount : ripCount);
+
+                    // lets rip
+                    foreach (Boid boid in boidsToRip)
+                    {
+                        boid.ToggleActualSwarm(this);
+                    }
+                }
+
+                waitForNextRipCount = 10f;
+            }
+            else
+            {
+                forceField.StopPulse();
+            }
+        }
     }
 
 
