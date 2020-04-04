@@ -1,16 +1,15 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Tutorial : MonoBehaviour
 {
-
     GuiOverlay guiOverlay;
     TopStatsScroller topStatsScroller;
     Leader leaderPlayer;
 
-    GameObject aiPlayer;
-
     public bool reachedTopStatsStep = false;
+    public bool showTutorial = true;
+    private float passedTime = 0;
+    private int step = 1;
 
     void Awake()
     {
@@ -19,20 +18,12 @@ public class Tutorial : MonoBehaviour
         leaderPlayer = GameObject.Find("Leader").GetComponent<Leader>();
     }
 
-    void Start()
-    {
-        //StartCoroutine(BasicTutorial());
-    }
 
-    public bool showTutorial = true;
-    float passedTime = 0;
-    int step = 1;
     void FixedUpdate() {
 
         if(showTutorial) {
             if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
                 passedTime += Time.deltaTime;
-                Debug.Log(passedTime);
             } else {
                 passedTime = 0;
 
