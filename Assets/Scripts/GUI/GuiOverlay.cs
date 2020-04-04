@@ -32,7 +32,7 @@ public class GuiOverlay : MonoBehaviour
         warning
     }
 
-      public enum GameStatus
+    public enum GameStatus
     {
         newGame,
         inGame,
@@ -44,6 +44,7 @@ public class GuiOverlay : MonoBehaviour
 
     void Awake()
     {
+        gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         cameraPosition = FindObjectOfType<CameraPosition>();
         mainMessagesColor = mainMessages.color;
@@ -71,8 +72,20 @@ public class GuiOverlay : MonoBehaviour
 
     void PlayButtonClickEvent()
     {
+        // If PLAY / UNPAUSE is clicked
         if(gameStatus == GameStatus.newGame || gameStatus == GameStatus.pausedGame) {
+            Play();
+            Debug.Log(gameStatus);
 
+        // If PAUSE is clicked
+        } else if(gameStatus == GameStatus.inGame) {
+           Pause();
+            Debug.Log(gameStatus);
+        }
+    }
+
+
+    void Play() {
             gameStatus = GameStatus.inGame;
             cameraPosition.toggleView = true;
 
@@ -83,8 +96,11 @@ public class GuiOverlay : MonoBehaviour
             quitButton.gameObject.SetActive(false);
             restartButton.gameObject.SetActive(false);
 
-        } else if(gameStatus == GameStatus.inGame) {
-            
+            playButton.gameObject.SetActive(false);
+            StartCoroutine(WaitForCamAnimation());
+    }
+
+    void Pause() {
             gameStatus = GameStatus.pausedGame;
             cameraPosition.toggleView = true;
 
@@ -94,20 +110,16 @@ public class GuiOverlay : MonoBehaviour
 
             quitButton.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
-        }
+            
+            playButton.gameObject.SetActive(false);
+            StartCoroutine(WaitForCamAnimation());
     }
 
-    void Pause() {
-        Cursor.visible = true;
-
-        playButton.onClick.AddListener(PlayButtonClickEvent);
-        playButtonText.text = "Start";
-
-        quitButton.onClick.AddListener(QuitButtonClickEvent);
-        quitButton.gameObject.SetActive(true);
-
-        restartButton.onClick.AddListener(RestartButtonClickEvent);
-        restartButton.gameObject.SetActive(true);
+    // display Play/Pause button after the camera-animation has finished
+    private IEnumerator WaitForCamAnimation()
+    {
+        yield return new WaitForSeconds(5);
+        playButton.gameObject.SetActive(true);
     }
 
     void UnPause() {
@@ -124,8 +136,6 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-
-
     void QuitButtonClickEvent()
     {
         Application.Quit();
@@ -133,6 +143,7 @@ public class GuiOverlay : MonoBehaviour
 
     void RestartButtonClickEvent()
     {
+        NewGame();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

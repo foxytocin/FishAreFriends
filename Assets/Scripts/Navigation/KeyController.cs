@@ -83,124 +83,126 @@ public class KeyController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            Application.Quit();
+        if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                Application.Quit();
 
-        cellGroups.SetPlayerCell(transform.position);
+            cellGroups.SetPlayerCell(transform.position);
 
-        if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))
-            StartCoroutine(InvertControll());
+            if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))
+                StartCoroutine(InvertControll());
 
-        Vector3 acceleration = Vector3.zero;
-        bool isHeadingForCollision = IsHeadingForCollision();
+            Vector3 acceleration = Vector3.zero;
+            bool isHeadingForCollision = IsHeadingForCollision();
 
-        // avoid collisiton
-        if (isHeadingForCollision)
-        {
-            Vector3 collisionAvoidDir = ObstacleRays();
-            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
-            acceleration += collisionAvoidForce;
-        }
-
-        // speed handling
-        velocity += acceleration * Time.deltaTime;
-        float speed = velocity.magnitude;
-        Vector3 dir = velocity / speed;
-
-
-        if (!isHeadingForCollision)
-        {
-            if (Input.GetKeyDown(KeyCode.Q))
+            // avoid collisiton
+            if (isHeadingForCollision)
             {
-                speed -= 0.5f;
-                //Debug.Log("KeyDown Q: " + speed);
+                Vector3 collisionAvoidDir = ObstacleRays();
+                Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
+                acceleration += collisionAvoidForce;
             }
-            if (Input.GetKeyDown(KeyCode.E))
+
+            // speed handling
+            velocity += acceleration * Time.deltaTime;
+            float speed = velocity.magnitude;
+            Vector3 dir = velocity / speed;
+
+
+            if (!isHeadingForCollision)
             {
-                speed += 0.5f;
-                //Debug.Log("KeyDown E: " + speed);
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    speed -= 0.5f;
+                    //Debug.Log("KeyDown Q: " + speed);
+                }
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    speed += 0.5f;
+                    //Debug.Log("KeyDown E: " + speed);
+                }
             }
-        }
 
-        speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
-        velocity = dir * speed;
+            speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
+            velocity = dir * speed;
 
-        // handle key events
-        if (!isHeadingForCollision)
-        {
-            // key ups
-            if (Input.GetKeyDown(KeyCode.A))
-                leftKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.D))
-                rightKeyPressed = true;
+            // handle key events
+            if (!isHeadingForCollision)
+            {
+                // key ups
+                if (Input.GetKeyDown(KeyCode.A))
+                    leftKeyPressed = true;
+                if (Input.GetKeyDown(KeyCode.D))
+                    rightKeyPressed = true;
+
+                if (!invertedControlls)
+                {
+                    if (Input.GetKeyDown(KeyCode.W))
+                        upKeyPressed = true;
+                    if (Input.GetKeyDown(KeyCode.S))
+                        downKeyPressed = true;
+                }
+                else
+                {
+                    if (Input.GetKeyDown(KeyCode.S))
+                        upKeyPressed = true;
+                    if (Input.GetKeyDown(KeyCode.W))
+                        downKeyPressed = true;
+                }
+            }
+
+            // key downs
+            if (Input.GetKeyUp(KeyCode.A))
+                leftKeyPressed = false;
+            if (Input.GetKeyUp(KeyCode.D))
+                rightKeyPressed = false;
 
             if (!invertedControlls)
             {
-                if (Input.GetKeyDown(KeyCode.W))
-                    upKeyPressed = true;
-                if (Input.GetKeyDown(KeyCode.S))
-                    downKeyPressed = true;
+                if (Input.GetKeyUp(KeyCode.W))
+                    upKeyPressed = false;
+                if (Input.GetKeyUp(KeyCode.S))
+                    downKeyPressed = false;
             }
             else
             {
-                if (Input.GetKeyDown(KeyCode.S))
-                    upKeyPressed = true;
-                if (Input.GetKeyDown(KeyCode.W))
-                    downKeyPressed = true;
+                if (Input.GetKeyUp(KeyCode.S))
+                    upKeyPressed = false;
+                if (Input.GetKeyUp(KeyCode.W))
+                    downKeyPressed = false;
             }
+
+            if (!isHeadingForCollision)
+            {
+
+                if (leftKeyPressed)
+                    velocity -= transform.right * Time.deltaTime * speed;
+                if (rightKeyPressed)
+                    velocity += transform.right * Time.deltaTime * speed;
+                if (upKeyPressed)
+                    velocity += transform.up * Time.deltaTime * speed;
+                if (downKeyPressed)
+                    velocity -= transform.up * Time.deltaTime * speed;
+            }
+
+
+            cachedTransform.position += velocity * Time.deltaTime;
+            cachedTransform.forward = dir;
+
+            position = cachedTransform.position;
+            forward = dir;
+
+            float ws = material.GetFloat("_WobbleSpeed");
+            if (ws != speed)
+            {
+                if (speed < 0)
+                    speed = 0;
+
+                ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
+            }
+
+            setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
         }
-
-        // key downs
-        if (Input.GetKeyUp(KeyCode.A))
-            leftKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.D))
-            rightKeyPressed = false;
-
-        if (!invertedControlls)
-        {
-            if (Input.GetKeyUp(KeyCode.W))
-                upKeyPressed = false;
-            if (Input.GetKeyUp(KeyCode.S))
-                downKeyPressed = false;
-        }
-        else
-        {
-            if (Input.GetKeyUp(KeyCode.S))
-                upKeyPressed = false;
-            if (Input.GetKeyUp(KeyCode.W))
-                downKeyPressed = false;
-        }
-
-        if (!isHeadingForCollision)
-        {
-
-            if (leftKeyPressed)
-                velocity -= transform.right * Time.deltaTime * speed;
-            if (rightKeyPressed)
-                velocity += transform.right * Time.deltaTime * speed;
-            if (upKeyPressed)
-                velocity += transform.up * Time.deltaTime * speed;
-            if (downKeyPressed)
-                velocity -= transform.up * Time.deltaTime * speed;
-        }
-
-
-        cachedTransform.position += velocity * Time.deltaTime;
-        cachedTransform.forward = dir;
-
-        position = cachedTransform.position;
-        forward = dir;
-
-        float ws = material.GetFloat("_WobbleSpeed");
-        if (ws != speed)
-        {
-            if (speed < 0)
-                speed = 0;
-
-            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
-        }
-
-        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
 
 

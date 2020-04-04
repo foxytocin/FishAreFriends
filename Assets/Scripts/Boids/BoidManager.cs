@@ -34,8 +34,11 @@ public class BoidManager : MonoBehaviour
     private float timeTilCellUpdate;
     private bool boidInitializationCompleted = false;
 
+    private GuiOverlay guiOverlay;
+
     void Awake()
     {
+       
         viewRadius = settings.perceptionRadius;
         avoidRadius = settings.avoidanceRadius;
         alignWeight = settings.alignWeight;
@@ -49,7 +52,8 @@ public class BoidManager : MonoBehaviour
 
     }
     void Start()
-    {
+    { 
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         cellGroups = FindObjectOfType<CellGroups>();
         spawner = FindObjectOfType<Spawner>();
@@ -65,7 +69,7 @@ public class BoidManager : MonoBehaviour
     {
         timeTilCellUpdate -= Time.deltaTime;
 
-        if (cellGroups.allBoidCells != null)
+        if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame && cellGroups.allBoidCells != null)
         {
             int foodNeedsSum = 0;
             foreach (List<Boid> boidsList in cellGroups.allBoidCells)
