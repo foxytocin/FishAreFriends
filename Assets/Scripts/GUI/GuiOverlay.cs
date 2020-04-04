@@ -20,8 +20,13 @@ public class GuiOverlay : MonoBehaviour
     public TextMeshProUGUI playButtonText;
     public Button quitButton;
     public Button restartButton;
+    public Button newMapButton;
+
     private CameraPosition cameraPosition;
+    private MenuScroller menuScroller;
     private bool allowToggle = false;
+
+    private MapGenerator mapGenerator;
 
     public enum MessageType
     {
@@ -46,6 +51,8 @@ public class GuiOverlay : MonoBehaviour
         gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         cameraPosition = FindObjectOfType<CameraPosition>();
+        menuScroller = FindObjectOfType<MenuScroller>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
@@ -74,13 +81,21 @@ public class GuiOverlay : MonoBehaviour
         playButtonText.text = "Start";
 
         quitButton.onClick.AddListener(QuitButtonClickEvent);
-        quitButton.gameObject.SetActive(true);
+        //quitButton.gameObject.SetActive(true);
 
         restartButton.onClick.AddListener(RestartButtonClickEvent);
-        restartButton.gameObject.SetActive(true);
+        //restartButton.gameObject.SetActive(true);
 
-        playButton.gameObject.SetActive(false); 
+        newMapButton.onClick.AddListener(GenerateNewMap);
+
+        //playButton.gameObject.SetActive(false);
+
+        menuScroller.FadeIn();
         StartCoroutine(WaitForCamAnimation());
+    }
+
+    void GenerateNewMap() {
+        mapGenerator.GenerateMap();
     }
 
 
@@ -101,12 +116,13 @@ public class GuiOverlay : MonoBehaviour
             gameStatus = GameStatus.inGame;
             cameraPosition.toggleView = true;
 
-            playButtonText.text = "Pause";
+            //playButtonText.text = "Pause";
 
-            quitButton.gameObject.SetActive(false);
-            restartButton.gameObject.SetActive(false);
+            //quitButton.gameObject.SetActive(false);
+            //restartButton.gameObject.SetActive(false);
 
-            playButton.gameObject.SetActive(false);
+            menuScroller.FadeOut();
+            //playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
 
@@ -116,23 +132,28 @@ public class GuiOverlay : MonoBehaviour
 
             playButtonText.text = "Fortsetzen";
 
-            playButton.gameObject.SetActive(false);
+            //playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
 
     // display Play/Pause button after the camera-animation has finished
     private IEnumerator WaitForCamAnimation()
     {
+        if(gameStatus == GameStatus.pausedGame) {
+            newMapButton.gameObject.SetActive(false);
+        }
+
         while(cameraPosition.toggleView) {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.2f);
         }
 
         if(gameStatus != GameStatus.inGame) {
-            quitButton.gameObject.SetActive(true);
-            restartButton.gameObject.SetActive(true);
-            playButton.gameObject.SetActive(true);
+            //quitButton.gameObject.SetActive(true);
+            //restartButton.gameObject.SetActive(true);
+            //playButton.gameObject.SetActive(true);
+            menuScroller.FadeIn();
         }
-            
+
         allowToggle = true;
     }
 
