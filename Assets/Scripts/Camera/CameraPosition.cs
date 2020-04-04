@@ -197,11 +197,11 @@ public class CameraPosition : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
 
-            switchingPerspevtiv = false;
-            toggleView = false;
-
             if (RenderSettings.fogDensity < 0)
                 RenderSettings.fogDensity = 0;
+
+            switchingPerspevtiv = false;
+            toggleView = false;
         }
     }
 
