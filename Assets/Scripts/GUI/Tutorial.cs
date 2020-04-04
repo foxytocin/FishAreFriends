@@ -35,7 +35,7 @@ public class Tutorial : MonoBehaviour
             switch(step) {
                 // start
                 case 1:
-                    if(passedTime > 3) {
+                    if(passedTime > 6) {
                         passedTime = 0;
                         step++;
                         guiOverlay.DisplayMainMessage("Los geht's", 2, GuiOverlay.MessageType.info);
