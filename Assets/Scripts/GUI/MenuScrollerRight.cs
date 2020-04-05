@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class MenuScroller : MonoBehaviour
+public class MenuScrollerRight : MonoBehaviour
 {
     float offScreenOffset = 145f;
     float target;

@@ -85,7 +85,8 @@ public class Predator : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            foodNeeds -= UnityEngine.Random.Range(2, 20);
+            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+                foodNeeds -= UnityEngine.Random.Range(2, 20);
         }
     }
 

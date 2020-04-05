@@ -23,7 +23,8 @@ public class GuiOverlay : MonoBehaviour
     public Button newMapButton;
 
     private CameraPosition cameraPosition;
-    private MenuScroller menuScroller;
+    private MenuScrollerRight menuScrollerRight;
+    private MenuScrollerLeft menuScrollerLeft;
     private bool allowToggle = false;
 
     private MapGenerator mapGenerator;
@@ -52,13 +53,17 @@ public class GuiOverlay : MonoBehaviour
         gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         cameraPosition = FindObjectOfType<CameraPosition>();
-        menuScroller = FindObjectOfType<MenuScroller>();
+        menuScrollerLeft = FindObjectOfType<MenuScrollerLeft>();
+        menuScrollerRight = FindObjectOfType<MenuScrollerRight>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         spawner = FindObjectOfType<Spawner>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
+    }
 
+    void Start() {
+        
         NewGame();
     }
 
@@ -92,7 +97,8 @@ public class GuiOverlay : MonoBehaviour
 
         //playButton.gameObject.SetActive(false);
 
-        menuScroller.FadeIn();
+        menuScrollerLeft.FadeIn();
+        menuScrollerRight.FadeIn();
         StartCoroutine(WaitForCamAnimation());
     }
 
@@ -128,7 +134,8 @@ public class GuiOverlay : MonoBehaviour
             //quitButton.gameObject.SetActive(false);
             //restartButton.gameObject.SetActive(false);
 
-            menuScroller.FadeOut();
+            menuScrollerLeft.FadeOut();
+            menuScrollerRight.FadeOut();
             //playButton.gameObject.SetActive(false);
             StartCoroutine(WaitForCamAnimation());
     }
@@ -159,7 +166,8 @@ public class GuiOverlay : MonoBehaviour
             //quitButton.gameObject.SetActive(true);
             //restartButton.gameObject.SetActive(true);
             //playButton.gameObject.SetActive(true);
-            menuScroller.FadeIn();
+            menuScrollerLeft.FadeIn();
+            menuScrollerRight.FadeIn();
         }
 
         allowToggle = true;
@@ -173,15 +181,15 @@ public class GuiOverlay : MonoBehaviour
 
     void RestartButtonClickEvent()
     {
-        NewGame();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //NewGame();
     }
 
 
     public void SetPlayerSwarmSize(int size)
     {
         if (size == 0)
-            playerSwarmSize.text = "lonely";
+            playerSwarmSize.text = "alleine";
 
         playerSwarmSize.text = size.ToString();
     }

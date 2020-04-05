@@ -64,6 +64,8 @@ public class Boid : MonoBehaviour
 
     public int timeBetweedFoodUpdate = 3;
 
+    private GuiOverlay guiOverlay;
+
     public Status status;
     public enum Status
     {
@@ -89,6 +91,7 @@ public class Boid : MonoBehaviour
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         // leader = FindObjectOfType<Leader>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
@@ -155,7 +158,8 @@ public class Boid : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
 
-            foodNeeds += hungerRate;
+            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+                foodNeeds += hungerRate;
 
 
             if (firstTime)
