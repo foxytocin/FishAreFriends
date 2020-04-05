@@ -52,10 +52,10 @@ public class Leader : MonoBehaviour
 
     private void Start()
     {
-        if (leaderList != null) {
-            leaderList = new List<Leader>();
-            leaderList.Add(this);
-        }
+        //if (humanPlayer && leaderList != null) {
+        //    leaderList = new List<Leader>();
+        //    leaderList.Add(this);
+        //}
             
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
