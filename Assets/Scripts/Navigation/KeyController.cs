@@ -33,6 +33,7 @@ public class KeyController : MonoBehaviour
     private bool rightKeyPressed = false;
     private bool invertedControlls = false;
     private bool invertingSemaphor = false;
+    private SettingInvertControlls settingInvertControlls;
 
     // Debug
     private bool showDebug = false;
@@ -44,6 +45,7 @@ public class KeyController : MonoBehaviour
         cellGroups = FindObjectOfType<CellGroups>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
         flowStream = FindObjectOfType<FlowStream>();
+        settingInvertControlls = FindObjectOfType<SettingInvertControlls>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
         Cursor.visible = false;
@@ -59,6 +61,17 @@ public class KeyController : MonoBehaviour
     }
 
 
+    public void InvertedControlls(bool value)
+    {
+        invertedControlls = value;
+    }
+
+    public bool CheckInvertedControlls()
+    {
+        return invertedControlls;
+    }
+
+
     private IEnumerator InvertControll()
     {
         invertingSemaphor = true;
@@ -66,11 +79,13 @@ public class KeyController : MonoBehaviour
         if (invertedControlls)
         {
             invertedControlls = false;
+            settingInvertControlls.SetInvertedControlls(false);
             guiOverlay.DisplayMainMessage("Invertierte Steuerung deaktiviert", 1, GuiOverlay.MessageType.info);
         }
         else
         {
             invertedControlls = true;
+            settingInvertControlls.SetInvertedControlls(true);
             guiOverlay.DisplayMainMessage("Invertierte Steuerung aktiviert", 1, GuiOverlay.MessageType.info);
         }
 
@@ -83,8 +98,9 @@ public class KeyController : MonoBehaviour
 
     void Update()
     {
-        if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
-           
+        if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+        {
+
             cellGroups.SetPlayerCell(transform.position);
 
             if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))

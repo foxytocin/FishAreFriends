@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class MenuScrollerLeft : MonoBehaviour
+public class SettingMenu : MonoBehaviour
 {
-    float offScreenOffset = -150f;
+
+    float offScreenOffset = 200f;
     float target;
     float position;
 
@@ -11,21 +12,21 @@ public class MenuScrollerLeft : MonoBehaviour
     private RectTransform[] rectTransform;
     Coroutine fadeInTopStatsCore = null;
     Coroutine fadeOutTopStatsCore = null;
-    public Animator transition;
+    private Tutorial tutorial;
 
     void Awake()
     {
         rectTransform = GetComponents<RectTransform>();
-        rectTransform[0].anchoredPosition = new Vector2(offScreenOffset, 0);
+        rectTransform[0].anchoredPosition = new Vector2(13, offScreenOffset);
+        position = offScreenOffset;
+        tutorial = FindObjectOfType<Tutorial>();
     }
 
 
     public void FadeIn()
     {
-
-        transition.SetTrigger("FadeIn");
-        target = 140;
-        position = rectTransform[0].anchoredPosition.x;
+        target = -250;
+        position = rectTransform[0].anchoredPosition.y;
         fadeInTopStatsCore = StartCoroutine(FadeInTopStatsCore());
     }
 
@@ -35,10 +36,10 @@ public class MenuScrollerLeft : MonoBehaviour
         if (fadeOutTopStatsCore != null)
             StopCoroutine(fadeOutTopStatsCore);
 
-        while (position < target)
+        while (position > target)
         {
             position = Mathf.Lerp(position, target, Time.deltaTime * speed);
-            rectTransform[0].anchoredPosition = new Vector2(position, 0);
+            rectTransform[0].anchoredPosition = new Vector2(13, position);
             yield return new WaitForEndOfFrame();
         }
     }
@@ -46,10 +47,7 @@ public class MenuScrollerLeft : MonoBehaviour
 
     public void FadeOut()
     {
-
-        transition.SetTrigger("FadeOut");
-
-        position = rectTransform[0].anchoredPosition.x;
+        position = rectTransform[0].anchoredPosition.y;
         target = offScreenOffset;
         fadeOutTopStatsCore = StartCoroutine(FadeOutTopStatsCore());
     }
@@ -61,10 +59,10 @@ public class MenuScrollerLeft : MonoBehaviour
         if (fadeInTopStatsCore != null)
             StopCoroutine(fadeInTopStatsCore);
 
-        while (position > target)
+        while (position < target)
         {
             position = Mathf.Lerp(position, target, Time.deltaTime * speed);
-            rectTransform[0].anchoredPosition = new Vector2(position, 0);
+            rectTransform[0].anchoredPosition = new Vector2(13, position);
             yield return new WaitForEndOfFrame();
         }
     }
