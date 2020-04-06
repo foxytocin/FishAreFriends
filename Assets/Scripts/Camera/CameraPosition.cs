@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using System.Collections;
 
 public class CameraPosition : MonoBehaviour
@@ -24,9 +23,7 @@ public class CameraPosition : MonoBehaviour
 
     public GameObject postProcessing;
     Volume volume;
-    DepthOfField depthOfField;
-    private float targetFieldOfView;
-    private float originalFieldOfView;
+
     private float targetFogDensity;
     private float originalFogDensity;
 
@@ -54,7 +51,6 @@ public class CameraPosition : MonoBehaviour
         targetPosition = Top_View;
         switchingPerspevtiv = true;
         myCamera.farClipPlane = 1000;
-        SwitchFieldOfViewToTop(true);
         totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
         SwitchFogDensityToTop(true);
         topStatsScroller.FadeOutTopStats();
@@ -94,7 +90,6 @@ public class CameraPosition : MonoBehaviour
 
             switchingPerspevtiv = true;
             myCamera.farClipPlane = 1000;
-            SwitchFieldOfViewToTop(true);
             startPosition = transform.position.y;
             targetPosition = Top_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
@@ -107,7 +102,6 @@ public class CameraPosition : MonoBehaviour
         else if (!switchingPerspevtiv && toggleView && side)
         {
             switchingPerspevtiv = true;
-            SwitchFieldOfViewToTop(false);
             startPosition = transform.position.y;
             lookAtLeader = target.position;
             targetPosition = Side_View;
@@ -150,18 +144,6 @@ public class CameraPosition : MonoBehaviour
         }
     }
 
-
-    private void SwitchFieldOfViewToTop(bool value)
-    {
-        if (value)
-        {
-            targetFieldOfView = 10f;
-        }
-        else
-        {
-            targetFieldOfView = 60f;
-        }
-    }
 
     private void SwitchFogDensityToTop(bool top)
     {

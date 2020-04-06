@@ -27,7 +27,7 @@ public class GuiOverlay : MonoBehaviour
     private MenuScrollerRight menuScrollerRight;
     private MenuScrollerLeft menuScrollerLeft;
     private GameEndMenu gameEndMenu;
-   
+    private AudioSource messageSound;
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
@@ -66,6 +66,7 @@ public class GuiOverlay : MonoBehaviour
         mapGenerator = FindObjectOfType<MapGenerator>();
         spawner = FindObjectOfType<Spawner>();
         settingMenu = FindObjectOfType<SettingMenu>();
+        messageSound = GetComponent<AudioSource>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
@@ -132,14 +133,17 @@ public class GuiOverlay : MonoBehaviour
 
         settingMenu.PlayBubbleSound();
         Cursor.visible = false;
-        
-        if (gameStatus != GameStatus.gameEnd) {
+
+        if (gameStatus != GameStatus.gameEnd)
+        {
             menuScrollerLeft.FadeOut();
             menuScrollerRight.FadeOut();
-        } else if (gameStatus == GameStatus.gameEnd) {
+        }
+        else if (gameStatus == GameStatus.gameEnd)
+        {
             gameEndMenu.FadeOut();
         }
-        
+
         gameStatus = GameStatus.inGame;
     }
 
@@ -176,6 +180,8 @@ public class GuiOverlay : MonoBehaviour
 
     public void RestartButtonClickEvent()
     {
+        StopAllCoroutines();
+        gameStatus = GameStatus.newGame;
         Leader.resetLeaderList();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
@@ -220,6 +226,7 @@ public class GuiOverlay : MonoBehaviour
     private IEnumerator DisplayAndFadeMainMessage()
     {
         broadcastingMessage = true;
+        messageSound.Play();
 
         alpha = 0;
         while (alpha < 1)
@@ -243,7 +250,6 @@ public class GuiOverlay : MonoBehaviour
 
         alpha = 0;
         mainMessages.text = "";
-
         broadcastingMessage = false;
     }
 }
