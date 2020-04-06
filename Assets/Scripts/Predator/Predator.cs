@@ -149,7 +149,7 @@ public class Predator : MonoBehaviour
             {
 
                 boidToHunt = leaderToAttack.GetSwarmList()[0];
-                if (leaderToAttack.LeaderIsHumanPlayer())
+                if ((foodNeeds < 200 || isHunting) && leaderToAttack.LeaderIsHumanPlayer())
                 {
                     guiOverlay.DisplayMainMessage("Achtung! Der Hai hat deinen Schwarm im Visier.", 4, GuiOverlay.MessageType.warning);
                 }
