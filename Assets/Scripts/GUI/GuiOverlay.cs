@@ -25,7 +25,6 @@ public class GuiOverlay : MonoBehaviour
     private CameraPosition cameraPosition;
     private MenuScrollerRight menuScrollerRight;
     private MenuScrollerLeft menuScrollerLeft;
-    private bool allowToggle = false;
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
@@ -49,7 +48,6 @@ public class GuiOverlay : MonoBehaviour
 
     void Awake()
     {
-        allowToggle = false;
         gameStatus = GameStatus.newGame;
         textMeshPro = FindObjectOfType<TextMeshProUGUI>();
         cameraPosition = FindObjectOfType<CameraPosition>();
@@ -62,24 +60,28 @@ public class GuiOverlay : MonoBehaviour
         mainMessagesColorStandard = mainMessages.color;
     }
 
-    void Start() {
-        
+    void Start()
+    {
         NewGame();
     }
 
-    void LateUpdate() {
-        if (allowToggle && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))) {
-            allowToggle = false;
-
-            if(gameStatus == GameStatus.inGame) {
+    void LateUpdate()
+    {
+        if (!cameraPosition.toggleView && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P)))
+        {
+            if (gameStatus == GameStatus.inGame)
+            {
                 Pause();
-            } else if(gameStatus == GameStatus.pausedGame) {
-                 Play();
+            }
+            else if (gameStatus == GameStatus.pausedGame)
+            {
+                Play();
             }
         }
     }
 
-    void NewGame() {
+    void NewGame()
+    {
         gameStatus = GameStatus.newGame;
         Cursor.visible = true;
         Application.targetFrameRate = 0;
@@ -88,89 +90,51 @@ public class GuiOverlay : MonoBehaviour
         playButtonText.text = "Start";
 
         quitButton.onClick.AddListener(QuitButtonClickEvent);
-        //quitButton.gameObject.SetActive(true);
-
         restartButton.onClick.AddListener(RestartButtonClickEvent);
-        //restartButton.gameObject.SetActive(true);
-
         newMapButton.onClick.AddListener(GenerateNewMap);
-
-        //playButton.gameObject.SetActive(false);
 
         menuScrollerLeft.FadeIn();
         menuScrollerRight.FadeIn();
-        StartCoroutine(WaitForCamAnimation());
     }
 
-    void GenerateNewMap() {
+    void GenerateNewMap()
+    {
         mapGenerator.GenerateMap();
     }
 
 
     void PlayButtonClickEvent()
     {
-        // If PLAY / UNPAUSE is clicked
-        if(gameStatus == GameStatus.newGame || gameStatus == GameStatus.pausedGame) {
-            Play();
-
-        // If PAUSE is clicked
-        } else if(gameStatus == GameStatus.inGame) {
-           Pause();
+        if (gameStatus == GameStatus.inGame)
+        {
+            Pause();
+            return;
         }
+        Play();
     }
 
 
-    void Play() {
-
-            if(gameStatus == GameStatus.newGame)
-                spawner.SpawnFishSwarms();
-
-            Cursor.visible = false;
-            gameStatus = GameStatus.inGame;
-            cameraPosition.toggleView = true;
-
-            //playButtonText.text = "Pause";
-
-            //quitButton.gameObject.SetActive(false);
-            //restartButton.gameObject.SetActive(false);
-
-            menuScrollerLeft.FadeOut();
-            menuScrollerRight.FadeOut();
-            //playButton.gameObject.SetActive(false);
-            StartCoroutine(WaitForCamAnimation());
-    }
-
-    void Pause() {
-            Cursor.visible = true;
-            gameStatus = GameStatus.pausedGame;
-            cameraPosition.toggleView = true;
-
-            playButtonText.text = "Fortsetzen";
-
-            //playButton.gameObject.SetActive(false);
-            StartCoroutine(WaitForCamAnimation());
-    }
-
-    // display Play/Pause button after the camera-animation has finished
-    private IEnumerator WaitForCamAnimation()
+    void Play()
     {
-        if(gameStatus == GameStatus.pausedGame) {
-            newMapButton.gameObject.SetActive(false);
-        }
+        if (gameStatus == GameStatus.newGame)
+            spawner.SpawnFishSwarms();
 
-        while(cameraPosition.toggleView) {
-            yield return new WaitForSeconds(0.2f);
-        }
+        Cursor.visible = false;
+        gameStatus = GameStatus.inGame;
+        menuScrollerLeft.FadeOut();
+        menuScrollerRight.FadeOut();
+    }
 
-        if(gameStatus != GameStatus.inGame) {
-            //quitButton.gameObject.SetActive(true);
-            //restartButton.gameObject.SetActive(true);
-            //playButton.gameObject.SetActive(true);
-            menuScrollerLeft.FadeIn();
-            menuScrollerRight.FadeIn();
-        }
+    void Pause()
+    {
+        Cursor.visible = true;
+        gameStatus = GameStatus.pausedGame;
+        playButtonText.text = "Fortsetzen";
 
-        allowToggle = true;
+        newMapButton.gameObject.SetActive(false);
+        menuScrollerLeft.FadeIn();
+        menuScrollerRight.FadeIn();
+        //playButton.gameObject.SetActive(false);
     }
 
 
@@ -182,7 +146,6 @@ public class GuiOverlay : MonoBehaviour
     void RestartButtonClickEvent()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        //NewGame();
     }
 
 

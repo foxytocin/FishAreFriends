@@ -36,7 +36,7 @@ public class CameraPosition : MonoBehaviour
 
     bool switchingPerspevtiv = false;
     public bool toggleView = false;
-
+    private GuiOverlay guiOverlay;
 
     void Awake()
     {
@@ -46,6 +46,7 @@ public class CameraPosition : MonoBehaviour
         topStatsScroller = FindObjectOfType<TopStatsScroller>();
         musicMenu = FindObjectOfType<MusicMenu>();
         ambientMusic = FindObjectOfType<AmbientMusic>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
 
         // start at top
         side = false;
@@ -75,12 +76,24 @@ public class CameraPosition : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!switchingPerspevtiv && toggleView && side)
+        if (!toggleView && guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame && side == false)
+        {
+            toggleView = true;
+            side = true;
+        }
+
+        if (!toggleView && guiOverlay.gameStatus != GuiOverlay.GameStatus.inGame && side == true)
+        {
+            toggleView = true;
+            side = false;
+        }
+
+
+        if (!switchingPerspevtiv && toggleView && !side)
         {
             if (setClippingPlane != null)
                 StopCoroutine(setClippingPlane);
 
-            side = false;
             switchingPerspevtiv = true;
             myCamera.farClipPlane = 1000;
             SwitchFieldOfViewToTop(true);
@@ -94,9 +107,8 @@ public class CameraPosition : MonoBehaviour
             ambientMusic.StopAmbientMusic();
 
         }
-        else if (!switchingPerspevtiv && toggleView && !side)
+        else if (!switchingPerspevtiv && toggleView && side)
         {
-            side = true;
             switchingPerspevtiv = true;
             SwitchFieldOfViewToTop(false);
             startPosition = transform.position.y;
