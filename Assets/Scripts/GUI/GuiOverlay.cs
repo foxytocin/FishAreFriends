@@ -10,6 +10,7 @@ public class GuiOverlay : MonoBehaviour
     private TextMeshProUGUI textMeshPro;
     public TextMeshProUGUI playerSwarmSize;
     public TextMeshProUGUI mainMessages;
+    public TextMeshProUGUI gameEndMessage;
     private Color mainMessagesColor;
     private Color mainMessagesColorStandard;
     private float alpha = 1f;
@@ -25,9 +26,14 @@ public class GuiOverlay : MonoBehaviour
     private CameraPosition cameraPosition;
     private MenuScrollerRight menuScrollerRight;
     private MenuScrollerLeft menuScrollerLeft;
+    private GameEndMenu gameEndMenu;
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
+    private SettingMenu settingMenu;
+    public Image gameEndBackground;
+    public Color winColor;
+    public Color loseColor;
 
     public enum MessageType
     {
@@ -40,8 +46,10 @@ public class GuiOverlay : MonoBehaviour
     {
         newGame,
         inGame,
-        pausedGame
+        pausedGame,
+        gameEnd
     }
+
 
     public GameStatus gameStatus;
 
@@ -53,8 +61,10 @@ public class GuiOverlay : MonoBehaviour
         cameraPosition = FindObjectOfType<CameraPosition>();
         menuScrollerLeft = FindObjectOfType<MenuScrollerLeft>();
         menuScrollerRight = FindObjectOfType<MenuScrollerRight>();
+        gameEndMenu = FindObjectOfType<GameEndMenu>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         spawner = FindObjectOfType<Spawner>();
+        settingMenu = FindObjectOfType<SettingMenu>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
@@ -80,7 +90,7 @@ public class GuiOverlay : MonoBehaviour
         }
     }
 
-    void NewGame()
+    public void NewGame()
     {
         gameStatus = GameStatus.newGame;
         Cursor.visible = true;
@@ -114,15 +124,17 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    void Play()
+    public void Play()
     {
         if (gameStatus == GameStatus.newGame)
             spawner.SpawnFishSwarms();
 
+        settingMenu.PlayBubbleSound();
         Cursor.visible = false;
         gameStatus = GameStatus.inGame;
         menuScrollerLeft.FadeOut();
         menuScrollerRight.FadeOut();
+        gameEndMenu.FadeOut();
     }
 
     void Pause()
@@ -131,10 +143,23 @@ public class GuiOverlay : MonoBehaviour
         gameStatus = GameStatus.pausedGame;
         playButtonText.text = "Fortsetzen";
 
+        settingMenu.PlayBubbleSound();
         newMapButton.gameObject.SetActive(false);
         menuScrollerLeft.FadeIn();
         menuScrollerRight.FadeIn();
         //playButton.gameObject.SetActive(false);
+    }
+
+
+    public void GameEnd(bool winner)
+    {
+        Cursor.visible = true;
+        gameStatus = GameStatus.gameEnd;
+        gameEndMessage.text = (winner) ? "GEWONNEN" : "VERLOREN";
+        gameEndBackground.color = (winner) ? winColor : loseColor;
+
+        settingMenu.PlayBubbleSound();
+        gameEndMenu.FadeIn();
     }
 
 
@@ -143,7 +168,7 @@ public class GuiOverlay : MonoBehaviour
         Application.Quit();
     }
 
-    void RestartButtonClickEvent()
+    public void RestartButtonClickEvent()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

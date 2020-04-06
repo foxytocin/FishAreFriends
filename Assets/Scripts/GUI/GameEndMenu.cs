@@ -1,34 +1,26 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class SettingMenu : MonoBehaviour
+public class GameEndMenu : MonoBehaviour
 {
 
     float offScreenOffset = 200f;
     float target;
     float position;
-    public AudioSource bubbleSound;
+
 
     public float speed = 0.5f;
     private RectTransform[] rectTransform;
     Coroutine fadeInTopStatsCore = null;
     Coroutine fadeOutTopStatsCore = null;
-    private Tutorial tutorial;
+
 
     void Awake()
     {
         rectTransform = GetComponents<RectTransform>();
         rectTransform[0].anchoredPosition = new Vector2(13, offScreenOffset);
         position = offScreenOffset;
-        tutorial = FindObjectOfType<Tutorial>();
-        bubbleSound = GetComponent<AudioSource>();
     }
-
-    public void PlayBubbleSound() {
-        if(!bubbleSound.isPlaying)
-        bubbleSound.Play();
-    }
-
 
     public void FadeIn()
     {
