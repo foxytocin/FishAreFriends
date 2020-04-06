@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using System.Collections;
 
 public class CameraPosition : MonoBehaviour
 {
-
+    MusicMenu musicMenu;
+    AmbientMusic ambientMusic;
     MapGenerator mapGenerator;
-
+    TopStatsScroller topStatsScroller;
     public Transform Top_View;
     public Transform Side_View;
     public Transform target;
@@ -15,7 +15,7 @@ public class CameraPosition : MonoBehaviour
     Vector3 lookAtLeader;
     Vector3 lookAtCenterOfTank;
 
-    bool side = true;
+    bool side = false;
 
     private Transform targetPosition;
     private Vector3 centerOfTank;
@@ -23,92 +23,105 @@ public class CameraPosition : MonoBehaviour
 
     public GameObject postProcessing;
     Volume volume;
-    DepthOfField depthOfField;
-    private float targetFieldOfView;
-    private float originalFieldOfView;
+
     private float targetFogDensity;
     private float originalFogDensity;
 
     float totalDistanceToTarget = 1;
     float startPosition = 0;
+    Coroutine setClippingPlane = null;
 
-
+    bool switchingPerspevtiv = false;
+    public bool toggleView = false;
+    private GuiOverlay guiOverlay;
 
     void Awake()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
         myCamera = GetComponent<Camera>();
         volume = postProcessing.GetComponent<Volume>();
+        topStatsScroller = FindObjectOfType<TopStatsScroller>();
+        musicMenu = FindObjectOfType<MusicMenu>();
+        ambientMusic = FindObjectOfType<AmbientMusic>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
+
+        // start at top
+        side = false;
+        toggleView = false;
+        targetPosition = Top_View;
+        switchingPerspevtiv = true;
+        myCamera.farClipPlane = 1000;
+        totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
+        SwitchFogDensityToTop(true);
+        topStatsScroller.FadeOutTopStats();
+        musicMenu.StartMenuMusic();
+        ambientMusic.StopAmbientMusic();
     }
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        targetPosition = Side_View;
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
-        //Top_View.position = centerOfTank + new Vector3(0, mapGenerator.mapSize.y * 2, 0);
-        lookAtCenterOfTank = centerOfTank;
-        originalFogDensity = RenderSettings.fogDensity;
-        originalFieldOfView = myCamera.fieldOfView;
+        lookAtCenterOfTank = centerOfTank + new Vector3(0, 0, 20);
+        originalFogDensity = 0.025f;
         startPosition = transform.position.y;
     }
 
 
-    // Update is called once per frame
-    void FixedUpdate()
+    void LateUpdate()
     {
-        bool down = Input.GetKeyDown(KeyCode.Space);
-        if (down & side)
+        if (!toggleView && guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame && side == false)
         {
+            toggleView = true;
+            side = true;
+        }
+
+        if (!toggleView && guiOverlay.gameStatus != GuiOverlay.GameStatus.inGame && guiOverlay.gameStatus != GuiOverlay.GameStatus.gameEnd && side == true)
+        {
+            toggleView = true;
             side = false;
+        }
+
+
+        if (!switchingPerspevtiv && toggleView && !side)
+        {
+            if (setClippingPlane != null)
+                StopCoroutine(setClippingPlane);
+
+            switchingPerspevtiv = true;
             myCamera.farClipPlane = 1000;
-            SwitchFieldOfViewToTop(true);
             startPosition = transform.position.y;
             targetPosition = Top_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
-            DisablePostEffects(true);
-            SwitchFodDensityToTop(true);
+            SwitchFogDensityToTop(true);
+            topStatsScroller.FadeOutTopStats();
+            musicMenu.StartMenuMusic();
+            ambientMusic.StopAmbientMusic();
 
         }
-        else if (down & !side)
+        else if (!switchingPerspevtiv && toggleView && side)
         {
-            side = true;
-            SwitchFieldOfViewToTop(false);
+            switchingPerspevtiv = true;
             startPosition = transform.position.y;
             lookAtLeader = target.position;
             targetPosition = Side_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - lookAtLeader.y);
-            DisablePostEffects(false);
-            SwitchFodDensityToTop(false);
-            StartCoroutine(SetClippingPlane());
+            SwitchFogDensityToTop(false);
+            setClippingPlane = StartCoroutine(SetClippingPlane());
+            topStatsScroller.FadeInTopStats();
+            musicMenu.StopMenuMusic();
+            ambientMusic.StartAmbientMusic();
 
         }
 
         if (targetPosition.position != transform.position)
         {
             transform.position = Vector3.Lerp(transform.position, targetPosition.position, 0.2f * Time.deltaTime * 5);
-            // float percentOfWay = Mathf.Abs(transform.position.y - startPosition) / totalDistanceToTarget;
-            // percentOfWay = Mathf.Clamp(percentOfWay, 0.01f, 1f);
-
-            // if (side)
-            // {
-            //     //myCamera.fieldOfView = map(percentOfWay, 0, 0.9f, 10f, 60f);
-            //     myCamera.fieldOfView = Mathf.Lerp(myCamera.fieldOfView, map(percentOfWay, 0.01f, 1f, 10f, 60f), 0.2f * Time.deltaTime * 2);
-            // }
-            // else
-            // {
-            //     //myCamera.fieldOfView = map(percentOfWay, 0, 0.9f, 60f, 10f);
-            //     myCamera.fieldOfView = map(percentOfWay, 0.01f, 1f, 60f, 10f);
-
-            // }
-
         }
 
         if (side)
         {
-            lookAtLeader = target.position;
+            lookAtLeader = target.position + new Vector3(0, 1.25f, 0);
 
             if (tmpLookAtTarget != lookAtLeader)
             {
@@ -129,40 +142,10 @@ public class CameraPosition : MonoBehaviour
                 transform.TransformDirection(Vector3.down);
             }
         }
-
     }
 
 
-    private void SwitchFieldOfViewToTop(bool value)
-    {
-        if (value)
-        {
-            //This enables the orthographic mode
-            //myCamera.orthographic = true;
-
-            //myCamera.fieldOfView = 10f;
-            targetFieldOfView = 10f;
-            //StartCoroutine(AnimateFieldOfView());
-            //Set the size of the viewing volume you'd like the orthographic Camera to pick up (5)
-            //myCamera.orthographicSize = 30f;
-
-            //Set the orthographic Camera Viewport size and position
-            //camera.rect = new Rect(centerOfTank.x, centerOfTank.y, mapGenerator.mapSize.x, mapGenerator.mapSize.y);
-        }
-        else
-        {
-            //This enables the orthographic mode
-            //myCamera.orthographic = false;
-            targetFieldOfView = 60f;
-            //StartCoroutine(AnimateFieldOfView());
-            //myCamera.fieldOfView = 60f;
-
-            //Set the orthographic Camera Viewport size and position
-            //camera.rect = new Rect(m_ViewPositionX, m_ViewPositionY, m_ViewWidth, m_ViewHeight); 
-        }
-    }
-
-    private void SwitchFodDensityToTop(bool top)
+    private void SwitchFogDensityToTop(bool top)
     {
         StopCoroutine(AnimateFogDensity());
 
@@ -189,61 +172,33 @@ public class CameraPosition : MonoBehaviour
             yield return new WaitForSeconds(1);
             while (RenderSettings.fogDensity < targetFogDensity)
             {
-                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                RenderSettings.fogDensity += (0.015f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
+
+            switchingPerspevtiv = false;
+            toggleView = false;
         }
         else
         {
             while (RenderSettings.fogDensity > targetFogDensity)
             {
-                RenderSettings.fogDensity = Mathf.Lerp(RenderSettings.fogDensity, targetFogDensity, 1f * Time.deltaTime * speed);
+                RenderSettings.fogDensity -= (0.3f * Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
 
             if (RenderSettings.fogDensity < 0)
                 RenderSettings.fogDensity = 0;
+
+            switchingPerspevtiv = false;
+            toggleView = false;
         }
     }
 
 
     private IEnumerator SetClippingPlane()
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
         myCamera.farClipPlane = 300;
     }
-
-
-    private IEnumerator AnimateFieldOfView()
-    {
-        while (myCamera.fieldOfView != targetFieldOfView)
-        {
-            myCamera.fieldOfView = Mathf.Lerp(myCamera.fieldOfView, targetFieldOfView, 0.3f * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-
-
-    private void DisablePostEffects(bool top)
-    {
-
-        DepthOfField tempDof;
-
-        if (volume.profile.TryGet<DepthOfField>(out tempDof))
-        {
-            depthOfField = tempDof;
-        }
-
-        if (top)
-        {
-            //depthOfField.focusDistance.value = 42f;
-            depthOfField.active = false;
-        }
-        else
-        {
-            depthOfField.active = true;
-        }
-    }
-
 }

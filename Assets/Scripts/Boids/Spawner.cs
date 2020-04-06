@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Spawner : MonoBehaviour
 {
     CellGroups cellGroups;
     EcoSystemManager ecoSystemManager;
+    BoidManager boidManager;
     public BoidSettings settings;
     public enum GizmoType { Never, SelectedOnly, Always }
     public bool spawnBoids = true;
     public Boid prefab;
-    public float spawnRadius = 10;
+    public GameObject opponentPlayerPrefab;
+    public GameObject predatorPrefab;
+    public float spawnRadius = 1;
     public int spawnCount = 10;
     public Color color1;
     public Color color2;
@@ -16,28 +20,104 @@ public class Spawner : MonoBehaviour
     public GizmoType showSpawnRegion;
     Transform fishHolder;
 
+    private Color[] opponentPlayerColor1 = { Color.cyan, Color.yellow, Color.blue };
+    private Color[] opponentPlayerColor2 = { Color.cyan, Color.yellow, Color.blue };
 
     void Awake()
     {
         cellGroups = FindObjectOfType<CellGroups>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        boidManager = FindObjectOfType<BoidManager>();
         fishHolder = new GameObject("Fishes").transform;
     }
 
-    void Start()
+
+    public void SpawnOpponentPlayers()
     {
-        if (spawnBoids)
+        for (int i = 0; i < 3; i++)
         {
-            for (int i = 0; i < spawnCount; i++)
-            {
-                Vector3 pos = Random.insideUnitSphere * spawnRadius;
-                Boid boid = Instantiate(prefab, pos, Quaternion.identity);
-                boid.transform.parent = fishHolder;
-                boid.PassColor(color1, color2);
-                boid.Initialize(settings, null);
-                boid.RespawnBoid();
-            }
+            MapGenerator mapGenerator = FindObjectOfType<MapGenerator>();
+            Vector3 pos = new Vector3(
+                Random.Range(3f, mapGenerator.mapSize.x - 3f),
+                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f),
+                Random.Range(3f, mapGenerator.mapSize.z - 3f)
+            );
+            GameObject tempGameObject = Instantiate(opponentPlayerPrefab, pos, Quaternion.identity);
+            tempGameObject.GetComponent<Leader>().leaderColor1 = opponentPlayerColor1[i];
+            tempGameObject.GetComponent<Leader>().leaderColor2 = opponentPlayerColor2[i];
         }
+    }
+
+    public void SpawnPredators()
+    {
+        for (int i = 0; i < 1; i++)
+        {
+            MapGenerator mapGenerator = FindObjectOfType<MapGenerator>();
+            Vector3 pos = new Vector3(
+                Random.Range(3f, mapGenerator.mapSize.x - 3f),
+                Random.Range(mapGenerator.heightScale + 1f, mapGenerator.mapSize.y - 5f),
+                Random.Range(3f, mapGenerator.mapSize.z - 3f)
+            );
+            Instantiate(predatorPrefab, pos, Quaternion.identity);
+
+        }
+    }
+
+    public void SpawnFishSwarms() {
+        StartCoroutine(InitializeBoidSlowly());
+    }
+
+
+    private IEnumerator InitializeBoidSlowly()
+    {
+
+        int count = 0;
+        yield return new WaitForSeconds(12);
+
+        while (count < spawnCount / 3)
+        {
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
+
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
+            count++;
+        }
+
+
+        yield return new WaitForSeconds(30);
+        while (count < (spawnCount / 3) * 2)
+        {
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
+
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
+            count++;
+        }
+
+
+        yield return new WaitForSeconds(30);
+        while (count < spawnCount)
+        {
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
+
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
+            count++;
+        }
+
+        boidManager.BoidInitializationCompleted();
     }
 
 

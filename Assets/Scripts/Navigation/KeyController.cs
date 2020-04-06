@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using Unity.Mathematics;
+using System.Collections;
 
 public class KeyController : MonoBehaviour
 {
-
+    FlowStream flowStream;
     CellGroups cellGroups;
+    GuiOverlay guiOverlay;
 
     // State
     [HideInInspector]
@@ -15,34 +18,36 @@ public class KeyController : MonoBehaviour
     Transform cachedTransform;
     Material material;
 
-    private float maxSpeed = 3f;
+    public float maxSpeed = 3f;
     public float maxSteerForce = 2f;
     public float avoidCollisionWeight = 10f;
     public float boundsRadius = 0.27f;
     public float collisionAvoidDst = 5f;
     public LayerMask obstacleMask;
 
-    // Key events
-    bool upKeyPressed = false;
-    bool downKeyPressed = false;
-    bool leftKeyPressed = false;
-    bool rightKeyPressed = false;
+
+    private bool invertedControlls = false;
+    private bool invertingSemaphor = false;
+    private SettingInvertControlls settingInvertControlls;
 
     // Debug
-    bool showDebug = true;
+    private bool showDebug = false;
 
 
     void Awake()
     {
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         cellGroups = FindObjectOfType<CellGroups>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
+        flowStream = FindObjectOfType<FlowStream>();
+        settingInvertControlls = FindObjectOfType<SettingInvertControlls>();
         cachedTransform = transform;
         material = gameObject.transform.GetChild(2).GetComponent<MeshRenderer>().material;
+        Cursor.visible = false;
     }
 
     public void Start()
     {
-
         position = cachedTransform.position;
         forward = cachedTransform.forward;
 
@@ -50,101 +55,116 @@ public class KeyController : MonoBehaviour
         velocity = transform.forward * startSpeed;
     }
 
+
+    public void InvertedControlls(bool value)
+    {
+        invertedControlls = value;
+    }
+
+    public bool CheckInvertedControlls()
+    {
+        return invertedControlls;
+    }
+
+
+    private IEnumerator InvertControll()
+    {
+        invertingSemaphor = true;
+
+        if (invertedControlls)
+        {
+            invertedControlls = false;
+            settingInvertControlls.SetInvertedControlls(false);
+            guiOverlay.DisplayMainMessage("Invertierte Steuerung deaktiviert", 1, GuiOverlay.MessageType.info);
+        }
+        else
+        {
+            invertedControlls = true;
+            settingInvertControlls.SetInvertedControlls(true);
+            guiOverlay.DisplayMainMessage("Invertierte Steuerung aktiviert", 1, GuiOverlay.MessageType.info);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        invertingSemaphor = false;
+    }
+
+
     void Update()
     {
-
-        cellGroups.SetPlayerCell(transform.position);
-
-        Vector3 acceleration = Vector3.zero;
-        bool isHeadingForCollision = IsHeadingForCollision();
-
-        // avoid collisiton
-        if (isHeadingForCollision)
+        if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
         {
-            Vector3 collisionAvoidDir = ObstacleRays();
-            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
-            acceleration += collisionAvoidForce;
-        }
+            //cellGroups.SetPlayerCell(transform.position);
 
-        // speed handling
-        velocity += acceleration * Time.deltaTime;
-        float speed = velocity.magnitude;
-        Vector3 dir = velocity / speed;
+            if (!invertingSemaphor && Input.GetKeyDown(KeyCode.I))
+                StartCoroutine(InvertControll());
 
+            Vector3 acceleration = Vector3.zero;
+            bool isHeadingForCollision = IsHeadingForCollision();
 
-        if (!isHeadingForCollision)
-        {
-            if (Input.GetKeyDown(KeyCode.Q))
+            // avoid collisiton
+            if (isHeadingForCollision)
             {
-                speed -= 0.5f;
-                //Debug.Log("KeyDown Q: " + speed);
+                Vector3 collisionAvoidDir = ObstacleRays();
+                Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * avoidCollisionWeight;
+                acceleration += collisionAvoidForce;
             }
-            if (Input.GetKeyDown(KeyCode.E))
+
+            // speed handling
+            velocity += acceleration * Time.deltaTime;
+            float speed = velocity.magnitude;
+            Vector3 dir = velocity / speed;
+
+
+            if (!isHeadingForCollision)
             {
-                speed += 0.5f;
-                //Debug.Log("KeyDown E: " + speed);
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    if (speed >= 0.5f)
+                        speed -= 0.5f;
+                }
+                else if (Input.GetKeyDown(KeyCode.E))
+                {
+                    speed += 0.5f;
+                }
+
+                // if (speed > (maxSpeed / 2))
+                //     speed -= 0.5f * Time.deltaTime;
+
+                // if (Input.GetButtonDown("Jump"))
+                //     speed = maxSpeed * 1.5f;
+
+                //Debug.Log(speed);
             }
+
+            speed = Mathf.Clamp(speed, 0.1f, maxSpeed);
+            velocity = dir * speed;
+
+            if (!isHeadingForCollision)
+            {
+                Vector3 right = transform.right * Input.GetAxis("Horizontal") * Time.deltaTime * speed;
+                Vector3 up = transform.up * Input.GetAxis("Vertical") * Time.deltaTime * speed;
+
+                velocity += right;
+                velocity += (!invertedControlls) ? up : -up;
+            }
+
+            cachedTransform.position += velocity * Time.deltaTime;
+            cachedTransform.forward = dir;
+
+            position = cachedTransform.position;
+            forward = dir;
+
+            float ws = material.GetFloat("_WobbleSpeed");
+            if (ws != speed)
+            {
+                if (speed < 0)
+                    speed = 0;
+
+                ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
+            }
+
+            setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
         }
-
-        speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
-        velocity = dir * speed;
-
-        // handle key events
-        if (!isHeadingForCollision)
-        {
-            // key ups
-            if (Input.GetKeyDown(KeyCode.A))
-                leftKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.D))
-                rightKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.W))
-                upKeyPressed = true;
-            if (Input.GetKeyDown(KeyCode.S))
-                downKeyPressed = true;
-        }
-
-        // key downs
-        if (Input.GetKeyUp(KeyCode.A))
-            leftKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.D))
-            rightKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.W))
-            upKeyPressed = false;
-        if (Input.GetKeyUp(KeyCode.S))
-            downKeyPressed = false;
-
-
-        if (!isHeadingForCollision)
-        {
-
-            if (leftKeyPressed)
-                velocity -= transform.right * Time.deltaTime * speed;
-            if (rightKeyPressed)
-                velocity += transform.right * Time.deltaTime * speed;
-            if (upKeyPressed)
-                velocity += transform.up * Time.deltaTime * speed;
-            if (downKeyPressed)
-                velocity -= transform.up * Time.deltaTime * speed;
-
-        }
-
-
-        cachedTransform.position += velocity * Time.deltaTime;
-        cachedTransform.forward = dir;
-
-        position = cachedTransform.position;
-        forward = dir;
-
-        float ws = material.GetFloat("_WobbleSpeed");
-        if (ws != speed)
-        {
-            if (speed < 0)
-                speed = 0;
-
-            ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
-        }
-
-        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
     }
 
 
@@ -157,6 +177,7 @@ public class KeyController : MonoBehaviour
     }
 
 
+    Vector3 hitPoint;
     bool IsHeadingForCollision()
     {
         if (showDebug)
@@ -168,6 +189,8 @@ public class KeyController : MonoBehaviour
         RaycastHit hit;
         if (Physics.SphereCast(position, boundsRadius, forward, out hit, collisionAvoidDst, obstacleMask))
         {
+            //Debug.Log("HIT: " + hit.point);
+            hitPoint = hit.point;
             return true;
         }
         else { }
@@ -176,8 +199,7 @@ public class KeyController : MonoBehaviour
 
     Vector3 ObstacleRays()
     {
-        Vector3[] rayDirections = BoidHelper.directions;
-
+        float3[] rayDirections = BoidHelper.directions;
 
         for (int i = 0; i < rayDirections.Length; i++)
         {
@@ -193,6 +215,10 @@ public class KeyController : MonoBehaviour
 
             if (!Physics.SphereCast(ray, boundsRadius, collisionAvoidDst, obstacleMask))
             {
+
+                Vector3 forward = transform.TransformDirection(Vector3.forward);
+
+                flowStream.playFlowStream(forward, hitPoint);
                 return dir;
             }
         }

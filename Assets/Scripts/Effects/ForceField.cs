@@ -1,0 +1,82 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class ForceField : MonoBehaviour
+{
+
+public float pulseSpeed = 0.5f;
+public float fadeSpeed = 0.5f;
+private Material material;
+private AudioSource audioPulse;
+private float alpha = 0f;
+private float power = 1f;
+
+private Coroutine pulseCoroutine = null;
+
+    void Awake()
+    {
+        material = GetComponent<MeshRenderer>().material;
+        material.SetFloat("_Alpha", alpha);
+        audioPulse = GetComponent<AudioSource>();
+        alpha = material.GetFloat("_Alpha");
+    }
+
+
+    public void StartPulse() {
+        StartCoroutine(FadeToOneAndPulse());
+    }
+
+    public void StopPulse() {
+        StartCoroutine(FadeToZeroAndStop());
+    }
+
+    public void SetColor(Color color) {
+        material.SetColor("_Emission", color);
+    }
+
+    private IEnumerator Pulse()
+    {
+        while(true) {
+            power = 1f + Mathf.PingPong(Time.time * pulseSpeed, 4f);
+            material.SetFloat("_Power", power);
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private IEnumerator FadeToZeroAndStop()
+    {
+        while (alpha > 0f) {
+            alpha -= (fadeSpeed / 2f) * Time.deltaTime;
+            audioPulse.volume -= (fadeSpeed / 2f) * Time.deltaTime;
+            material.SetFloat("_Alpha", alpha);
+            yield return new WaitForEndOfFrame();
+        }
+
+        if(pulseCoroutine != null)
+            StopCoroutine(pulseCoroutine);
+        
+        alpha = 0;
+        material.SetFloat("_Alpha", alpha);
+        audioPulse.Stop();
+        yield return null;
+    }
+
+    private IEnumerator FadeToOneAndPulse()
+    {
+        power = 1f;
+        audioPulse.volume = 1f;
+        audioPulse.Play();
+
+        while (alpha < 2f) {
+            alpha += fadeSpeed * Time.deltaTime;
+            material.SetFloat("_Alpha", alpha);
+            yield return new WaitForEndOfFrame();
+        }
+
+        alpha = 2f;
+        pulseCoroutine = StartCoroutine(Pulse());
+        material.SetFloat("_Alpha", alpha);
+        yield return null;
+    }
+
+}

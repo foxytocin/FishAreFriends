@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
+using Unity.Mathematics;
+
 public class Predator : MonoBehaviour
 {
 
+    public static List<Predator> availablePredators = new List<Predator>();
     EcoSystemManager ecoSystemManager;
-    GUIMessages guiMessages;
+    GuiOverlay guiOverlay;
 
     // State
     [HideInInspector]
@@ -26,7 +30,7 @@ public class Predator : MonoBehaviour
     public LayerMask obstacleMask;
 
     // hunting
-    GameObject boidToHunt = null;
+    Boid boidToHunt = null;
     public int fishNutritionalValue = 700;
 
     // food
@@ -42,10 +46,14 @@ public class Predator : MonoBehaviour
 
     void Awake()
     {
+        if (availablePredators == null)
+            availablePredators = new List<Predator>();
+        availablePredators.Add(this);
+
         maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
-        guiMessages = FindObjectOfType<GUIMessages>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         cachedTransform = transform;
         material = new Material[3];
         Transform child = gameObject.transform.GetChild(0);
@@ -77,11 +85,12 @@ public class Predator : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            foodNeeds -= 2;
+            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+                foodNeeds -= UnityEngine.Random.Range(2, 20);
         }
     }
 
-    public void IAmYourBoid(GameObject boid)
+    public void IAmYourBoid(Boid boid)
     {
         if (boidToHunt == null)
             boidToHunt = boid;
@@ -89,7 +98,7 @@ public class Predator : MonoBehaviour
 
     public bool BoidDied(Boid boid, int vitality)
     {
-        if (!boidToHunt.Equals(boid.gameObject))
+        if (!boidToHunt.Equals(boid))
             return false;
 
         boidToHunt = null;
@@ -118,6 +127,37 @@ public class Predator : MonoBehaviour
             acceleration += collisionAvoidForce;
         }
 
+        // check leaders and hunt their boids
+
+        if (Leader.leaderList != null)
+        {
+            Leader leaderToAttack = null;
+            float distanceToLeader = float.MaxValue;
+            foreach (Leader leader in Leader.leaderList)
+            {
+
+                float tempDistance = Vector3.Distance(position, leader.getPosition());
+                if (tempDistance < distanceToLeader)
+                {
+                    leaderToAttack = leader;
+                    distanceToLeader = tempDistance;
+                }
+            }
+
+            // if the nearest leaders has boids in swarm, attack him
+            if (leaderToAttack != null && distanceToLeader < 30f && leaderToAttack.GetSwarmSize() > 0)
+            {
+
+                boidToHunt = leaderToAttack.GetSwarmList()[0];
+                if ((foodNeeds < 200 || isHunting) && leaderToAttack.LeaderIsHumanPlayer())
+                {
+                    guiOverlay.DisplayMainMessage("Achtung! Der Hai hat deinen Schwarm im Visier.", 4, GuiOverlay.MessageType.warning);
+                }
+
+            }
+        }
+
+
         if (boidToHunt != null && (foodNeeds < 200 || isHunting))
         {
             if (!isHunting)
@@ -128,10 +168,10 @@ public class Predator : MonoBehaviour
 
             float distance = Vector3.Distance(position, boidToHunt.transform.position);
 
-            if (!boidToHunt.activeSelf)
+            if (!boidToHunt.gameObject.activeSelf)
                 boidToHunt = null;
 
-            if (distance > 10)
+            if (distance > 10f)
                 boidToHunt = null;
 
         }
@@ -187,7 +227,7 @@ public class Predator : MonoBehaviour
 
     Vector3 ObstacleRays()
     {
-        Vector3[] rayDirections = BoidHelper.directions;
+        float3[] rayDirections = BoidHelper.directions;
 
 
         for (int i = 0; i < rayDirections.Length; i++)
@@ -222,7 +262,14 @@ public class Predator : MonoBehaviour
         isHunting = value;
         maxSpeed = (isHunting) ? huntingMaxSpeed : normalMaxSpeed;
 
-        string text = (isHunting) ? "Der Hai ist auf der Jagt" : "Der Hai ist satt";
-        guiMessages.SetText(text);
+        if (isHunting)
+        {
+            guiOverlay.DisplayMainMessage("Der Hai ist auf der Jagt", 3, GuiOverlay.MessageType.warning);
+        }
+        else
+        {
+            guiOverlay.DisplayMainMessage("Der Hai ist satt", 3, GuiOverlay.MessageType.info);
+        }
+
     }
 }

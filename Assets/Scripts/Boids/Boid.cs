@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
+
 public class Boid : MonoBehaviour
 {
-
-    Predator predator;
-    Leader leader;
+    List<Predator> availablePredators;
     CellGroups cellGroups;
     BoidSettings settings;
     public GameObject prefabBlood;
     EcoSystemManager ecoSystemManager;
     MapGenerator mapGenerator;
-    FoodManager foodManager;
 
     private Color originalColor1;
     private Color originalColor2;
@@ -25,7 +24,11 @@ public class Boid : MonoBehaviour
     public Vector3 velocity;
 
     // To update:
-    Vector3 acceleration;
+    Vector3 accelerationNormalMoving = Vector3.zero;
+    Vector3 accelerationBehaviorChanges = Vector3.zero;
+    Vector3 accelerationFoodBehavior = Vector3.zero;
+
+
     [HideInInspector]
     public Vector3 avgFlockHeading;
     [HideInInspector]
@@ -37,7 +40,6 @@ public class Boid : MonoBehaviour
 
     public Vector3 dir;
 
-    public bool optimiert;
 
     // Cached
     Material[] material;
@@ -46,11 +48,13 @@ public class Boid : MonoBehaviour
     public Transform target;
 
     // Swarm handling varialbes
-    Leader myLeader = null;
+    private Leader myLeader = null;
     public int cellIndex = 0;
 
     // Food
-    public int basicFoodNeed = 1000;
+    public static int basicFoodNeed = 1000;
+    public static int thresholdHungry = 400;
+    public static int thresholdStarving = 200;
     public int foodNeeds = 0;
     public int foodLeft;
     public int hungerRate = 1;
@@ -58,18 +62,37 @@ public class Boid : MonoBehaviour
     private int delay = 30;
     private bool firstTime = true;
 
+    public int timeBetweedFoodUpdate = 3;
+
+    private GuiOverlay guiOverlay;
+
+    public Status status;
+    public enum Status
+    {
+        swimmsToFood,
+        normalSwimming,
+        died
+    }
+
+    public bool hungry = false;
+    public bool starving = false;
+
+    Coroutine updateBoidNormalMovement = null;
+    Coroutine calculateFoodBehavior = null;
+    List<Food> foodList;
+
     // Debug
     bool showDebug = false;
+
 
     void Awake()
     {
         alife = true;
-        foodManager = FindObjectOfType<FoodManager>();
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         cellGroups = FindObjectOfType<CellGroups>();
-        predator = FindObjectOfType<Predator>();
-        leader = FindObjectOfType<Leader>();
+        guiOverlay = FindObjectOfType<GuiOverlay>();
+        // leader = FindObjectOfType<Leader>();
         foodNeeds = 0;
         foodLeft = basicFoodNeed;
         material = new Material[4];
@@ -80,12 +103,16 @@ public class Boid : MonoBehaviour
         originalWobbleSpeed = 1;
         cachedTransform = transform;
         position = cachedTransform.position;
-        delay = Random.Range(5, 31);
+        delay = UnityEngine.Random.Range(5, 31);
+        hungerRate = hungerRate * timeBetweedFoodUpdate;
+        status = Status.normalSwimming;
     }
-
 
     public void Initialize(BoidSettings settings, Transform target)
     {
+        foodList = FoodManager.foodList;
+        availablePredators = Predator.availablePredators;
+
         this.target = target;
         this.settings = settings;
 
@@ -97,9 +124,12 @@ public class Boid : MonoBehaviour
 
         setColor(originalColor1, originalColor2);
 
-        cellIndex = cellGroups.GetIndex(transform.position);
         cellGroups.RegisterAtCell(this);
+        cellGroups.CheckCell(this);
+
+        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
+
 
     public void PassColor(Color col1, Color col2)
     {
@@ -111,285 +141,123 @@ public class Boid : MonoBehaviour
         }
     }
 
-    private IEnumerator IncreaseFood()
+
+    Food foodTarget = null;
+
+    private IEnumerator CalculateFoodBehavior()
     {
         while (true)
         {
-            yield return new WaitForSeconds(delay);
-            foodNeeds += hungerRate;
+            if (status != Status.swimmsToFood)
+            {
+                yield return new WaitForSeconds(delay);
+            }
+
+            if (status == Status.swimmsToFood)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+                foodNeeds += hungerRate;
+
 
             if (firstTime)
             {
                 firstTime = false;
-                delay = 1;
+                delay = timeBetweedFoodUpdate;
             }
 
+
+            setFoodNeeds();
+            // boid already has a food-target: swimm towards the target
+            if (foodTarget != null && foodTarget.checkAmount() > 0)
+            {
+                //Debug.Log("Schwimmt zur bekannten Futterquelle");
+                accelerationFoodBehavior = (foodTarget.GetPosition() - position) * settings.chaisingForFoodForce;
+            }
+            else
+            {
+                // find food 
+                foodTarget = null;
+                status = Status.normalSwimming;
+
+                if ((hungry && myLeader == null) || starving)
+                {
+                    //Debug.Log("Keine Futterquelle vorhanden: suche");
+                    setColor(Color.red, Color.red);
+
+                    if (foodList.Count > 0)
+                    {
+                        // find nearest food
+                        float nearestFood = float.PositiveInfinity;
+                        int nearestFoodIndex = 0;
+                        for (int i = 0; i < foodList.Count; i++)
+                        {
+                            float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
+                            if (dist < nearestFood)
+                            {
+                                nearestFood = dist;
+                                nearestFoodIndex = i;
+                            }
+                        }
+
+                        // found food: setting food-parameters
+                        if (nearestFood < 25f)
+                        {
+                            //Debug.Log("Futterquelle gefunden");
+                            // swim towards food
+                            status = Status.swimmsToFood;
+
+                            foodTarget = foodList[nearestFoodIndex];
+                            accelerationFoodBehavior = (foodTarget.GetPosition() - position) * settings.chaisingForFoodForce;
+                        }
+                    }
+                }
+            }
+
+            // tests if reached the food-source: eat when nearby
+            if (status == Status.swimmsToFood)
+            {
+
+                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                {
+                    foodNeeds -= foodTarget.getFood(foodNeeds);
+                    setFoodNeeds();
+
+                    accelerationFoodBehavior = Vector3.zero;
+                    foodTarget = null;
+                    status = Status.normalSwimming;
+
+                    //Debug.Log("Hat gefressen");
+                }
+            }
+            else
+            {
+
+                accelerationFoodBehavior = Vector3.zero;
+            }
         }
     }
 
-    public void UpdateBoid()
+
+    public bool CollisionAhead()
     {
-        cellGroups.CheckCell(this);
-
-        // if (
-        //     position.x < -1 || position.x > mapGenerator.mapSize.x + 1 ||
-        //     position.y < -1 || position.y > mapGenerator.mapSize.y + 1 ||
-        //     position.z < -1 || position.z > mapGenerator.mapSize.z + 1
-        // )
-        // {
-        //     LetMeDie();
-        // }
-
-        Vector3 acceleration = Vector3.zero;
-
-        if (target != null)
-        {
-            Vector3 offsetToTarget = (target.position - position);
-            acceleration = SteerTowards(offsetToTarget) * settings.targetWeight;
-        }
-
-        if (numPerceivedFlockmates != 0)
-        {
-            centreOfFlockmates /= numPerceivedFlockmates;
-
-            Vector3 offsetToFlockmatesCentre = (centreOfFlockmates - position);
-
-            var alignmentForce = SteerTowards(avgFlockHeading) * settings.alignWeight;
-            var cohesionForce = SteerTowards(offsetToFlockmatesCentre) * settings.cohesionWeight;
-            var seperationForce = SteerTowards(avgAvoidanceHeading) * settings.seperateWeight;
-
-            acceleration += alignmentForce;
-            acceleration += cohesionForce;
-            acceleration += seperationForce;
-        }
-
-        if (IsHeadingForCollision())
-        {
-            Vector3 collisionAvoidDir = ObstacleRays();
-            Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
-            acceleration += collisionAvoidForce;
-        }
+        return (
+            position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
+            position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
+            position.z < 5 || position.z > mapGenerator.mapSize.z - 5
+        );
+    }
 
 
-        Collider[] hitCollidersPredator = new Collider[1];
-        if (optimiert)
-        {
-            // avoid predator
-            float distanceToPredator = Vector3.Distance(position, predator.getPosition());
-            if (distanceToPredator < 5f)
-            {
-                Vector3 positionToPredator = predator.getPosition() - position;
-                acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
+    public void UpdateBoid(Vector3 acceleration_)
+    {
+        accelerationNormalMoving = accelerationBehaviorChanges + accelerationFoodBehavior + acceleration_;
 
-                predator.IAmYourBoid(gameObject);
-
-                if (distanceToPredator <= 1.5f)
-                {
-                    if (predator.BoidDied(this, foodLeft))
-                    {
-                        Instantiate(prefabBlood, position, Quaternion.identity);
-                        ecoSystemManager.addKilledFish();
-                        LetMeDie();
-                    }
-                }
-            }
-        }
-        else
-        {
-            // OHNE OPTIMIERUNG
-            hitCollidersPredator = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Predator"));
-            if (hitCollidersPredator.Length > 0)
-            {
-                GameObject predator = hitCollidersPredator[0].gameObject;
-                var positionToPredator = predator.transform.position - position;
-                acceleration += positionToPredator * -(settings.predatorAvoidanceForce);
-
-                Predator predatorScript = predator.GetComponent<Predator>();
-                predatorScript.IAmYourBoid(gameObject);
-
-                float distanceToPredator = Vector3.Distance(position, predator.transform.position);
-                if (distanceToPredator <= 1.5f)
-                {
-                    if (predatorScript.BoidDied(this, foodLeft))
-                    {
-                        Instantiate(prefabBlood, position, Quaternion.identity);
-                        ecoSystemManager.addKilledFish();
-                        LetMeDie();
-                    }
-
-                }
-            }
-        }
-
-
-        if (optimiert)
-        {
-            // if (cellIndex == leader.getCellInfo())
-            // {
-            float distanceToLeader = Vector3.Distance(position, leader.getPosition());
-            if (distanceToLeader < 2f) //Predator-Test fehlt
-            {
-                Vector3 positionToLeader = leader.getPosition() - position;
-                acceleration += positionToLeader * settings.leadingForce;
-
-                setColor(leader.leaderColor1, leader.leaderColor2);
-
-                if (myLeader == null)
-                {
-                    myLeader = leader;
-                    leader.AddBoidToSwarm(this);
-                }
-            }
-            else
-            {
-                setColor(originalColor1, originalColor2);
-
-                if (myLeader != null)
-                {
-                    myLeader.RemoveBoidFromSwarm(this);
-                    myLeader = null;
-                }
-
-            }
-            // }
-
-
-        }
-        else
-        {
-
-            //follow leader
-            Collider[] hitCollidersLeader = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("Leader"));
-            if (hitCollidersPredator.Length == 0 && hitCollidersLeader.Length > 0)
-            {
-                GameObject leaderGameObject = hitCollidersLeader[0].gameObject;
-                var positionToLeader = leaderGameObject.transform.position - position;
-                acceleration += positionToLeader * settings.leadingForce;
-
-
-                Leader leaderScript = hitCollidersLeader[0].gameObject.GetComponent<Leader>();
-                if (leaderScript == null)
-                    return;
-
-                setColor(leaderScript.leaderColor1, leaderScript.leaderColor2);
-
-                if (myLeader == null)
-                {
-                    myLeader = leaderScript;
-                    leaderScript.AddBoidToSwarm(this);
-                }
-
-            }
-            else
-            {
-                setColor(originalColor1, originalColor2);
-
-                if (myLeader != null)
-                {
-                    myLeader.RemoveBoidFromSwarm(this);
-                    myLeader = null;
-                }
-
-            }
-        }
-
-
-        if (optimiert)
-        {
-            setFoodNeeds();
-            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
-            {
-                setColor(Color.red, Color.red);
-
-                List<Food> foodList = foodManager.GetFoodList();
-                if (foodList.Count > 0)
-                {
-                    // find nearest food
-                    float nearestFood = float.PositiveInfinity;
-                    int nearestFoodIndex = 0;
-                    for (int i = 0; i < foodList.Count; i++)
-                    {
-                        float dist = Vector3.Distance(transform.position, foodList[i].GetPosition());
-                        if (dist < nearestFood)
-                        {
-                            nearestFood = dist;
-                            nearestFoodIndex = i;
-                        }
-                    }
-
-                    if (nearestFood < 15f)
-                    {
-                        // swim towards food
-                        var positionToFood = foodList[nearestFoodIndex].GetPosition() - position;
-                        acceleration += positionToFood * settings.chaisingForFoodForce;
-
-                        //Debug.DrawRay(position, positionToFood, Color.red);
-
-                        // eat when nearby
-                        if (Vector3.Distance(transform.position, foodList[nearestFoodIndex].GetPosition()) <= (foodList[nearestFoodIndex].transform.localScale.x / 2f) + 0.5f)
-                        {
-                            setColor(originalColor1, originalColor2);
-
-                            foodNeeds -= foodList[nearestFoodIndex].getFood(foodNeeds);
-                            setFoodNeeds();
-                        }
-                    }
-                }
-            }
-
-
-        }
-        else
-        {
-
-            // chaising for food
-            setFoodNeeds();
-            if ((foodLeft < 400 && myLeader == null) || foodLeft < 200)
-            {
-                setColor(Color.red, Color.red);
-
-                Collider[] hitCollidersFood = Physics.OverlapSphere(transform.position, 10, LayerMask.GetMask("Food"));
-                if (hitCollidersFood.Length > 0)
-                {
-                    // find nearest food
-                    float nearestFood = float.PositiveInfinity;
-                    int nearestFoodIndex = 0;
-                    for (int i = 0; i < hitCollidersFood.Length; i++)
-                    {
-                        float dist = Vector3.Distance(transform.position, hitCollidersFood[i].gameObject.transform.position);
-                        if (dist < nearestFood)
-                        {
-                            nearestFood = dist;
-                            nearestFoodIndex = i;
-                        }
-                    }
-
-                    // get nearest food gameobject
-                    GameObject fo = hitCollidersFood[nearestFoodIndex].gameObject;
-
-                    if (fo)
-                    {
-                        // swim towards food
-                        var positionToFood = fo.transform.position - position;
-                        acceleration += positionToFood * settings.chaisingForFoodForce;
-
-                        //Debug.DrawRay(position, positionToFood, Color.red);
-
-                        // eat when nearby
-                        if (Vector3.Distance(transform.position, fo.transform.position) <= (fo.transform.localScale.x / 2f) + 0.5f)
-                        {
-                            setColor(originalColor1, originalColor2);
-
-                            foodNeeds -= fo.GetComponent<Food>().getFood(foodNeeds);
-                            setFoodNeeds();
-                        }
-                    }
-                }
-            }
-        }
-
-        velocity += acceleration * Time.deltaTime;
+        velocity += accelerationNormalMoving * Time.deltaTime;
         float speed = velocity.magnitude;
+
         dir = velocity / speed;
         speed = Mathf.Clamp(speed, settings.minSpeed, settings.maxSpeed);
         velocity = dir * speed;
@@ -406,6 +274,109 @@ public class Boid : MonoBehaviour
         }
 
         setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+    }
+
+
+    public IEnumerator UpdateBoidNormalMovement()
+    {
+
+        while (true)
+        {
+
+            accelerationBehaviorChanges = Vector3.zero;
+
+            if (IsHeadingForCollision())
+            {
+                Vector3 collisionAvoidDir = ObstacleRays();
+                Vector3 collisionAvoidForce = SteerTowards(collisionAvoidDir) * settings.avoidCollisionWeight;
+                accelerationBehaviorChanges += collisionAvoidForce;
+            }
+
+
+            // avoid predator
+            foreach (Predator predator in availablePredators)
+            {
+                float distanceToPredator = Vector3.Distance(position, predator.getPosition());
+                if (distanceToPredator < 5f)
+                {
+                    Vector3 positionToPredator = predator.getPosition() - position;
+                    accelerationBehaviorChanges += positionToPredator * -(settings.predatorAvoidanceForce);
+
+                    predator.IAmYourBoid(this);
+
+                    if (distanceToPredator <= 1.5f)
+                    {
+                        if (predator.BoidDied(this, foodLeft))
+                        {
+                            Instantiate(prefabBlood, position, Quaternion.identity);
+                            ecoSystemManager.addKilledFish();
+                            LetMeDie();
+                        }
+                    }
+                }
+            }
+
+
+            Leader otherLeader = null;
+
+            // find leader
+            float distanceToLeader = float.MaxValue;
+            if (Leader.leaderList != null)
+            {
+                foreach (Leader l in Leader.leaderList)
+                {
+                    float tempDistance = Vector3.Distance(position, l.getPosition());
+                    if (tempDistance < distanceToLeader)
+                    {
+                        otherLeader = l;
+                        distanceToLeader = tempDistance;
+                    }
+                }
+            }
+
+
+            // if i have no leader already, use the nearest, if distance < 5
+            if (myLeader == null && distanceToLeader <= 5f)
+                JoinNewSwarm(otherLeader);
+
+            // if i have a leader but he is to far away, reset follow leader
+            if (myLeader != null && distanceToLeader > 10f)
+                LeaveActualSwarm();
+
+            // if i have a leader
+            if (myLeader != null)
+            {
+                Vector3 positionToLeader = myLeader.getPosition() - position;
+                accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
+            }
+
+            yield return new WaitForSeconds(0.25f);
+        }
+    }
+
+
+
+    private void JoinNewSwarm(Leader leader)
+    {
+        myLeader = leader;
+        leader.AddBoidToSwarm(this);
+        setColor(leader.leaderColor1, leader.leaderColor2);
+    }
+
+    private void LeaveActualSwarm()
+    {
+        setColor(originalColor1, originalColor2);
+        myLeader.RemoveBoidFromSwarm(this);
+        myLeader = null;
+    }
+
+    public void ToggleActualSwarm(Leader newLeader)
+    {
+        newLeader.AddBoidToSwarm(this);
+        myLeader.RemoveBoidFromSwarm(this);
+
+        myLeader = newLeader;
+        setColor(newLeader.leaderColor1, newLeader.leaderColor2);
     }
 
 
@@ -427,7 +398,13 @@ public class Boid : MonoBehaviour
     }
 
 
-    void setFoodNeeds()
+    public void setFoodNeeds(int newValue)
+    {
+        foodLeft = newValue;
+        foodNeeds = basicFoodNeed - foodLeft;
+    }
+
+    private void setFoodNeeds()
     {
         if (foodNeeds > basicFoodNeed)
         {
@@ -437,6 +414,20 @@ public class Boid : MonoBehaviour
         {
             foodNeeds = Mathf.Clamp(foodNeeds, 0, basicFoodNeed);
             foodLeft = basicFoodNeed - foodNeeds;
+
+            starving = (foodLeft < thresholdStarving) ? true : false;
+            hungry = (foodLeft < thresholdHungry) ? true : false;
+
+            if (!starving)
+            {
+                if (myLeader == null)
+                    setColor(originalColor1, originalColor2);
+                else
+                    setColor(myLeader.leaderColor1, myLeader.leaderColor2);
+
+                status = Status.normalSwimming;
+                foodTarget = null;
+            }
         }
     }
 
@@ -445,18 +436,16 @@ public class Boid : MonoBehaviour
     {
         if (alife)
         {
-            StopCoroutine(IncreaseFood());
+            StopCoroutine(calculateFoodBehavior);
+            StopCoroutine(updateBoidNormalMovement);
+
             alife = false;
             ecoSystemManager.addDiedFish();
-            StartDeadAnimation();
+
+            StartCoroutine(Animate());
         }
     }
 
-
-    public void StartDeadAnimation()
-    {
-        StartCoroutine(Animate());
-    }
 
     private IEnumerator Animate()
     {
@@ -478,16 +467,23 @@ public class Boid : MonoBehaviour
 
         // reset position
         gameObject.transform.position = ecoSystemManager.GetNextSpawnPoint();
-        gameObject.transform.forward = Random.insideUnitSphere;
+        gameObject.transform.forward = UnityEngine.Random.insideUnitSphere;
 
         // reset state
         ecoSystemManager.addFishToFishCount();
-        //gameObject.SetActive(true);
+
+
         alife = true;
+        status = Status.normalSwimming;
+        foodTarget = null;
+
         setColor(originalColor1, originalColor2);
         setWobbleSpeed(originalWobbleSpeed);
 
-        StartCoroutine(IncreaseFood());
+        cellGroups.CheckCell(this);
+
+        calculateFoodBehavior = StartCoroutine(CalculateFoodBehavior());
+        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
     bool IsHeadingForCollision()
@@ -498,10 +494,6 @@ public class Boid : MonoBehaviour
             Debug.DrawRay(position, forward, Color.green);
         }
 
-        // if (position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
-        // position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
-        // position.z < 5 || position.z > mapGenerator.mapSize.z - 5)
-        // {
         RaycastHit hit;
         if (Physics.SphereCast(position, settings.boundsRadius, forward, out hit, settings.collisionAvoidDst, settings.obstacleMask))
         {
@@ -509,13 +501,20 @@ public class Boid : MonoBehaviour
         }
         else { }
         return false;
-        // }
-        // return false;
     }
+
+
+    // use this to check if oppenent want to hunt a boid
+    //  check boid is allready in a swarm
+    public bool HasLeader()
+    {
+        return myLeader != null;
+    }
+
 
     Vector3 ObstacleRays()
     {
-        Vector3[] rayDirections = BoidHelper.directions;
+        float3[] rayDirections = BoidHelper.directions;
 
 
         for (int i = 0; i < rayDirections.Length; i++)
@@ -538,6 +537,7 @@ public class Boid : MonoBehaviour
 
         return forward;
     }
+
 
     Vector3 SteerTowards(Vector3 vector)
     {

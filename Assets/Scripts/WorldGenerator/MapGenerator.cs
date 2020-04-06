@@ -16,11 +16,13 @@ public class MapGenerator : MonoBehaviour
     public bool generateWalls = true;
 
 
-    [Header("Bricks")]
-    public GameObject prefabCube;
-    public GameObject prefabCylinder;
+    [Header("Rocks")]
     public int amountSzeneElements = 30;
-    public int sizeVariationBrick = 3;
+
+    [Range(0, 3f)]
+    public float sizeVariationBrick = 1.3f;
+    public GameObject[] bricks = new GameObject[2];
+
 
     [Header("Stones")]
     public GameObject[] stones = new GameObject[5];
@@ -41,6 +43,13 @@ public class MapGenerator : MonoBehaviour
     public float grassScale = 13;
     [Range(0, 1f)]
     public float growDensityGrass = 0.25f;
+
+
+    [Header("Bubbles")]
+    public GameObject prefabBubbles;
+
+    [Range(0, 0.5f)]
+    public float amountBubbles = 0.1f;
 
 
     [Header("Seaweed")]
@@ -95,6 +104,7 @@ public class MapGenerator : MonoBehaviour
     private Vector3[] verticesGround;
     private Mesh meshWater;
     private Vector3[] verticesWater;
+    public float[,] noiseMap;
 
 
 
@@ -121,7 +131,7 @@ public class MapGenerator : MonoBehaviour
         if (randomSeed)
             seed = Random.Range(0, 100000);
 
-        float[,] noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
+        noiseMap = Noise.GenerateNoiseMap(((int)mapSize.x * mapResolution), ((int)mapSize.z * mapResolution), seed, noiseScale, octaves, persistence, lacunarity, offset);
 
         ScaleUnderwaterDust();
 
@@ -168,10 +178,24 @@ public class MapGenerator : MonoBehaviour
                     go1.tag = "Enviroment";
 
                     // add gras as spawnpoint
+#if (UNITY_EDITOR)
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
+#endif
                         if (sample < 0.3f)
                             ecoSystemManager.AddSpawnPoint(go1.transform.position + new Vector3(0, 2, 0));
+#if (UNITY_EDITOR)
+                    }
+#endif
+
+                    // bubbles
+                    if (Random.value < amountBubbles)
+                    {
+                        GameObject bubble = Instantiate(prefabBubbles, new Vector3(0, 0, 0), Quaternion.identity);
+                        bubble.transform.position = new Vector3((x / (float)mapResolution), heightOffset, (y / (float)mapResolution));
+                        bubble.transform.localEulerAngles += new Vector3(-90, 0, 0);
+                        bubble.transform.parent = enviromentHolder;
+                        bubble.tag = "Enviroment";
                     }
 
                 }
@@ -187,12 +211,15 @@ public class MapGenerator : MonoBehaviour
                     go2.transform.parent = enviromentHolder;
                     go2.tag = "Enviroment";
 
-                    // add gras as spawnpoint
+                    // add seaweed as spawnpoint
+#if (UNITY_EDITOR)
                     if (UnityEditor.EditorApplication.isPlaying)
                     {
-                        ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
+#endif
+                        //ecoSystemManager.AddSpawnPoint(go2.transform.position + new Vector3(0, Random.Range(2, gs2 * 6), 0));
+#if (UNITY_EDITOR)
                     }
-
+#endif
                 }
             }
         }
@@ -230,7 +257,7 @@ public class MapGenerator : MonoBehaviour
         wall4.transform.parent = enviromentHolder;
         wall4.tag = "Enviroment";
 
-        // Bottom - Ground is the Wall
+        //Bottom - Ground is the Wall
         // Vector3 position5 = new Vector3(mapSize.x / 2, 0.5f, mapSize.z / 2);
         // GameObject wall5 = Instantiate(prefabWall, position5, Quaternion.identity);
         // wall5.transform.localScale = new Vector3(mapSize.x + 1, 1, mapSize.z + 1);
@@ -252,8 +279,8 @@ public class MapGenerator : MonoBehaviour
     {
         for (int i = 0; i < amountSzeneElements; i++)
         {
-            float elementHeight = Random.Range(3f * sizeVariationBrick, 9f * sizeVariationBrick);
-            float elementWidth = Random.Range(1f * sizeVariationBrick, 3f * sizeVariationBrick);
+            float elementHeight = Random.Range(1f * sizeVariationBrick, 2f * sizeVariationBrick);
+            float elementWidth = Random.Range(1f * sizeVariationBrick, 2f * sizeVariationBrick);
 
             int x = (int)Random.Range(paddingToMapBorder, mapSize.x - paddingToMapBorder);
             int y = (int)Random.Range(paddingToMapBorder, mapSize.z - paddingToMapBorder);
@@ -261,12 +288,13 @@ public class MapGenerator : MonoBehaviour
             float sample = noiseMap[x, y];
             float heightOffset = sample * heightScale;
 
-            Vector3 position = new Vector3(x, elementHeight / 2f, y);
-            GameObject instName = prefabCube; //(Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
+            Vector3 position = new Vector3(x, heightOffset, y);
+            // GameObject instName = prefabCube; //(Random.Range(0, 2) == 0) ? prefabCube : prefabCylinder;
+            GameObject brick = bricks[(int)Random.Range(0, bricks.Length)];
 
-            GameObject go = Instantiate(instName, position, Quaternion.identity);
+            GameObject go = Instantiate(brick, position, Quaternion.identity);
             go.transform.localScale = new Vector3(elementWidth, elementHeight, elementWidth);
-            go.transform.localEulerAngles = new Vector3(0, Random.Range(0, 90), 0);
+            go.transform.localEulerAngles = new Vector3(Random.Range(-8f, 8f), Random.Range(0f, 90f), Random.Range(-8f, 8f));
             go.transform.parent = enviromentHolder;
             go.tag = "Enviroment";
         }
@@ -461,18 +489,18 @@ public class MapGenerator : MonoBehaviour
 
     public void Cleanup()
     {
-        {
-            GameObject[] go = GameObject.FindGameObjectsWithTag("Enviroment");
-            foreach (GameObject tgo in go)
-            {
-                DestroyImmediate(tgo);
-            }
+        ecoSystemManager.ResetSpawnPoints();
 
-            if (!enviromentHolder)
-            {
-                enviromentHolder = new GameObject("Enviroment").transform;
-                enviromentHolder.tag = "Enviroment";
-            }
+        GameObject[] go = GameObject.FindGameObjectsWithTag("Enviroment");
+        foreach (GameObject tgo in go)
+        {
+            DestroyImmediate(tgo);
+        }
+
+        if (!enviromentHolder)
+        {
+            enviromentHolder = new GameObject("Enviroment").transform;
+            enviromentHolder.tag = "Enviroment";
         }
     }
 

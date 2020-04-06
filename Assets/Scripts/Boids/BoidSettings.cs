@@ -29,4 +29,7 @@ public class BoidSettings : ScriptableObject
     public float leadingForce = 4;
     public float chaisingForFoodForce = 5;
 
+    [Header("If leader exists")]
+    public float seperateWeightLeader = 5;
+
 }
