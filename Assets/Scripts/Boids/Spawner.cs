@@ -72,11 +72,10 @@ public class Spawner : MonoBehaviour
     {
 
         int count = 0;
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(12);
 
-        while (count < spawnCount)
+        while (count < spawnCount / 3)
         {
-
             Vector3 pos = Random.insideUnitSphere * spawnRadius;
             Boid boid = Instantiate(prefab, pos, Quaternion.identity);
             boid.transform.parent = fishHolder;
@@ -84,10 +83,37 @@ public class Spawner : MonoBehaviour
             boid.PassColor(color1, color2);
             boid.Initialize(settings, null);
             boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
+            count++;
+        }
 
-            //Debug.Log("Initializing Boid #:" +count);
-            yield return new WaitForSeconds(0.015f);
 
+        yield return new WaitForSeconds(30);
+        while (count < (spawnCount / 3) * 2)
+        {
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
+
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
+            count++;
+        }
+
+
+        yield return new WaitForSeconds(30);
+        while (count < spawnCount)
+        {
+            Vector3 pos = Random.insideUnitSphere * spawnRadius;
+            Boid boid = Instantiate(prefab, pos, Quaternion.identity);
+            boid.transform.parent = fishHolder;
+
+            boid.PassColor(color1, color2);
+            boid.Initialize(settings, null);
+            boid.RespawnBoid();
+            yield return new WaitForSeconds(0.02f);
             count++;
         }
 
