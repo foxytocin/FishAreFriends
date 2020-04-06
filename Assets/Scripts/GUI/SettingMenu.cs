@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class SettingMenu : MonoBehaviour
 {
-
     float offScreenOffset = 200f;
     float target;
     float position;

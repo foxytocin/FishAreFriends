@@ -13562,8 +13562,8 @@ GameObject:
   m_Component:
   - component: {fileID: 712393333}
   - component: {fileID: 712393336}
-  - component: {fileID: 712393335}
   - component: {fileID: 712393334}
+  - component: {fileID: 712393335}
   m_Layer: 5
   m_Name: bgGameEnd
   m_TagString: Untagged
