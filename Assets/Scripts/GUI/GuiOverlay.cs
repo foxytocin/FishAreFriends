@@ -27,6 +27,7 @@ public class GuiOverlay : MonoBehaviour
     private MenuScrollerRight menuScrollerRight;
     private MenuScrollerLeft menuScrollerLeft;
     private GameEndMenu gameEndMenu;
+   
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
@@ -175,6 +176,7 @@ public class GuiOverlay : MonoBehaviour
 
     public void RestartButtonClickEvent()
     {
+        Leader.resetLeaderList();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

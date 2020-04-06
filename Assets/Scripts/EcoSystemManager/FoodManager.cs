@@ -24,15 +24,6 @@ public class FoodManager : MonoBehaviour
         randomColor = new Color[] { Color.yellow }; //{ Color.red, Color.green, Color.blue, Color.yellow };
     }
 
-    void Update()
-    {
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            dropFood();
-        }
-
-    }
 
     public void dropFood()
     {

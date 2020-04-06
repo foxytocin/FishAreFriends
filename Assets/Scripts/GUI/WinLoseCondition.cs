@@ -28,14 +28,6 @@ public class WinLoseCondition : MonoBehaviour
         StartCheckingWinLoseCondition();
     }
 
-    private void Update() {
-
-        if(Input.GetKeyDown(KeyCode.T))
-            PlayerLose();
-
-        if(Input.GetKeyDown(KeyCode.Z))
-            PlayerWin();
-    }
 
     public void StartCheckingWinLoseCondition()
     {
@@ -55,9 +47,7 @@ public class WinLoseCondition : MonoBehaviour
             if (CalculateSwarmSizes.calculatedSwarmSizeList == null)
                 yield return new WaitForSeconds(30f);
 
-            print("Check win lose");
             int humanPlayerFishCount = 0;
-
 
             humanPlayerFishCount = CalculateSwarmSizes.calculatedSwarmSizeList[CalculateSwarmSizes.calculatedSwarmSizeList.Count -1].size;
             if (humanPlayerFishCount >= GlobalFishCount * 0.1)
