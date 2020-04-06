@@ -119,15 +119,23 @@ public class KeyController : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Q))
                 {
-                    speed -= 0.5f;
+                    if (speed > 0.5f)
+                        speed -= 0.5f;
                 }
                 else if (Input.GetKeyDown(KeyCode.E))
                 {
                     speed += 0.5f;
                 }
+
+                if (speed > (maxSpeed / 2))
+                    speed -= 0.5f * Time.deltaTime;
+
+                if (Input.GetButtonDown("Jump"))
+                    speed = maxSpeed * 1.5f;
+
+                //Debug.Log(speed);
             }
 
-            speed = Mathf.Clamp(speed, 0.00001f, maxSpeed);
             velocity = dir * speed;
 
             if (!isHeadingForCollision)
