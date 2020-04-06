@@ -340,7 +340,7 @@ public class Boid : MonoBehaviour
                 JoinNewSwarm(otherLeader);
 
             // if i have a leader but he is to far away, reset follow leader
-            if (myLeader != null && distanceToLeader > 15f)
+            if (myLeader != null && distanceToLeader > 10f)
                 LeaveActualSwarm();
 
             // if i have a leader
@@ -350,7 +350,7 @@ public class Boid : MonoBehaviour
                 accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.25f);
         }
     }
 

@@ -49,14 +49,12 @@ public class Leader : MonoBehaviour
         foodList = FoodManager.foodList;
     }
 
+    public static void resetLeaderList() {
+                leaderList = new List<Leader>();
+    }
 
     private void Start()
-    {
-        //if (humanPlayer && leaderList != null) {
-        //    leaderList = new List<Leader>();
-        //    leaderList.Add(this);
-        //}
-            
+    {       
         material.SetColor("_BaseColor1", leaderColor1);
         material.SetColor("_BaseColor2", leaderColor2);
         forceField.SetColor(leaderColor1);
@@ -238,7 +236,7 @@ public class Leader : MonoBehaviour
             Food foodTarget = foodList[nearestFoodIndex];
             Vector3 foodPosition = foodTarget.GetPosition();
 
-            if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 1f)
+            if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 1.5f)
             {
                 int neededFood = hungerOfSwarm - availableEnergie;
                 neededFood = (neededFood > 0) ? neededFood : 0;

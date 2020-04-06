@@ -49,7 +49,7 @@ MonoBehaviour:
   minSpeed: 2
   normalMaxSpeed: 3
   huntingMaxSpeed: 4.5
-  maxSteerForce: 2
+  maxSteerForce: 3
   avoidCollisionWeight: 5
   boundsRadius: 0.27
   collisionAvoidDst: 5

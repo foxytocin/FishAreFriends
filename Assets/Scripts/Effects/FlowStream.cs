@@ -36,17 +36,13 @@ public class FlowStream : MonoBehaviour
             flowObjectEmitter.Enqueue(new GameObjectWithTime(gameObject, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()));
         }
 
-        print(flowObjectEmitter.Count);
         StartCoroutine(disableGameObjects());
-
     }
 
 
     public void playFlowStream(Vector3 forward, Vector3 hitpoint)
     {
-
         instanciateNewFlowEmitter(leader.transform.position, forward);
-
     }
 
 
