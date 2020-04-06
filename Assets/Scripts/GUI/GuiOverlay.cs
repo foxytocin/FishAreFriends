@@ -10,6 +10,7 @@ public class GuiOverlay : MonoBehaviour
     private TextMeshProUGUI textMeshPro;
     public TextMeshProUGUI playerSwarmSize;
     public TextMeshProUGUI mainMessages;
+    public TextMeshProUGUI gameEndMessage;
     private Color mainMessagesColor;
     private Color mainMessagesColorStandard;
     private float alpha = 1f;
@@ -25,6 +26,7 @@ public class GuiOverlay : MonoBehaviour
     private CameraPosition cameraPosition;
     private MenuScrollerRight menuScrollerRight;
     private MenuScrollerLeft menuScrollerLeft;
+    private GameEndMenu gameEndMenu;
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
@@ -41,8 +43,10 @@ public class GuiOverlay : MonoBehaviour
     {
         newGame,
         inGame,
-        pausedGame
+        pausedGame,
+        gameEnd
     }
+
 
     public GameStatus gameStatus;
 
@@ -54,6 +58,7 @@ public class GuiOverlay : MonoBehaviour
         cameraPosition = FindObjectOfType<CameraPosition>();
         menuScrollerLeft = FindObjectOfType<MenuScrollerLeft>();
         menuScrollerRight = FindObjectOfType<MenuScrollerRight>();
+        gameEndMenu = FindObjectOfType<GameEndMenu>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         spawner = FindObjectOfType<Spawner>();
         settingMenu = FindObjectOfType<SettingMenu>();
@@ -82,7 +87,7 @@ public class GuiOverlay : MonoBehaviour
         }
     }
 
-    void NewGame()
+    public void NewGame()
     {
         gameStatus = GameStatus.newGame;
         Cursor.visible = true;
@@ -116,7 +121,7 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
-    void Play()
+    public void Play()
     {
         if (gameStatus == GameStatus.newGame)
             spawner.SpawnFishSwarms();
@@ -126,6 +131,7 @@ public class GuiOverlay : MonoBehaviour
         gameStatus = GameStatus.inGame;
         menuScrollerLeft.FadeOut();
         menuScrollerRight.FadeOut();
+        gameEndMenu.FadeOut();
     }
 
     void Pause()
@@ -142,12 +148,23 @@ public class GuiOverlay : MonoBehaviour
     }
 
 
+    public void GameEnd(bool winner)
+    {
+        Cursor.visible = true;
+        gameStatus = GameStatus.gameEnd;
+        gameEndMessage.text = (winner) ? "GEWONNEN" : "VERLOREN";
+
+        settingMenu.PlayBubbleSound();
+        gameEndMenu.FadeIn();
+    }
+
+
     void QuitButtonClickEvent()
     {
         Application.Quit();
     }
 
-    void RestartButtonClickEvent()
+    public void RestartButtonClickEvent()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

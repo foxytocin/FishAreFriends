@@ -1,37 +1,40 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WinLoseCondition : MonoBehaviour
 {
-    /* Description:
-     * Win condition:
-     *  - Player has more than 70% of fishes in his swarm
-     *  
-     * Lose condition:
-     *  - Player has less than 8 fishes, after he has more than 10% of fishes 
-     * 
-     */
+     private GuiOverlay guiOverlay;
+
 
     public int GlobalFishCount = 100;
 
     public void PlayerWin()
     {
         print("player win");
-        // TODO: implement player win stuff what should happen
+        guiOverlay.GameEnd(true);
     }
 
 
     public void PlayerLose()
     {
         print("player lose");
-        // TODO: implement player lose stuff what should happen
+        guiOverlay.GameEnd(false);
     }
 
 
     private void Awake()
     {
+        guiOverlay = FindObjectOfType<GuiOverlay>();
         StartCheckingWinLoseCondition();
+    }
+
+    private void Update() {
+
+        if(Input.GetKeyDown(KeyCode.T))
+            PlayerLose();
+
+        if(Input.GetKeyDown(KeyCode.Z))
+            PlayerWin();
     }
 
     public void StartCheckingWinLoseCondition()
