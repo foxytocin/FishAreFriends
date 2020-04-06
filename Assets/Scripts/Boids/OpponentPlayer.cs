@@ -106,7 +106,7 @@ public class OpponentPlayer : MonoBehaviour
                 // Debug.Log("Switched opponentBehavior to attackOtherLeader");
             }
 
-            if (avgEnergieSwarm < 500)
+            if (avgEnergieSwarm < 400)
             {
                 // Debug.Log("Opponent Player swarm is hungry");
                 opponentBehavior = OpponentBehavior.SearchForFood;
@@ -291,7 +291,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         acceleration += foodTarget.GetPosition() - position;
 
-                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 2f)
                         {
                             cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
                             foodTarget = null;
