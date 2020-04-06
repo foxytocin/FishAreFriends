@@ -236,7 +236,7 @@ public class Leader : MonoBehaviour
             Food foodTarget = foodList[nearestFoodIndex];
             Vector3 foodPosition = foodTarget.GetPosition();
 
-            if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 1f)
+            if (Vector3.Distance(transform.position, foodPosition) <= (foodTarget.transform.localScale.x / 2f) + 1.5f)
             {
                 int neededFood = hungerOfSwarm - availableEnergie;
                 neededFood = (neededFood > 0) ? neededFood : 0;
