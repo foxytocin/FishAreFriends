@@ -142,6 +142,19 @@ public class Boid : MonoBehaviour
     }
 
 
+
+    private void resetPosition()
+    {
+        if (
+            position.x < -5 || position.x > mapGenerator.mapSize.x + 5 ||
+            position.y < -5 || position.y > mapGenerator.mapSize.y + 5 ||
+            position.z < -5 || position.z > mapGenerator.mapSize.z + 5)
+        {
+            LetMeDie();
+        }
+    }
+
+
     Food foodTarget = null;
 
     private IEnumerator CalculateFoodBehavior()
@@ -158,7 +171,7 @@ public class Boid : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
 
-            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+            if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
                 foodNeeds += hungerRate;
 
 
@@ -170,6 +183,7 @@ public class Boid : MonoBehaviour
 
 
             setFoodNeeds();
+            resetPosition();
             // boid already has a food-target: swimm towards the target
             if (foodTarget != null && foodTarget.checkAmount() > 0)
             {
@@ -241,16 +255,6 @@ public class Boid : MonoBehaviour
     }
 
 
-    public bool CollisionAhead()
-    {
-        return (
-            position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
-            position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
-            position.z < 5 || position.z > mapGenerator.mapSize.z - 5
-        );
-    }
-
-
     public void UpdateBoid(Vector3 acceleration_)
     {
         accelerationNormalMoving = accelerationBehaviorChanges + accelerationFoodBehavior + acceleration_;
@@ -282,7 +286,6 @@ public class Boid : MonoBehaviour
 
         while (true)
         {
-
             accelerationBehaviorChanges = Vector3.zero;
 
             if (IsHeadingForCollision())
@@ -449,7 +452,7 @@ public class Boid : MonoBehaviour
 
     private IEnumerator Animate()
     {
-        while (transform.position.y < mapGenerator.mapSize.y * 1.3f)
+        while (transform.position.y < mapGenerator.mapSize.y + 5f)
         {
             transform.position += new Vector3(0, 1f * Time.deltaTime, 0);
             yield return new WaitForEndOfFrame();
