@@ -82,7 +82,7 @@ public class CameraPosition : MonoBehaviour
             side = true;
         }
 
-        if (!toggleView && guiOverlay.gameStatus != GuiOverlay.GameStatus.inGame && side == true)
+        if (!toggleView && guiOverlay.gameStatus != GuiOverlay.GameStatus.inGame && guiOverlay.gameStatus != GuiOverlay.GameStatus.gameEnd && side == true)
         {
             toggleView = true;
             side = false;
