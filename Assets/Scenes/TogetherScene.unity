@@ -26299,9 +26299,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Debug: 1
   resolution:
-    x: 2
+    x: 3
     y: 2
-    z: 2
+    z: 3
   widthStep: 0
   depthStep: 0
   heightStep: 0
