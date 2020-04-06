@@ -16275,7 +16275,7 @@ MonoBehaviour:
   foodLeft: 0
   feedAutomatically: 1
   ifHungerAbove: 330
-  andAvailableFoodBelow: 400000
+  andAvailableFoodBelow: 350000
 --- !u!4 &1215664452
 Transform:
   m_ObjectHideFlags: 0

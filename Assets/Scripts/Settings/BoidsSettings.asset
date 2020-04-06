@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minSpeed: 2
   maxSpeed: 4
-  perceptionRadius: 2.5
+  perceptionRadius: 3
   avoidanceRadius: 1
   maxSteerForce: 2
   alignWeight: 1.5
@@ -27,7 +27,7 @@ MonoBehaviour:
   boundsRadius: 0.27
   avoidCollisionWeight: 20
   collisionAvoidDst: 5
-  predatorAvoidanceForce: 10
+  predatorAvoidanceForce: 11
   leadingForce: 4
   chaisingForFoodForce: 5
   seperateWeightLeader: 5
