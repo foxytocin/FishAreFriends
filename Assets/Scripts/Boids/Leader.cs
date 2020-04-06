@@ -137,7 +137,7 @@ public class Leader : MonoBehaviour
     }
 
 
-    public void LateUpdate()
+    public void Update()
     {
         if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
             if (humanPlayer)
