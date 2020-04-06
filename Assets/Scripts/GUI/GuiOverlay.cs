@@ -28,6 +28,7 @@ public class GuiOverlay : MonoBehaviour
 
     private MapGenerator mapGenerator;
     private Spawner spawner;
+    private SettingMenu settingMenu;
 
     public enum MessageType
     {
@@ -55,6 +56,7 @@ public class GuiOverlay : MonoBehaviour
         menuScrollerRight = FindObjectOfType<MenuScrollerRight>();
         mapGenerator = FindObjectOfType<MapGenerator>();
         spawner = FindObjectOfType<Spawner>();
+        settingMenu = FindObjectOfType<SettingMenu>();
         mainMessagesColor = mainMessages.color;
         mainMessagesColor.a = 1f;
         mainMessagesColorStandard = mainMessages.color;
@@ -119,6 +121,7 @@ public class GuiOverlay : MonoBehaviour
         if (gameStatus == GameStatus.newGame)
             spawner.SpawnFishSwarms();
 
+        settingMenu.PlayBubbleSound();
         Cursor.visible = false;
         gameStatus = GameStatus.inGame;
         menuScrollerLeft.FadeOut();
@@ -131,6 +134,7 @@ public class GuiOverlay : MonoBehaviour
         gameStatus = GameStatus.pausedGame;
         playButtonText.text = "Fortsetzen";
 
+        settingMenu.PlayBubbleSound();
         newMapButton.gameObject.SetActive(false);
         menuScrollerLeft.FadeIn();
         menuScrollerRight.FadeIn();

@@ -7,6 +7,7 @@ public class SettingMenu : MonoBehaviour
     float offScreenOffset = 200f;
     float target;
     float position;
+    public AudioSource bubbleSound;
 
     public float speed = 0.5f;
     private RectTransform[] rectTransform;
@@ -20,6 +21,12 @@ public class SettingMenu : MonoBehaviour
         rectTransform[0].anchoredPosition = new Vector2(13, offScreenOffset);
         position = offScreenOffset;
         tutorial = FindObjectOfType<Tutorial>();
+        bubbleSound = GetComponent<AudioSource>();
+    }
+
+    public void PlayBubbleSound() {
+        if(!bubbleSound.isPlaying)
+        bubbleSound.Play();
     }
 
 
