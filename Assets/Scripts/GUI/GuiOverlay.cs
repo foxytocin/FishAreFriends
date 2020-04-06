@@ -31,6 +31,9 @@ public class GuiOverlay : MonoBehaviour
     private MapGenerator mapGenerator;
     private Spawner spawner;
     private SettingMenu settingMenu;
+    public Image gameEndBackground;
+    public Color winColor;
+    public Color loseColor;
 
     public enum MessageType
     {
@@ -153,6 +156,7 @@ public class GuiOverlay : MonoBehaviour
         Cursor.visible = true;
         gameStatus = GameStatus.gameEnd;
         gameEndMessage.text = (winner) ? "GEWONNEN" : "VERLOREN";
+        gameEndBackground.color = (winner) ? winColor : loseColor;
 
         settingMenu.PlayBubbleSound();
         gameEndMenu.FadeIn();

@@ -13619,7 +13619,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.10980392, g: 0.45882353, b: 0.59607846, a: 0.627451}
+  m_Color: {r: 0.1098039, g: 0.59607846, b: 0.14830862, a: 0.627451}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -19291,6 +19291,9 @@ MonoBehaviour:
   quitButton: {fileID: 1374970607}
   restartButton: {fileID: 643628826}
   newMapButton: {fileID: 11946476}
+  gameEndBackground: {fileID: 712393335}
+  winColor: {r: 0.10980392, g: 0.59607846, b: 0.14901961, a: 0.6313726}
+  loseColor: {r: 0.59607846, g: 0.1098039, b: 0.12560563, a: 0.6313726}
   gameStatus: 0
 --- !u!114 &1590052706
 MonoBehaviour:
