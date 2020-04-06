@@ -68,7 +68,7 @@ public class CameraPosition : MonoBehaviour
     }
 
 
-    void FixedUpdate()
+    void LateUpdate()
     {
         if (!toggleView && guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame && side == false)
         {
