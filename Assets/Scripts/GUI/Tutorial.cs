@@ -53,7 +53,7 @@ public class Tutorial : MonoBehaviour
                 case 2:
                     if (passedTime > 8)
                     {
-                        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Naehe schwimmst", 7, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Du bist ganz allein. Finde neue Freunde, indem Du in ihre Nähe schwimmst", 7, GuiOverlay.MessageType.tutorial);
                         step++;
                     }
                     break;
@@ -85,7 +85,7 @@ public class Tutorial : MonoBehaviour
                     {
                         passedTime = 0;
                         step++;
-                        guiOverlay.DisplayMainMessage("Die Zahl im Infobereich gibt an, wie gross Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Die Zahl im Infobereich gibt an wie groß Dein Schwarm ist", 5, GuiOverlay.MessageType.tutorial);
                     }
                     break;
 
@@ -95,7 +95,7 @@ public class Tutorial : MonoBehaviour
                     {
                         passedTime = 0;
                         step++;
-                        guiOverlay.DisplayMainMessage("Das Balkendiagramm zeigt das Verhaeltnis zu allen Fischen im Aquarium", 7, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Das Balkendiagramm zeigt das Verhältnis zu allen Fischen im Aquarium", 7, GuiOverlay.MessageType.tutorial);
                     }
                     break;
 
@@ -105,7 +105,7 @@ public class Tutorial : MonoBehaviour
                     {
                         passedTime = 0;
                         step++;
-                        guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt Dir, wie hungrig dein Schwarm ist", 4, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Das Fischsymbol zeigt Dir wie hungrig Dein Schwarm ist", 4, GuiOverlay.MessageType.tutorial);
                     }
                     break;
 
@@ -116,7 +116,7 @@ public class Tutorial : MonoBehaviour
                         passedTime = 0;
                         step++;
                         GameObject.Find("Spawner").GetComponent<Spawner>().SpawnOpponentPlayers();
-                        guiOverlay.DisplayMainMessage("Es sind weitere Fischschwaerme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Es sind weitere Fischschwärme aufgetaucht", 3, GuiOverlay.MessageType.tutorial);
                     }
                     break;
 
@@ -126,7 +126,7 @@ public class Tutorial : MonoBehaviour
                     {
                         passedTime = 0;
                         step++;
-                        guiOverlay.DisplayMainMessage("Im Balkendiagramm kannst Du nun deine Schwarmgroesse, mit der der Anderen vergleichen", 8, GuiOverlay.MessageType.tutorial);
+                        guiOverlay.DisplayMainMessage("Im Balkendiagramm kannst Du nun, deine Schwarmgröße, mit der der Anderen vergleichen", 8, GuiOverlay.MessageType.tutorial);
                     }
                     break;
 
