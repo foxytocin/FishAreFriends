@@ -126,8 +126,6 @@ public class Boid : MonoBehaviour
 
         cellGroups.RegisterAtCell(this);
         cellGroups.CheckCell(this);
-
-        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
 
@@ -368,7 +366,9 @@ public class Boid : MonoBehaviour
 
     private void LeaveActualSwarm()
     {
-        setColor(originalColor1, originalColor2);
+        if(status != Status.died)
+            setColor(originalColor1, originalColor2);
+
         myLeader.RemoveBoidFromSwarm(this);
         myLeader = null;
     }
@@ -444,6 +444,9 @@ public class Boid : MonoBehaviour
 
             alife = false;
             ecoSystemManager.addDiedFish();
+
+            if (myLeader != null)
+                LeaveActualSwarm();
 
             StartCoroutine(Animate());
         }
