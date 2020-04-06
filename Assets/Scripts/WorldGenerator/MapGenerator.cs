@@ -466,7 +466,7 @@ public class MapGenerator : MonoBehaviour
         meshWater.RecalculateNormals();
 
         proceduralWater.transform.Rotate(180, 0, 0, Space.Self);
-        proceduralWater.transform.position = new Vector3(0, mapSize.y + 3, mapSize.z);
+        proceduralWater.transform.position = new Vector3(0, mapSize.y, mapSize.z);
     }
 
 
