@@ -56,7 +56,6 @@ public class CameraPosition : MonoBehaviour
         myCamera.farClipPlane = 1000;
         SwitchFieldOfViewToTop(true);
         totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
-        // DisablePostEffects(true);
         SwitchFogDensityToTop(true);
         topStatsScroller.FadeOutTopStats();
         musicMenu.StartMenuMusic();
@@ -68,8 +67,7 @@ public class CameraPosition : MonoBehaviour
         centerOfTank = mapGenerator.mapSize / 2;
         centerOfTank += new Vector3(0, -(mapGenerator.mapSize.y / 2), 0) + new Vector3(0, (float)mapGenerator.heightScale, 0);
         lookAtCenterOfTank = centerOfTank + new Vector3(0, 0, 20);
-        originalFogDensity = RenderSettings.fogDensity;
-        originalFieldOfView = myCamera.fieldOfView;
+        originalFogDensity = 0.025f;
         startPosition = transform.position.y;
     }
 
@@ -100,7 +98,6 @@ public class CameraPosition : MonoBehaviour
             startPosition = transform.position.y;
             targetPosition = Top_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - targetPosition.position.y);
-            // DisablePostEffects(true);
             SwitchFogDensityToTop(true);
             topStatsScroller.FadeOutTopStats();
             musicMenu.StartMenuMusic();
@@ -115,7 +112,6 @@ public class CameraPosition : MonoBehaviour
             lookAtLeader = target.position;
             targetPosition = Side_View;
             totalDistanceToTarget = Mathf.Abs(transform.position.y - lookAtLeader.y);
-            // DisablePostEffects(false);
             SwitchFogDensityToTop(false);
             setClippingPlane = StartCoroutine(SetClippingPlane());
             topStatsScroller.FadeInTopStats();
@@ -223,37 +219,4 @@ public class CameraPosition : MonoBehaviour
         yield return new WaitForSeconds(5);
         myCamera.farClipPlane = 300;
     }
-
-
-    private IEnumerator AnimateFieldOfView()
-    {
-        while (myCamera.fieldOfView != targetFieldOfView)
-        {
-            myCamera.fieldOfView = Mathf.Lerp(myCamera.fieldOfView, targetFieldOfView, 0.3f * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-
-
-    private void DisablePostEffects(bool top)
-    {
-        DepthOfField tempDof;
-
-        if (volume.profile.TryGet<DepthOfField>(out tempDof))
-        {
-            depthOfField = tempDof;
-        }
-
-        if (top)
-        {
-            depthOfField.focusDistance.value = 42f;
-            depthOfField.active = false;
-        }
-        else
-        {
-            depthOfField.active = true;
-        }
-    }
-
 }
