@@ -131,10 +131,15 @@ public class GuiOverlay : MonoBehaviour
 
         settingMenu.PlayBubbleSound();
         Cursor.visible = false;
+        
+        if (gameStatus != GameStatus.gameEnd) {
+            menuScrollerLeft.FadeOut();
+            menuScrollerRight.FadeOut();
+        } else if (gameStatus == GameStatus.gameEnd) {
+            gameEndMenu.FadeOut();
+        }
+        
         gameStatus = GameStatus.inGame;
-        menuScrollerLeft.FadeOut();
-        menuScrollerRight.FadeOut();
-        gameEndMenu.FadeOut();
     }
 
     void Pause()
