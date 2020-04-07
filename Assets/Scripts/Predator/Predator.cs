@@ -42,7 +42,7 @@ public class Predator : MonoBehaviour
 
     // Debug
     bool showDebug = false;
-
+    private MapGenerator mapGenerator;
 
     void Awake()
     {
@@ -53,6 +53,7 @@ public class Predator : MonoBehaviour
         maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
         cachedTransform = transform;
         material = new Material[3];
@@ -113,10 +114,24 @@ public class Predator : MonoBehaviour
         return true;
     }
 
+    private void resetPosition()
+    {
+        if (
+            position.x < -5 || position.x > mapGenerator.mapSize.x + 5 ||
+            position.y < -5 || position.y > mapGenerator.mapSize.y + 5 ||
+            position.z < -5 || position.z > mapGenerator.mapSize.z + 5)
+        {
+            transform.position = ecoSystemManager.GetNextSpawnPoint();
+            cachedTransform = transform;
+            position = cachedTransform.position;
+        }
+    }
+
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
+        resetPosition();
         ecoSystemManager.setFoodDemandPredator(foodNeeds);
 
         Vector3 acceleration = Vector3.zero;
