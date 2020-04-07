@@ -310,7 +310,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         acceleration += foodTarget.GetPosition() - position;
 
-                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 3f)
+                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 1.75f)
                         {
                             cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
                             foodTarget = null;
