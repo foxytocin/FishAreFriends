@@ -232,7 +232,7 @@ public class Boid : MonoBehaviour
             if (status == Status.swimmsToFood)
             {
 
-                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 1f)
                 {
                     foodNeeds -= foodTarget.getFood(foodNeeds);
                     setFoodNeeds();
