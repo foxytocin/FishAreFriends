@@ -79,14 +79,14 @@ LODGroup:
   m_LocalReferencePoint: {x: -0.0005001202, y: 0.021527395, z: -0.21702856}
   m_Size: 1.0186039
   m_FadeMode: 0
-  m_AnimateCrossFading: 0
+  m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
   - screenRelativeHeight: 0.14752579
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4086698907418593471}
-  - screenRelativeHeight: 0.045926258
+  - screenRelativeHeight: 0.025806842
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4086698909178370420}
@@ -174,7 +174,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: b11b1234b15824fc9b343d9ca61957c7,
         type: 3}
       propertyPath: m_ScaleInLightmap
-      value: 0.21353191
+      value: 0.025806842
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: b11b1234b15824fc9b343d9ca61957c7,
         type: 3}
@@ -295,7 +295,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: c870c02e43b5a40839a00bf7f10edcac,
         type: 3}
       propertyPath: m_ScaleInLightmap
-      value: 0.31673643
+      value: 0.14752579
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: c870c02e43b5a40839a00bf7f10edcac,
         type: 3}
@@ -522,7 +522,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: 6202c294f1bb74b58be40c180ec9a984,
         type: 3}
       propertyPath: m_ScaleInLightmap
-      value: 0.119982004
+      value: 0.0149977505
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: 6202c294f1bb74b58be40c180ec9a984,
         type: 3}

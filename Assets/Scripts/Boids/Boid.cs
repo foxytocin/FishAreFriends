@@ -270,12 +270,12 @@ public class Boid : MonoBehaviour
         forward = dir;
 
         float ws = material[0].GetFloat("_WobbleSpeed");
-        if (ws != speed && speed > 0)
+        if (ws != speed && speed > settings.minSpeed)
         {
             ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
         }
 
-        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 8f));
     }
 
 
@@ -351,7 +351,7 @@ public class Boid : MonoBehaviour
                 accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
             }
 
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
 
