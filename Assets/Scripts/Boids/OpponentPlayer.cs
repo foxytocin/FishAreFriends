@@ -56,6 +56,8 @@ public class OpponentPlayer : MonoBehaviour
 
     // gui
     GuiOverlay guiOverlay;
+    private MapGenerator mapGenerator;
+    private EcoSystemManager ecoSystemManager;
 
     void Awake()
     {
@@ -65,6 +67,8 @@ public class OpponentPlayer : MonoBehaviour
         material = gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material;
         opponentBehavior = OpponentBehavior.SearchForBoids;
         myLeaderScript = gameObject.GetComponent<Leader>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
+        ecoSystemManager = FindObjectOfType<EcoSystemManager>();
         timeToStayNextToAttackedLeader = 0f;
         timeToRehunt = 0;
     }
@@ -83,9 +87,24 @@ public class OpponentPlayer : MonoBehaviour
         StartCoroutine(CalculateFoodBehavior());
     }
 
+
+    private void resetPosition()
+    {
+        if (
+            position.x < -5 || position.x > mapGenerator.mapSize.x + 5 ||
+            position.y < -5 || position.y > mapGenerator.mapSize.y + 5 ||
+            position.z < -5 || position.z > mapGenerator.mapSize.z + 5)
+        {
+            transform.position = ecoSystemManager.GetNextSpawnPoint();
+            cachedTransform = transform;
+            position = cachedTransform.position;
+        }
+    }
+
     void Update()
     {
-        if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame) {
+        if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+        {
             // just for debuging
             if (debug && Input.GetKeyDown(KeyCode.U))
                 opponentBehavior = OpponentBehavior.SearchForBoids;
@@ -291,7 +310,7 @@ public class OpponentPlayer : MonoBehaviour
                     {
                         acceleration += foodTarget.GetPosition() - position;
 
-                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 2f)
+                        if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 1.75f)
                         {
                             cachedFoodInLeader = foodTarget.getFood(hungerOfSwarm);
                             foodTarget = null;
@@ -355,11 +374,9 @@ public class OpponentPlayer : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(2f);
-
+            resetPosition();
             CalculateSwarmFoodNeeds();
         }
-
-
     }
 
 

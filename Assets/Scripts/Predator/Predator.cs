@@ -42,7 +42,7 @@ public class Predator : MonoBehaviour
 
     // Debug
     bool showDebug = false;
-
+    private MapGenerator mapGenerator;
 
     void Awake()
     {
@@ -53,6 +53,7 @@ public class Predator : MonoBehaviour
         maxSpeed = normalMaxSpeed;
         obstacleMask = LayerMask.GetMask("Wall", "Obstacle");
         ecoSystemManager = FindObjectOfType<EcoSystemManager>();
+        mapGenerator = FindObjectOfType<MapGenerator>();
         guiOverlay = FindObjectOfType<GuiOverlay>();
         cachedTransform = transform;
         material = new Material[3];
@@ -113,10 +114,24 @@ public class Predator : MonoBehaviour
         return true;
     }
 
+    private void resetPosition()
+    {
+        if (
+            position.x < -5 || position.x > mapGenerator.mapSize.x + 5 ||
+            position.y < -5 || position.y > mapGenerator.mapSize.y + 5 ||
+            position.z < -5 || position.z > mapGenerator.mapSize.z + 5)
+        {
+            transform.position = ecoSystemManager.GetNextSpawnPoint();
+            cachedTransform = transform;
+            position = cachedTransform.position;
+        }
+    }
+
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
+        resetPosition();
         ecoSystemManager.setFoodDemandPredator(foodNeeds);
 
         Vector3 acceleration = Vector3.zero;
@@ -151,7 +166,7 @@ public class Predator : MonoBehaviour
                 boidToHunt = leaderToAttack.GetSwarmList()[0];
                 if ((foodNeeds < 200 || isHunting) && leaderToAttack.LeaderIsHumanPlayer())
                 {
-                    guiOverlay.DisplayMainMessage("Achtung! Der Hai hat deinen Schwarm im Visier.", 4, GuiOverlay.MessageType.warning);
+                    guiOverlay.DisplayMainMessage("Achtung! Der Hai hat Deinen Schwarm im Visier", 4, GuiOverlay.MessageType.warning);
                 }
 
             }
@@ -264,7 +279,7 @@ public class Predator : MonoBehaviour
 
         if (isHunting)
         {
-            guiOverlay.DisplayMainMessage("Der Hai ist auf der Jagt", 3, GuiOverlay.MessageType.warning);
+            guiOverlay.DisplayMainMessage("Der Hai ist auf der Jagd", 3, GuiOverlay.MessageType.warning);
         }
         else
         {

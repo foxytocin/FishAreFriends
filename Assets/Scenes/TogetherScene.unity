@@ -14359,7 +14359,7 @@ MonoBehaviour:
     type: 3}
   thresholdGrass: 0.38
   grassScale: 14
-  growDensityGrass: 0.2
+  growDensityGrass: 0.21
   prefabBubbles: {fileID: 7635260387978980181, guid: 29bb6a8612fda4704a40ae979c1465d0,
     type: 3}
   amountBubbles: 0.01
@@ -16275,7 +16275,7 @@ MonoBehaviour:
   foodLeft: 0
   feedAutomatically: 1
   ifHungerAbove: 330
-  andAvailableFoodBelow: 400000
+  andAvailableFoodBelow: 350000
 --- !u!4 &1215664452
 Transform:
   m_ObjectHideFlags: 0

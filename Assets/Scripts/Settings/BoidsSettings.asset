@@ -27,7 +27,7 @@ MonoBehaviour:
   boundsRadius: 0.27
   avoidCollisionWeight: 20
   collisionAvoidDst: 5
-  predatorAvoidanceForce: 12
+  predatorAvoidanceForce: 11
   leadingForce: 4
   chaisingForFoodForce: 5
   seperateWeightLeader: 5

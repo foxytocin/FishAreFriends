@@ -126,8 +126,6 @@ public class Boid : MonoBehaviour
 
         cellGroups.RegisterAtCell(this);
         cellGroups.CheckCell(this);
-
-        updateBoidNormalMovement = StartCoroutine(UpdateBoidNormalMovement());
     }
 
 
@@ -138,6 +136,19 @@ public class Boid : MonoBehaviour
             originalColor1 = col1;
             originalColor2 = col2;
             setColor(originalColor1, originalColor2);
+        }
+    }
+
+
+
+    private void resetPosition()
+    {
+        if (
+            position.x < -5 || position.x > mapGenerator.mapSize.x + 5 ||
+            position.y < -5 || position.y > mapGenerator.mapSize.y + 5 ||
+            position.z < -5 || position.z > mapGenerator.mapSize.z + 5)
+        {
+            LetMeDie();
         }
     }
 
@@ -158,7 +169,7 @@ public class Boid : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
 
-            if(guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
+            if (guiOverlay.gameStatus == GuiOverlay.GameStatus.inGame)
                 foodNeeds += hungerRate;
 
 
@@ -170,6 +181,7 @@ public class Boid : MonoBehaviour
 
 
             setFoodNeeds();
+            resetPosition();
             // boid already has a food-target: swimm towards the target
             if (foodTarget != null && foodTarget.checkAmount() > 0)
             {
@@ -220,7 +232,7 @@ public class Boid : MonoBehaviour
             if (status == Status.swimmsToFood)
             {
 
-                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 0.5f)
+                if (Vector3.Distance(transform.position, foodTarget.GetPosition()) <= (foodTarget.transform.localScale.x / 2f) + 1f)
                 {
                     foodNeeds -= foodTarget.getFood(foodNeeds);
                     setFoodNeeds();
@@ -241,16 +253,6 @@ public class Boid : MonoBehaviour
     }
 
 
-    public bool CollisionAhead()
-    {
-        return (
-            position.x < 5 || position.x > mapGenerator.mapSize.x - 5 ||
-            position.y < 5 || position.y > mapGenerator.mapSize.y - 5 ||
-            position.z < 5 || position.z > mapGenerator.mapSize.z - 5
-        );
-    }
-
-
     public void UpdateBoid(Vector3 acceleration_)
     {
         accelerationNormalMoving = accelerationBehaviorChanges + accelerationFoodBehavior + acceleration_;
@@ -268,12 +270,12 @@ public class Boid : MonoBehaviour
         forward = dir;
 
         float ws = material[0].GetFloat("_WobbleSpeed");
-        if (ws != speed && speed > 0)
+        if (ws != speed && speed > settings.minSpeed)
         {
             ws = Mathf.Lerp(ws, speed, 0.1f * Time.deltaTime);
         }
 
-        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 10f));
+        setWobbleSpeed(Mathf.Clamp(ws, 0.2f, 8f));
     }
 
 
@@ -282,7 +284,6 @@ public class Boid : MonoBehaviour
 
         while (true)
         {
-
             accelerationBehaviorChanges = Vector3.zero;
 
             if (IsHeadingForCollision())
@@ -350,7 +351,7 @@ public class Boid : MonoBehaviour
                 accelerationBehaviorChanges += positionToLeader * settings.leadingForce;
             }
 
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
 
@@ -365,7 +366,9 @@ public class Boid : MonoBehaviour
 
     private void LeaveActualSwarm()
     {
-        setColor(originalColor1, originalColor2);
+        if(status != Status.died)
+            setColor(originalColor1, originalColor2);
+
         myLeader.RemoveBoidFromSwarm(this);
         myLeader = null;
     }
@@ -442,6 +445,9 @@ public class Boid : MonoBehaviour
             alife = false;
             ecoSystemManager.addDiedFish();
 
+            if (myLeader != null)
+                LeaveActualSwarm();
+
             StartCoroutine(Animate());
         }
     }
@@ -449,7 +455,7 @@ public class Boid : MonoBehaviour
 
     private IEnumerator Animate()
     {
-        while (transform.position.y < mapGenerator.mapSize.y * 1.3f)
+        while (transform.position.y < mapGenerator.mapSize.y + 5f)
         {
             transform.position += new Vector3(0, 1f * Time.deltaTime, 0);
             yield return new WaitForEndOfFrame();

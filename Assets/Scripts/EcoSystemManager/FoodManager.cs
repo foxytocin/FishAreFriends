@@ -32,7 +32,7 @@ public class FoodManager : MonoBehaviour
         audioSource.Play();
 
         float x = Random.Range(spawnOffset.x, mapSize.x - spawnOffset.x);
-        float y = Random.Range(mapSize.y * 0.7f + spawnOffset.y, mapSize.y + 5f);
+        float y = Random.Range(mapSize.y * 0.7f + spawnOffset.y, mapSize.y - 2f);
         float z = Random.Range(spawnOffset.z, mapSize.z - spawnOffset.z);
         spawnPoint = new Vector3(x, y, z);
 
